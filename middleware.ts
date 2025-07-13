@@ -1,27 +1,27 @@
-import { updateSession } from "@/lib/supabase/middleware";
-import { 
-  getProfileFromRequest, 
-  createUnauthorizedResponse, 
+import { updateSession } from '@/lib/supabase/middleware';
+import {
+  getProfileFromRequest,
+  createUnauthorizedResponse,
   createForbiddenResponse,
   isAdminRoute,
   isProtectedRoute,
-  requiresApproval
-} from "@/lib/auth/middleware-utils";
-import { type NextRequest } from "next/server";
-import { NextResponse } from "next/server";
-import { hasEnvVars } from "@/lib/utils";
+  requiresApproval,
+} from '@/lib/auth/middleware-utils';
+import { type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import { hasEnvVars } from '@/lib/utils';
 
 export async function middleware(request: NextRequest) {
   // First, update the session
   const response = await updateSession(request);
-  
+
   // If env vars are not set, skip role-based checks
   if (!hasEnvVars) {
     return response;
   }
 
   const { pathname } = request.nextUrl;
-  
+
   // Skip middleware for auth routes, static files, and API routes
   if (
     pathname.startsWith('/auth') ||
@@ -39,28 +39,28 @@ export async function middleware(request: NextRequest) {
     if (!profile) {
       return createUnauthorizedResponse(request, 'Authentication required');
     }
-    
+
     if (profile.status === 'rejected') {
       return createForbiddenResponse(request, 'Account access denied');
     }
-    
+
     if (profile.status === 'pending') {
       return createForbiddenResponse(request, 'Account pending approval');
     }
-    
+
     // Redirect to role-appropriate dashboard
     const url = request.nextUrl.clone();
-    url.pathname = profile.role === 'admin' ? '/admin' : '/app/chat';
+    url.pathname = profile.role === 'admin' ? '/admin' : '/employee/chat';
     return NextResponse.redirect(url);
   }
 
   // Handle protected route groups
   const isAdminPath = pathname.startsWith('/admin');
-  const isAppPath = pathname.startsWith('/app');
-  
+  const isAppPath = pathname.startsWith('/employee');
+
   if (isAdminPath || isAppPath) {
     const profile = await getProfileFromRequest(request);
-    
+
     // No profile means user is not authenticated
     if (!profile) {
       return createUnauthorizedResponse(request, 'Authentication required');
@@ -102,6 +102,6 @@ export const config = {
      * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
