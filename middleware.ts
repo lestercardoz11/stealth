@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
     pathname === '/' ||
-    pathname === '/access-denied'
+    pathname === '/auth/access-denied'
   ) {
     return response;
   }

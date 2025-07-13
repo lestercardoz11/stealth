@@ -1,6 +1,6 @@
-import { createServerClient } from "@supabase/ssr";
-import { NextRequest, NextResponse } from "next/server";
-import { UserRole, UserStatus } from "@/lib/types/database";
+import { createServerClient } from '@supabase/ssr';
+import { NextRequest, NextResponse } from 'next/server';
+import { UserRole, UserStatus } from '@/lib/types/database';
 
 export interface MiddlewareProfile {
   id: string;
@@ -8,7 +8,9 @@ export interface MiddlewareProfile {
   status: UserStatus;
 }
 
-export async function getProfileFromRequest(request: NextRequest): Promise<MiddlewareProfile | null> {
+export async function getProfileFromRequest(
+  request: NextRequest
+): Promise<MiddlewareProfile | null> {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -24,7 +26,10 @@ export async function getProfileFromRequest(request: NextRequest): Promise<Middl
     }
   );
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
   if (authError || !user) return null;
 
   const { data: profile, error } = await supabase
@@ -37,16 +42,22 @@ export async function getProfileFromRequest(request: NextRequest): Promise<Middl
   return profile;
 }
 
-export function createUnauthorizedResponse(request: NextRequest, reason: string = 'Unauthorized'): NextResponse {
+export function createUnauthorizedResponse(
+  request: NextRequest,
+  reason: string = 'Unauthorized'
+): NextResponse {
   const url = request.nextUrl.clone();
   url.pathname = '/auth/login';
   url.searchParams.set('error', reason);
   return NextResponse.redirect(url);
 }
 
-export function createForbiddenResponse(request: NextRequest, reason: string = 'Access denied'): NextResponse {
+export function createForbiddenResponse(
+  request: NextRequest,
+  reason: string = 'Access denied'
+): NextResponse {
   const url = request.nextUrl.clone();
-  url.pathname = '/access-denied';
+  url.pathname = '/auth/access-denied';
   url.searchParams.set('reason', reason);
   return NextResponse.redirect(url);
 }
@@ -62,10 +73,10 @@ export function isProtectedRoute(pathname: string): boolean {
     '/conversations',
     '/chat',
     '/admin',
-    '/profile'
+    '/profile',
   ];
-  
-  return protectedPaths.some(path => pathname.startsWith(path));
+
+  return protectedPaths.some((path) => pathname.startsWith(path));
 }
 
 export function requiresApproval(pathname: string): boolean {
@@ -73,8 +84,8 @@ export function requiresApproval(pathname: string): boolean {
     '/dashboard',
     '/documents',
     '/conversations',
-    '/chat'
+    '/chat',
   ];
-  
-  return approvalRequiredPaths.some(path => pathname.startsWith(path));
+
+  return approvalRequiredPaths.some((path) => pathname.startsWith(path));
 }

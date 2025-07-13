@@ -9,11 +9,11 @@ export async function redirectBasedOnRole() {
   }
 
   if (profile.status === 'rejected') {
-    redirect('/access-denied?reason=Account access denied');
+    redirect('/auth/access-denied?reason=Account access denied');
   }
 
   if (profile.status === 'pending') {
-    redirect('/access-denied?reason=Account pending approval');
+    redirect('/auth/access-denied?reason=Account pending approval');
   }
 
   // Redirect based on role
