@@ -7,7 +7,7 @@ import Link from "next/link";
 import { getCurrentUserProfile } from "@/lib/auth/roles";
 import { redirect } from "next/navigation";
 
-export default function ProtectedLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;

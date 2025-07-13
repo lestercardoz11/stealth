@@ -7,7 +7,7 @@ import Link from "next/link";
 import { getCurrentUserProfile } from "@/lib/auth/roles";
 import { redirect } from "next/navigation";
 
-export default function ProtectedLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -16,6 +16,10 @@ export default function ProtectedLayout({
   
   if (!profile) {
     redirect("/auth/login");
+  }
+
+  if (profile.role !== 'admin' || profile.status !== 'approved') {
+    redirect("/access-denied?reason=Admin access required");
   }
 
   return (
