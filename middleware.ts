@@ -33,8 +33,32 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // Check if route requires authentication
-  if (isProtectedRoute(pathname)) {
+  // Handle dashboard redirect - redirect to role-appropriate route
+  if (pathname === '/dashboard') {
+    const profile = await getProfileFromRequest(request);
+    if (!profile) {
+      return createUnauthorizedResponse(request, 'Authentication required');
+    }
+    
+    if (profile.status === 'rejected') {
+      return createForbiddenResponse(request, 'Account access denied');
+    }
+    
+    if (profile.status === 'pending') {
+      return createForbiddenResponse(request, 'Account pending approval');
+    }
+    
+    // Redirect to role-appropriate dashboard
+    const url = request.nextUrl.clone();
+    url.pathname = profile.role === 'admin' ? '/admin' : '/app/chat';
+    return NextResponse.redirect(url);
+  }
+
+  // Handle protected route groups
+  const isAdminPath = pathname.startsWith('/admin');
+  const isAppPath = pathname.startsWith('/app');
+  
+  if (isAdminPath || isAppPath) {
     const profile = await getProfileFromRequest(request);
     
     // No profile means user is not authenticated
@@ -42,21 +66,26 @@ export async function middleware(request: NextRequest) {
       return createUnauthorizedResponse(request, 'Authentication required');
     }
 
-    // Check if user is pending approval for routes that require approval
-    if (requiresApproval(pathname) && profile.status === 'pending') {
-      return createForbiddenResponse(request, 'Account pending approval');
-    }
-
     // Check if user is rejected
     if (profile.status === 'rejected') {
       return createForbiddenResponse(request, 'Account access denied');
     }
 
+    // Check if user is pending approval
+    if (profile.status === 'pending') {
+      return createForbiddenResponse(request, 'Account pending approval');
+    }
+
     // Check admin routes
-    if (isAdminRoute(pathname)) {
-      if (profile.role !== 'admin' || profile.status !== 'approved') {
-        return createForbiddenResponse(request, 'Admin access required');
-      }
+    if (isAdminPath && profile.role !== 'admin') {
+      return createForbiddenResponse(request, 'Admin access required');
+    }
+
+    // Check employee routes (redirect admin to admin area)
+    if (isAppPath && profile.role === 'admin') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/admin';
+      return NextResponse.redirect(url);
     }
   }
 
