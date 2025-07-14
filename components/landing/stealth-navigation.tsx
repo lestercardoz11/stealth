@@ -69,12 +69,12 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
       ];
     } else {
       return [
-        { icon: MessageSquare, label: 'AI Chat', href: '/app/chat' },
-        { icon: FileText, label: 'My Documents', href: '/app/documents' },
+        { icon: MessageSquare, label: 'AI Chat', href: '/employee/chat' },
+        { icon: FileText, label: 'My Documents', href: '/employee/documents' },
         {
           icon: FileText,
           label: 'Company Docs',
-          href: '/app/company-documents',
+          href: '/employee/company-documents',
         },
       ];
     }
