@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import {
   User,
   Settings,
@@ -22,11 +21,10 @@ import {
   FileText,
   Users,
   BarChart3,
-  ChevronDown,
   Menu,
   X,
 } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { User as SuperbaseUser } from '@supabase/supabase-js';
 import { Profile } from '@/lib/types/database';
@@ -57,33 +55,6 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
         .slice(0, 2);
     }
     return email?.slice(0, 2).toUpperCase() || 'U';
-  };
-
-  const getStatusBadge = () => {
-    if (!profile) return null;
-
-    switch (profile.status) {
-      case 'approved':
-        return (
-          <Badge variant='default' className='bg-green-500 text-xs ml-2'>
-            Active
-          </Badge>
-        );
-      case 'pending':
-        return (
-          <Badge variant='secondary' className='text-xs ml-2'>
-            Pending
-          </Badge>
-        );
-      case 'rejected':
-        return (
-          <Badge variant='destructive' className='text-xs ml-2'>
-            Rejected
-          </Badge>
-        );
-      default:
-        return null;
-    }
   };
 
   const getQuickActions = () => {
@@ -130,28 +101,12 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
             {user && profile ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    className='relative h-10 w-auto px-3 text-white hover:bg-gray-800'>
-                    <div className='flex items-center space-x-3'>
-                      <Avatar className='h-8 w-8'>
-                        <AvatarFallback className='bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm'>
-                          {getInitials(profile.full_name, profile.email)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className='hidden md:flex flex-col items-start'>
-                        <span className='text-sm font-medium'>
-                          {profile.full_name || profile.email}
-                        </span>
-                        <div className='flex items-center'>
-                          <span className='text-xs text-gray-400 capitalize'>
-                            {profile.role}
-                          </span>
-                          {getStatusBadge()}
-                        </div>
-                      </div>
-                      <ChevronDown className='h-4 w-4 text-gray-400' />
-                    </div>
+                  <Button className='relative h-10 w-auto text-white bg-transparent hover:bg-transparent'>
+                    <Avatar className='h-8 w-8'>
+                      <AvatarFallback className='bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm'>
+                        {getInitials(profile.full_name, profile.email)}
+                      </AvatarFallback>
+                    </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
@@ -166,12 +121,6 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
                       <p className='text-xs leading-none text-gray-400'>
                         {profile.email}
                       </p>
-                      <div className='flex items-center pt-1'>
-                        <span className='text-xs text-gray-400 capitalize'>
-                          {profile.role}
-                        </span>
-                        {getStatusBadge()}
-                      </div>
                     </div>
                   </DropdownMenuLabel>
 
@@ -218,7 +167,7 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
                 <Button
                   variant='ghost'
                   asChild
-                  className='text-white hover:bg-gray-800'>
+                  className='text-white hover:text-white hover:bg-gray-800'>
                   <Link href='/auth/login'>Sign In</Link>
                 </Button>
                 <Button

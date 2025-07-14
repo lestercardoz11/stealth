@@ -1,14 +1,17 @@
-import { createClient } from "@/lib/supabase/server";
-import { createClient as createBrowserClient } from "@/lib/supabase/client";
-import { UserRole, UserStatus, Profile } from "@/lib/types/database";
+import { createClient } from '@/utils/supabase/server';
+import { createClient as createBrowserClient } from '@/utils/supabase/client';
+import { UserRole, UserStatus, Profile } from '@/lib/types/database';
 
 /**
  * Server-side role checking utilities
  */
 export async function getCurrentUserProfile(): Promise<Profile | null> {
-  const supabase = createClient();
-  
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
   if (authError || !user) return null;
 
   const { data: profile, error } = await supabase
@@ -57,8 +60,11 @@ export async function requireApprovedUser(): Promise<Profile> {
  */
 export async function getCurrentUserProfileClient(): Promise<Profile | null> {
   const supabase = createBrowserClient();
-  
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
   if (authError || !user) return null;
 
   const { data: profile, error } = await supabase
@@ -89,11 +95,14 @@ export async function hasRoleClient(role: UserRole): Promise<boolean> {
 /**
  * Admin utilities for managing users
  */
-export async function updateUserRole(userId: string, role: UserRole): Promise<void> {
+export async function updateUserRole(
+  userId: string,
+  role: UserRole
+): Promise<void> {
   await requireAdmin(); // Ensure current user is admin
-  
+
   const supabase = createClient();
-  const { error } = await supabase
+  const { error } = await (await supabase)
     .from('profiles')
     .update({ role })
     .eq('id', userId);
@@ -101,11 +110,14 @@ export async function updateUserRole(userId: string, role: UserRole): Promise<vo
   if (error) throw error;
 }
 
-export async function updateUserStatus(userId: string, status: UserStatus): Promise<void> {
+export async function updateUserStatus(
+  userId: string,
+  status: UserStatus
+): Promise<void> {
   await requireAdmin(); // Ensure current user is admin
-  
+
   const supabase = createClient();
-  const { error } = await supabase
+  const { error } = await (await supabase)
     .from('profiles')
     .update({ status })
     .eq('id', userId);
@@ -115,9 +127,9 @@ export async function updateUserStatus(userId: string, status: UserStatus): Prom
 
 export async function getAllUsers(): Promise<Profile[]> {
   await requireAdmin(); // Ensure current user is admin
-  
+
   const supabase = createClient();
-  const { data, error } = await supabase
+  const { data, error } = await (await supabase)
     .from('profiles')
     .select('*')
     .order('created_at', { ascending: false });
@@ -128,9 +140,9 @@ export async function getAllUsers(): Promise<Profile[]> {
 
 export async function getPendingUsers(): Promise<Profile[]> {
   await requireAdmin(); // Ensure current user is admin
-  
+
   const supabase = createClient();
-  const { data, error } = await supabase
+  const { data, error } = await (await supabase)
     .from('profiles')
     .select('*')
     .eq('status', 'pending')

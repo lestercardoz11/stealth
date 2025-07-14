@@ -60,7 +60,7 @@ export function Sidebar({ profile }: SidebarProps) {
           title: 'Pending Approvals',
           href: '/admin/users/pending',
           icon: UserCheck,
-          badge: '3', // This would be dynamic
+          // badge: '3', // This would be dynamic
         },
         {
           title: 'All Users',
@@ -226,16 +226,18 @@ export function Sidebar({ profile }: SidebarProps) {
   const sidebarContent = (
     <div className='flex flex-col h-full'>
       {/* Logo */}
-      <div
-        className={cn(
-          'flex items-center gap-3 p-6 border-b',
-          isCollapsed && 'justify-center px-3'
-        )}>
-        <div className='w-8 h-8 bg-primary rounded-lg flex items-center justify-center'>
-          <span className='text-primary-foreground font-bold text-sm'>S</span>
+      <Link href='/'>
+        <div
+          className={cn(
+            'h-16 flex items-center gap-3 py-2 px-6 border-b',
+            isCollapsed && 'justify-center px-3'
+          )}>
+          <div className='w-8 h-8 bg-primary rounded-lg flex items-center justify-center'>
+            <span className='text-primary-foreground font-bold text-sm'>S</span>
+          </div>
+          {!isCollapsed && <span className='font-bold text-xl'>Stealth</span>}
         </div>
-        {!isCollapsed && <span className='font-bold text-xl'>Stealth</span>}
-      </div>
+      </Link>
 
       {/* Navigation */}
       <nav className='flex-1 p-4 space-y-1 overflow-y-auto'>
@@ -243,20 +245,6 @@ export function Sidebar({ profile }: SidebarProps) {
           <NavItemComponent key={item.title} item={item} />
         ))}
       </nav>
-
-      {/* User Status */}
-      {!isCollapsed && (
-        <div className='p-4 border-t'>
-          <div className='text-xs text-muted-foreground mb-2'>
-            {profile.role === 'admin' ? 'Administrator' : 'Employee'}
-          </div>
-          {profile.status === 'pending' && (
-            <div className='text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded'>
-              Account pending approval
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Collapse Toggle */}
       <div className='p-4 border-t'>
@@ -270,7 +258,6 @@ export function Sidebar({ profile }: SidebarProps) {
           ) : (
             <>
               <ChevronRight className='h-4 w-4 rotate-180' />
-              <span className='ml-2'>Collapse</span>
             </>
           )}
         </Button>
