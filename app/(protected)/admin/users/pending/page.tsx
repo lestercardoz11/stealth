@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { requireAdmin, getPendingUsers } from '@/lib/auth/roles';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { UserApprovalInterface } from '@/components/admin/user-approval-interface';
 
 export default async function PendingUsersPage() {
