@@ -6,7 +6,7 @@ import { UserRole, UserStatus, Profile } from "@/lib/types/database";
  * Server-side role checking utilities
  */
 export async function getCurrentUserProfile(): Promise<Profile | null> {
-  const supabase = await createClient();
+  const supabase = createClient();
   
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return null;
@@ -92,7 +92,7 @@ export async function hasRoleClient(role: UserRole): Promise<boolean> {
 export async function updateUserRole(userId: string, role: UserRole): Promise<void> {
   await requireAdmin(); // Ensure current user is admin
   
-  const supabase = await createClient();
+  const supabase = createClient();
   const { error } = await supabase
     .from('profiles')
     .update({ role })
@@ -104,7 +104,7 @@ export async function updateUserRole(userId: string, role: UserRole): Promise<vo
 export async function updateUserStatus(userId: string, status: UserStatus): Promise<void> {
   await requireAdmin(); // Ensure current user is admin
   
-  const supabase = await createClient();
+  const supabase = createClient();
   const { error } = await supabase
     .from('profiles')
     .update({ status })
@@ -116,7 +116,7 @@ export async function updateUserStatus(userId: string, status: UserStatus): Prom
 export async function getAllUsers(): Promise<Profile[]> {
   await requireAdmin(); // Ensure current user is admin
   
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
@@ -129,7 +129,7 @@ export async function getAllUsers(): Promise<Profile[]> {
 export async function getPendingUsers(): Promise<Profile[]> {
   await requireAdmin(); // Ensure current user is admin
   
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data, error } = await supabase
     .from('profiles')
     .select('*')

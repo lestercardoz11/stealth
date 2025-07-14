@@ -5,7 +5,7 @@ import { StealthNavigation } from "@/components/landing/stealth-navigation";
 import { Footer } from "@/components/landing/footer";
 
 export default async function HomePage() {
-  const supabase = await createClient();
+  const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   let profile = null;
