@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { requireAdmin, getPendingUsers } from '@/lib/auth/roles';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UserManagement } from '@/components/admin/user-management';
+import { UserApprovalInterface } from '@/components/admin/user-approval-interface';
 
 export default async function PendingUsersPage() {
   try {
@@ -30,16 +30,7 @@ export default async function PendingUsersPage() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              Pending User Approvals ({pendingUsers.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <UserManagement users={pendingUsers} />
-          </CardContent>
-        </Card>
+        <UserApprovalInterface users={pendingUsers} />
       )}
     </div>
   );
