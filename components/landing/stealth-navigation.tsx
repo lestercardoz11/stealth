@@ -83,15 +83,15 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
   const quickActions = getQuickActions();
 
   return (
-    <nav className='relative z-50 bg-black/80 backdrop-blur-md border-b border-gray-800'>
+    <nav className='relative z-50 bg-background/80 backdrop-blur-md border-b'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex justify-between items-center h-16'>
           {/* Logo */}
           <Link href='/' className='flex items-center space-x-3'>
-            <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center'>
-              <span className='text-white font-bold text-sm'>S</span>
+            <div className='w-8 h-8 bg-primary rounded-lg flex items-center justify-center'>
+              <span className='text-primary-foreground font-bold text-sm'>S</span>
             </div>
-            <span className='text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent'>
+            <span className='text-xl font-bold text-primary'>
               Stealth
             </span>
           </Link>
@@ -110,15 +110,15 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className='w-64 bg-gray-900 border-gray-700'
+                  className='w-64'
                   align='end'
                   forceMount>
                   <DropdownMenuLabel className='font-normal'>
                     <div className='flex flex-col space-y-1'>
-                      <p className='text-sm font-medium leading-none text-white'>
+                      <p className='text-sm font-medium leading-none'>
                         {profile.full_name || 'User'}
                       </p>
-                      <p className='text-xs leading-none text-gray-400'>
+                      <p className='text-xs leading-none text-muted-foreground'>
                         {profile.email}
                       </p>
                     </div>
@@ -126,14 +126,14 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
 
                   {quickActions.length > 0 && (
                     <>
-                      <DropdownMenuSeparator className='bg-gray-700' />
-                      <DropdownMenuLabel className='text-xs text-gray-400 uppercase tracking-wider'>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuLabel className='text-xs text-muted-foreground uppercase tracking-wider'>
                         Quick Actions
                       </DropdownMenuLabel>
                       {quickActions.map((action) => (
                         <DropdownMenuItem
                           key={action.href}
-                          className='cursor-pointer text-gray-300 hover:text-white hover:bg-gray-800'
+                          className='cursor-pointer'
                           asChild>
                           <Link href={action.href}>
                             <action.icon className='mr-2 h-4 w-4' />
@@ -144,18 +144,18 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
                     </>
                   )}
 
-                  <DropdownMenuSeparator className='bg-gray-700' />
-                  <DropdownMenuItem className='cursor-pointer text-gray-300 hover:text-white hover:bg-gray-800'>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className='cursor-pointer'>
                     <User className='mr-2 h-4 w-4' />
                     <span>Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className='cursor-pointer text-gray-300 hover:text-white hover:bg-gray-800'>
+                  <DropdownMenuItem className='cursor-pointer'>
                     <Settings className='mr-2 h-4 w-4' />
                     <span>Settings</span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className='bg-gray-700' />
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    className='cursor-pointer text-red-400 hover:text-red-300 hover:bg-gray-800'
+                    className='cursor-pointer text-destructive'
                     onClick={handleSignOut}>
                     <LogOut className='mr-2 h-4 w-4' />
                     <span>Sign Out</span>
@@ -167,12 +167,12 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
                 <Button
                   variant='ghost'
                   asChild
-                  className='text-white hover:text-white hover:bg-gray-800'>
+                  className='text-foreground hover:text-foreground'>
                   <Link href='/auth/login'>Sign In</Link>
                 </Button>
                 <Button
                   asChild
-                  className='bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'>
+                  className='bg-primary hover:bg-primary/90'>
                   <Link href='/auth/sign-up'>Get Started</Link>
                 </Button>
               </div>
@@ -182,7 +182,7 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
             <Button
               variant='ghost'
               size='sm'
-              className='md:hidden text-white'
+              className='md:hidden'
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               {isMobileMenuOpen ? (
                 <X className='h-5 w-5' />
@@ -195,19 +195,19 @@ export function StealthNavigation({ user, profile }: StealthNavigationProps) {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className='md:hidden py-4 border-t border-gray-800'>
+          <div className='md:hidden py-4 border-t'>
             <div className='flex flex-col space-y-4'>
               {!user && (
-                <div className='flex flex-col space-y-2 pt-4 border-t border-gray-800'>
+                <div className='flex flex-col space-y-2 pt-4 border-t'>
                   <Button
                     variant='ghost'
                     asChild
-                    className='text-white hover:bg-gray-800 justify-start'>
+                    className='justify-start'>
                     <Link href='/auth/login'>Sign In</Link>
                   </Button>
                   <Button
                     asChild
-                    className='bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 justify-start'>
+                    className='bg-primary hover:bg-primary/90 justify-start'>
                     <Link href='/auth/sign-up'>Get Started</Link>
                   </Button>
                 </div>

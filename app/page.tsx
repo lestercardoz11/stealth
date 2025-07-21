@@ -21,7 +21,7 @@ export default async function HomePage() {
   }
 
   return (
-    <div className='min-h-screen bg-black text-white overflow-hidden'>
+    <div className='min-h-screen bg-background text-foreground overflow-hidden'>
       {/* Navigation */}
       <StealthNavigation user={user} profile={profile} />
 

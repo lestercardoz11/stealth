@@ -1,6 +1,5 @@
 'use client';
 
-import { useChat } from 'ai/react';
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,29 +16,77 @@ export function RAGChatInterface() {
   const [availableDocuments, setAvailableDocuments] = useState<any[]>([]);
   const [isLoadingDocs, setIsLoadingDocs] = useState(true);
   const [sources, setSources] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
-    useChat({
-      api: '/api/chat',
-      body: {
-        documentIds: selectedDocuments,
-      },
-      onError: (error) => {
-        console.error('Chat error:', error);
-      },
-      onResponse: (response) => {
-        // Extract sources from response headers
-        const sourcesHeader = response.headers.get('X-Sources');
-        if (sourcesHeader) {
-          try {
-            setSources(JSON.parse(sourcesHeader));
-          } catch (e) {
-            console.error('Error parsing sources:', e);
-          }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = {
+      id: Date.now().toString(),
+      role: 'user' as const,
+      content: input,
+      createdAt: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage].map(m => ({
+            role: m.role,
+            content: m.content,
+          })),
+          documentIds: selectedDocuments,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response');
+      }
+
+      const data = await response.json();
+      
+      // Extract sources from response headers
+      const sourcesHeader = response.headers.get('X-Sources');
+      if (sourcesHeader) {
+        try {
+          setSources(JSON.parse(sourcesHeader));
+        } catch (e) {
+          console.error('Error parsing sources:', e);
         }
-      },
-    });
+      }
+
+      const assistantMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant' as const,
+        content: data.response,
+        createdAt: new Date(),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Load available documents
   useEffect(() => {
@@ -66,12 +113,6 @@ export function RAGChatInterface() {
     } finally {
       setIsLoadingDocs(false);
     }
-  };
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-    handleSubmit(e);
   };
 
   return (
@@ -173,7 +214,7 @@ export function RAGChatInterface() {
             {error && (
               <div className='flex items-center gap-2 text-red-600 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg'>
                 <AlertCircle className='h-4 w-4' />
-                <span className='text-sm'>Error: {error.message}</span>
+                <span className='text-sm'>Error: {error}</span>
               </div>
             )}
 
@@ -183,7 +224,7 @@ export function RAGChatInterface() {
 
         {/* Input Area */}
         <div className='border-t bg-background p-4'>
-          <form onSubmit={handleFormSubmit} className='max-w-4xl mx-auto'>
+          <form onSubmit={handleSubmit} className='max-w-4xl mx-auto'>
             <div className='flex gap-2'>
               <Input
                 value={input}

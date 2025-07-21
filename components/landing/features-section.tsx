@@ -72,20 +72,14 @@ export function FeaturesSection() {
   ];
 
   return (
-    <section id='features' className='py-24 relative'>
-      {/* Background Effects */}
-      <div className='absolute inset-0'>
-        <div className='absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl'></div>
-        <div className='absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl'></div>
-      </div>
-
-      <div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+    <section id='features' className='py-24 bg-background'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         {/* Section Header */}
         <div className='text-center mb-16'>
-          <h2 className='text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent'>
+          <h2 className='text-4xl md:text-6xl font-bold mb-6 text-foreground'>
             Powerful Features
           </h2>
-          <p className='text-xl text-gray-400 max-w-3xl mx-auto'>
+          <p className='text-xl text-muted-foreground max-w-3xl mx-auto'>
             Everything you need to transform your legal practice with AI-powered
             intelligence
           </p>
@@ -96,65 +90,57 @@ export function FeaturesSection() {
           {features.map((feature, index) => (
             <div
               key={feature.title}
-              className='group relative bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition-all duration-300 hover:transform hover:scale-105'
+              className='group relative bg-card border rounded-2xl p-6 hover:border-primary/50 transition-all duration-300 hover:transform hover:scale-105'
               style={{
                 animationDelay: `${index * 100}ms`,
               }}>
-              {/* Gradient Background on Hover */}
-              <div
-                className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`}></div>
-
               {/* Icon */}
               <div
-                className={`relative w-12 h-12 bg-gradient-to-r ${feature.gradient} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                <feature.icon className='w-6 h-6 text-white' />
+                className='relative w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300'>
+                <feature.icon className='w-6 h-6 text-primary-foreground' />
               </div>
 
               {/* Content */}
-              <h3 className='text-xl font-semibold text-white mb-3 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-white group-hover:to-gray-300 transition-all duration-300'>
+              <h3 className='text-xl font-semibold text-card-foreground mb-3 transition-all duration-300'>
                 {feature.title}
               </h3>
-              <p className='text-gray-400 leading-relaxed'>
+              <p className='text-muted-foreground leading-relaxed'>
                 {feature.description}
               </p>
-
-              {/* Hover Effect Border */}
-              <div
-                className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300`}></div>
             </div>
           ))}
         </div>
 
         {/* Security Section */}
         <div className='mt-24 text-center'>
-          <div className='bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-3xl p-12 max-w-7xl mx-auto'>
+          <div className='bg-card border rounded-3xl p-12 max-w-7xl mx-auto'>
             <div className='flex justify-center mb-6'>
-              <div className='w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center'>
-                <Shield className='w-8 h-8 text-white' />
+              <div className='w-16 h-16 bg-primary rounded-2xl flex items-center justify-center'>
+                <Shield className='w-8 h-8 text-primary-foreground' />
               </div>
             </div>
-            <h3 className='text-3xl font-bold text-white mb-4'>
+            <h3 className='text-3xl font-bold text-card-foreground mb-4'>
               Security First Approach
             </h3>
-            <p className='text-xl text-gray-400 mb-8 max-w-2xl mx-auto'>
+            <p className='text-xl text-muted-foreground mb-8 max-w-2xl mx-auto'>
               Built with the highest security standards in mind. Your data is
               encrypted at rest and in transit, with complete audit trails and
               compliance with legal industry requirements.
             </p>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
               <div className='text-center'>
-                <div className='text-2xl font-bold text-white mb-2'>SOC 2</div>
-                <div className='text-gray-400'>Type II Certified</div>
+                <div className='text-2xl font-bold text-card-foreground mb-2'>SOC 2</div>
+                <div className='text-muted-foreground'>Type II Certified</div>
               </div>
               <div className='text-center'>
-                <div className='text-2xl font-bold text-white mb-2'>GDPR</div>
-                <div className='text-gray-400'>Compliant</div>
+                <div className='text-2xl font-bold text-card-foreground mb-2'>GDPR</div>
+                <div className='text-muted-foreground'>Compliant</div>
               </div>
               <div className='text-center'>
-                <div className='text-2xl font-bold text-white mb-2'>
+                <div className='text-2xl font-bold text-card-foreground mb-2'>
                   ISO 27001
                 </div>
-                <div className='text-gray-400'>Certified</div>
+                <div className='text-muted-foreground'>Certified</div>
               </div>
             </div>
           </div>

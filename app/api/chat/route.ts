@@ -1,5 +1,4 @@
-import { openai } from '@ai-sdk/openai';
-import { streamText, convertToCoreMessages } from 'ai';
+import { generateChatResponse } from '@/lib/ai/ollama-client';
 import { createClient } from '@/utils/supabase/server';
 import { searchDocuments } from '@/lib/ai/document-processor';
 
@@ -65,85 +64,45 @@ export async function POST(req: Request) {
       }
     }
 
-    // Create system prompt with context
-    const systemPrompt = `You are Stealth AI, a professional legal document assistant designed specifically for law firms. You provide accurate, well-reasoned legal analysis while maintaining the highest standards of professionalism.
+    // Generate response using Ollama
+    const response = await generateChatResponse(messages, context);
 
-${context ? `DOCUMENT CONTEXT:
-${context}
+    // Save the conversation to database
+    try {
+      const { data: conversation, error: convError } = await supabase
+        .from('conversations')
+        .insert({
+          user_id: user.id,
+          title: userQuery.substring(0, 100) + '...',
+        })
+        .select()
+        .single();
 
-INSTRUCTIONS:
-- Base your responses primarily on the provided document context
-- If the context doesn't contain sufficient information to answer the question, clearly state this limitation
-- When referencing information from documents, be specific about which document you're citing
-- Maintain professional legal language and terminology
-- Flag any potential legal issues, risks, or areas requiring further review
-- If you identify conflicting information in the documents, highlight these discrepancies
-- Suggest next steps or additional research when appropriate
+      if (conversation && !convError) {
+        // Save user message
+        await supabase.from('messages').insert({
+          conversation_id: conversation.id,
+          role: 'user',
+          content: userQuery,
+        });
 
-` : `INSTRUCTIONS:
-- You are operating without specific document context
-- Provide general legal guidance while emphasizing the need for document review
-- Recommend that the user upload relevant documents for more specific analysis
-- Maintain professional legal language and terminology
-- Always recommend consulting with qualified legal counsel for specific legal matters
+        // Save assistant message
+        await supabase.from('messages').insert({
+          conversation_id: conversation.id,
+          role: 'assistant',
+          content: response,
+        });
+      }
+    } catch (saveError) {
+      console.error('Error saving conversation:', saveError);
+    }
 
-`}IMPORTANT DISCLAIMERS:
-- This analysis is for informational purposes only and does not constitute legal advice
-- Always consult with qualified legal counsel for specific legal matters
-- Verify all information against original source documents
-- Consider jurisdiction-specific laws and regulations
-
-Please provide a thorough, professional response to the user's query.`;
-
-    // Stream the AI response
-    const result = await streamText({
-      model: openai('gpt-4-turbo'),
-      system: systemPrompt,
-      messages: convertToCoreMessages(messages),
-      temperature: 0.1,
-      maxTokens: 2000,
-      onFinish: async (result) => {
-        // Save the conversation to database
-        try {
-          // Create or get conversation
-          let conversationId;
-          
-          // For now, we'll create a new conversation for each chat
-          // In a full implementation, you'd manage conversation persistence
-          const { data: conversation, error: convError } = await supabase
-            .from('conversations')
-            .insert({
-              user_id: user.id,
-              title: userQuery.substring(0, 100) + '...',
-            })
-            .select()
-            .single();
-
-          if (conversation && !convError) {
-            conversationId = conversation.id;
-
-            // Save user message
-            await supabase.from('messages').insert({
-              conversation_id: conversationId,
-              role: 'user',
-              content: userQuery,
-            });
-
-            // Save assistant message
-            await supabase.from('messages').insert({
-              conversation_id: conversationId,
-              role: 'assistant',
-              content: result.text,
-            });
-          }
-        } catch (saveError) {
-          console.error('Error saving conversation:', saveError);
-        }
-      },
-    });
-
-    return result.toAIStreamResponse({
+    return new Response(JSON.stringify({ 
+      response,
+      sources 
+    }), {
       headers: {
+        'Content-Type': 'application/json',
         'X-Sources': JSON.stringify(sources),
       },
     });
