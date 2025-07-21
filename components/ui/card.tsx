@@ -62,6 +62,8 @@ const CardContent = React.forwardRef<
     className={cn("p-6 pt-2", className)} 
     {...props} 
   />
+)
+)
 CardContent.displayName = "CardContent";
 
 const CardFooter = React.forwardRef<
