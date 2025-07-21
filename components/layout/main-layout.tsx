@@ -1,7 +1,6 @@
 import { getCurrentUserProfile } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
-import { Sidebar } from './sidebar';
-import { TopNavigation } from './top-navigation';
+import { UnifiedNavigation } from './unified-navigation';
 import { LoadingBoundary } from './loading-boundary';
 import { ErrorBoundary } from './error-boundary';
 
@@ -22,24 +21,16 @@ export async function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <ErrorBoundary>
-      <div className='min-h-screen bg-background'>
-        <div className='flex h-screen'>
-          {/* Sidebar */}
-          <Sidebar profile={profile} />
+      <div className='min-h-screen bg-gray-50 dark:bg-gray-900'>
+        {/* Unified Navigation */}
+        <UnifiedNavigation profile={profile} />
 
-          {/* Main Content Area */}
-          <div className='flex-1 flex flex-col overflow-hidden'>
-            {/* Top Navigation */}
-            <TopNavigation profile={profile} />
-
-            {/* Main Content */}
-            <main className='flex-1 overflow-y-auto bg-gray-50/50 dark:bg-gray-900/50'>
-              <div className='container mx-auto'>
-                <LoadingBoundary>{children}</LoadingBoundary>
-              </div>
-            </main>
+        {/* Main Content */}
+        <main className='min-h-[calc(100vh-4rem)]'>
+          <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+            <LoadingBoundary>{children}</LoadingBoundary>
           </div>
-        </div>
+        </main>
       </div>
     </ErrorBoundary>
   );

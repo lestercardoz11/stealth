@@ -41,7 +41,7 @@ export function DocumentViewer({ document, isOpen, onClose }: DocumentViewerProp
     }
   }, [document, isOpen]);
 
-  const loadDocumentUrl = async () => {
+  const loadDocumentUrl = async (): Promise<void> => {
     if (!document?.file_path) return;
     
     setIsLoading(true);
@@ -58,7 +58,7 @@ export function DocumentViewer({ document, isOpen, onClose }: DocumentViewerProp
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownload = async (): Promise<void> => {
     if (!documentUrl || !document) return;
     
     const link = document.createElement('a');
@@ -69,7 +69,7 @@ export function DocumentViewer({ document, isOpen, onClose }: DocumentViewerProp
     document.body.removeChild(link);
   };
 
-  const handleOpenInNewTab = () => {
+  const handleOpenInNewTab = (): void => {
     if (documentUrl) {
       window.open(documentUrl, '_blank');
     }

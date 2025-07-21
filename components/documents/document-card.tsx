@@ -56,7 +56,7 @@ export function DocumentCard({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDownload = async () => {
+  const handleDownload = async (): Promise<void> => {
     if (!document.file_path) return;
     
     try {
@@ -74,7 +74,7 @@ export function DocumentCard({
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (): Promise<void> => {
     setIsDeleting(true);
     try {
       const success = await deleteDocument(document.id);
@@ -89,7 +89,7 @@ export function DocumentCard({
     }
   };
 
-  const handleView = () => {
+  const handleView = (): void => {
     onView?.(document);
   };
 

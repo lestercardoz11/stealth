@@ -18,7 +18,15 @@ interface RecentActivityProps {
 }
 
 // Mock activity data for demonstration
-const generateMockActivity = (users: Profile[]) => {
+const generateMockActivity = (users: Profile[]): Array<{
+  id: string;
+  type: string;
+  user: { email: string; full_name?: string };
+  action: string;
+  timestamp: Date;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+}> => {
   const activities = [
     {
       id: '1',
@@ -109,7 +117,7 @@ export function RecentActivity({ users }: RecentActivityProps) {
     return email?.slice(0, 2).toUpperCase() || 'U';
   };
 
-  const getActivityBadge = (type: string) => {
+  const getActivityBadge = (type: string): React.ReactNode => {
     switch (type) {
       case 'user_signup':
         return <Badge variant='secondary'>New User</Badge>;
@@ -150,7 +158,15 @@ export function RecentActivity({ users }: RecentActivityProps) {
       </div>
 
       <div className='space-y-4 max-h-96 overflow-y-auto'>
-        {activities.map((activity) => (
+        {activities.map((activity: {
+          id: string;
+          type: string;
+          user: { email: string; full_name?: string };
+          action: string;
+          timestamp: Date;
+          icon: React.ComponentType<{ className?: string }>;
+          color: string;
+        }) => (
           <div
             key={activity.id}
             className='flex items-start space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors'>

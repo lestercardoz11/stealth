@@ -68,22 +68,22 @@ export default function AdminDashboard({
   return (
     <div className='space-y-6'>
       {/* Welcome Section */}
-      <div className='flex items-center justify-between'>
+      <div className='flex items-center justify-between bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 rounded-2xl p-6 border border-blue-100 dark:border-blue-900'>
         <div>
-          <h1 className='text-3xl font-bold'>
+          <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
             Welcome back,{' '}
             {currentAdmin?.full_name || currentAdmin?.email || 'Admin'}
           </h1>
-          <p className='text-muted-foreground'>
+          <p className='text-gray-600 dark:text-gray-300 mt-2'>
             {`Here's what's happening with your Stealth platform today`}
           </p>
         </div>
-        <div className='flex items-center space-x-2'>
-          <Badge variant='default' className='bg-green-500'>
+        <div className='flex items-center space-x-3'>
+          <Badge variant='default' className='bg-green-500 hover:bg-green-600 shadow-sm'>
             <Shield className='w-3 h-3 mr-1' />
             System Secure
           </Badge>
-          <Badge variant='outline'>
+          <Badge variant='outline' className='border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300'>
             <Activity className='w-3 h-3 mr-1' />
             All Systems Operational
           </Badge>
@@ -91,7 +91,7 @@ export default function AdminDashboard({
       </div>
 
       {/* Key Metrics */}
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+      <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
         <MetricCard
           title='Total Users'
           value={allUsers.length}
@@ -129,12 +129,14 @@ export default function AdminDashboard({
 
       {/* Pending Users Alert */}
       {pendingUsers.length > 0 && (
-        <UserApprovalCard pendingUsers={pendingUsers} />
+        <div className='animate-pulse'>
+          <UserApprovalCard pendingUsers={pendingUsers} />
+        </div>
       )}
 
-      <Card>
+      <Card className='shadow-lg'>
         <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
+          <CardTitle className='flex items-center gap-2 text-lg'>
             <TrendingUp className='h-5 w-5' />
             Usage Analytics
           </CardTitle>
@@ -147,9 +149,9 @@ export default function AdminDashboard({
       {/* Charts and Analytics */}
       <div className='grid gap-6 md:grid-cols-2'>
         {/* Recent Activity */}
-        <Card>
+        <Card className='shadow-lg'>
           <CardHeader>
-            <CardTitle className='flex items-center gap-2'>
+            <CardTitle className='flex items-center gap-2 text-lg'>
               <Activity className='h-5 w-5' />
               Recent Activity
             </CardTitle>
@@ -159,9 +161,9 @@ export default function AdminDashboard({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className='shadow-lg'>
           <CardHeader>
-            <CardTitle className='flex items-center gap-2'>
+            <CardTitle className='flex items-center gap-2 text-lg'>
               <Activity className='h-5 w-5' />
               System Health
             </CardTitle>
@@ -173,23 +175,23 @@ export default function AdminDashboard({
       </div>
 
       {/* Quick Actions */}
-      <Card>
+      <Card className='shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900'>
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
+          <CardTitle className='text-lg'>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className='grid gap-4 md:grid-cols-3'>
-            <Button variant='outline' className='h-20 flex-col'>
+            <Button variant='outline' className='h-24 flex-col hover:bg-blue-50 dark:hover:bg-blue-950/50 border-blue-200 dark:border-blue-800'>
               <Users className='h-6 w-6 mb-2' />
-              Manage Users
+              <span className='font-medium'>Manage Users</span>
             </Button>
-            <Button variant='outline' className='h-20 flex-col'>
+            <Button variant='outline' className='h-24 flex-col hover:bg-green-50 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800'>
               <FileText className='h-6 w-6 mb-2' />
-              Upload Documents
+              <span className='font-medium'>Upload Documents</span>
             </Button>
-            <Button variant='outline' className='h-20 flex-col'>
+            <Button variant='outline' className='h-24 flex-col hover:bg-purple-50 dark:hover:bg-purple-950/50 border-purple-200 dark:border-purple-800'>
               <Zap className='h-6 w-6 mb-2' />
-              System Settings
+              <span className='font-medium'>System Settings</span>
             </Button>
           </div>
         </CardContent>

@@ -43,7 +43,7 @@ export function DocumentUpload({
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback((acceptedFiles: File[]): void => {
     const validFiles = acceptedFiles.filter(file => {
       const validation = validateFile(file);
       if (!validation.isValid) {
@@ -82,7 +82,7 @@ export function DocumentUpload({
     onDragLeave: () => setDragActive(false),
   });
 
-  const handleUpload = async (uploadingFile: UploadingFile, index: number) => {
+  const handleUpload = async (uploadingFile: UploadingFile, index: number): Promise<void> => {
     try {
       const result = await uploadDocument(
         uploadingFile.file,
@@ -135,7 +135,7 @@ export function DocumentUpload({
     }
   };
 
-  const updateFileTitle = (index: number, title: string) => {
+  const updateFileTitle = (index: number, title: string): void => {
     setUploadingFiles(prev => 
       prev.map((file, i) => 
         i === index ? { ...file, title } : file
@@ -143,7 +143,7 @@ export function DocumentUpload({
     );
   };
 
-  const updateFileCompanyWide = (index: number, isCompanyWide: boolean) => {
+  const updateFileCompanyWide = (index: number, isCompanyWide: boolean): void => {
     setUploadingFiles(prev => 
       prev.map((file, i) => 
         i === index ? { ...file, isCompanyWide } : file
@@ -151,11 +151,11 @@ export function DocumentUpload({
     );
   };
 
-  const removeFile = (index: number) => {
+  const removeFile = (index: number): void => {
     setUploadingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const clearCompleted = () => {
+  const clearCompleted = (): void => {
     setUploadingFiles(prev => 
       prev.filter(file => file.status === 'uploading')
     );

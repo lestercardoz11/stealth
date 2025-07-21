@@ -11,7 +11,12 @@ import {
 } from 'recharts';
 
 // Mock data for demonstration
-const usageData = [
+const usageData: Array<{
+  name: string;
+  users: number;
+  documents: number;
+  chats: number;
+}> = [
   { name: 'Jan', users: 65, documents: 120, chats: 89 },
   { name: 'Feb', users: 78, documents: 145, chats: 112 },
   { name: 'Mar', users: 92, documents: 167, chats: 134 },
@@ -54,10 +59,11 @@ export function UsageChart() {
           <YAxis axisLine={false} tickLine={false} className='text-xs' />
           <Tooltip
             contentStyle={{
-              backgroundColor: 'hsl(var(--card))',
-              border: '1px solid hsl(var(--border))',
+              backgroundColor: 'white',
+              border: '1px solid #e5e7eb',
               borderRadius: '8px',
               fontSize: '12px',
+              boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
             }}
           />
           <Area

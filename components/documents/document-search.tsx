@@ -41,14 +41,14 @@ export function DocumentSearch({
 }: DocumentSearchProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const updateFilter = (key: keyof DocumentFilters, value: string) => {
+  const updateFilter = (key: keyof DocumentFilters, value: string): void => {
     onFiltersChange({
       ...filters,
       [key]: value,
     });
   };
 
-  const clearFilters = () => {
+  const clearFilters = (): void => {
     onFiltersChange({
       search: '',
       type: 'all',
