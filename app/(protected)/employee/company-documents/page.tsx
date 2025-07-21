@@ -1,9 +1,9 @@
 import { requireApprovedUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
 import { getDocuments } from '@/lib/storage/supabase-storage';
-import { EmployeeDocumentManager } from '@/components/documents/employee-document-manager';
+import { CompanyDocumentViewer } from '@/components/documents/company-document-viewer';
 
-export default async function EmployeeDocumentsPage() {
+export default async function CompanyDocumentsPage() {
   try {
     await requireApprovedUser();
   } catch {
@@ -11,23 +11,19 @@ export default async function EmployeeDocumentsPage() {
   }
 
   const profile = await getCurrentUserProfile();
-  if (!profile) {
-    redirect('/auth/login');
-  }
-
-  const userDocuments = await getDocuments(profile.id);
+  const companyDocuments = await getDocuments(undefined, true); // Get only company-wide documents
 
   return (
     <div className='space-y-6'>
       <div>
-        <h1 className='text-3xl font-bold'>My Documents</h1>
+        <h1 className='text-3xl font-bold'>Company Documents</h1>
         <p className='text-muted-foreground'>
-          Manage your personal documents and files
+          Access company-wide documents and resources
         </p>
       </div>
 
-      <EmployeeDocumentManager 
-        initialDocuments={userDocuments}
+      <CompanyDocumentViewer 
+        documents={companyDocuments} 
         userProfile={profile}
       />
     </div>
