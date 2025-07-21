@@ -1,16 +1,16 @@
 'use client';
+import { Shield, Zap, Brain, Lock } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export function FuturisticHero() {
   const [currentText, setCurrentText] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
-import { useState, useEffect } from 'react';
   const heroTexts = [
     'AI-Powered Legal Intelligence',
     'Secure Document Processing',
     'Private LLM Platform',
     'Enterprise-Grade Security',
   ];
-import { Shield, Zap, Brain, Lock } from 'lucide-react';
   useEffect(() => {
     const interval = setInterval(() => {
       setIsVisible(false);
@@ -58,7 +58,9 @@ import { Shield, Zap, Brain, Lock } from 'lucide-react';
         <div className='flex flex-wrap justify-center gap-4 mb-12'>
           <div className='flex items-center space-x-2 bg-card border rounded-full px-4 py-2'>
             <Shield className='w-4 h-4 text-primary' />
-            <span className='text-sm text-card-foreground'>Enterprise Security</span>
+            <span className='text-sm text-card-foreground'>
+              Enterprise Security
+            </span>
           </div>
           <div className='flex items-center space-x-2 bg-card border rounded-full px-4 py-2'>
             <Brain className='w-4 h-4 text-primary' />
@@ -66,7 +68,9 @@ import { Shield, Zap, Brain, Lock } from 'lucide-react';
           </div>
           <div className='flex items-center space-x-2 bg-card border rounded-full px-4 py-2'>
             <Lock className='w-4 h-4 text-primary' />
-            <span className='text-sm text-card-foreground'>Private & Secure</span>
+            <span className='text-sm text-card-foreground'>
+              Private & Secure
+            </span>
           </div>
           <div className='flex items-center space-x-2 bg-card border rounded-full px-4 py-2'>
             <Zap className='w-4 h-4 text-primary' />
