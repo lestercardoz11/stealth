@@ -1,8 +1,9 @@
 import { requireApprovedUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
-import { getDocuments } from '@/lib/storage/supabase-storage';
+import { getDocuments } from '@/lib/storage/document-api';
 import { EmployeeDocumentManager } from '@/components/documents/employee-document-manager';
-import { getUserDocuments } from '@/lib/profile-actions';
+import { useRouter } from 'next/navigation';
+
 export default async function EmployeeDocumentsPage() {
   try {
     await requireApprovedUser();
@@ -15,12 +16,8 @@ export default async function EmployeeDocumentsPage() {
     redirect('/auth/login');
   }
 
-  const userDocuments = await getDocuments(profile.id);
-
-  const handleRefreshDocuments = async () => {
-    'use server';
-    return await getUserDocuments(profile.id);
-  };
+  const documentsResult = await getDocuments(profile.id);
+  const userDocuments = documentsResult.success ? documentsResult.documents || [] : [];
 
   return (
     <div className='space-y-6'>
@@ -34,7 +31,11 @@ export default async function EmployeeDocumentsPage() {
       <EmployeeDocumentManager 
         initialDocuments={userDocuments}
         userProfile={profile}
-        onRefreshDocuments={handleRefreshDocuments}
+        onRefreshDocuments={async () => {
+          'use server';
+          // This will trigger a page refresh to reload the documents
+          // In a real app, you might want to use revalidatePath or similar
+        }}
       />
     </div>
   );

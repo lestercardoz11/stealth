@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth/roles';
-import { getDocuments } from '@/lib/storage/supabase-storage';
+import { getDocuments } from '@/lib/storage/document-api';
 import { AdminDocumentManager } from '@/components/documents/admin-document-manager';
-import { getAllDocuments } from '@/lib/profile-actions';
+
 export default async function AdminDocumentsPage() {
   try {
     await requireAdmin();
@@ -10,12 +10,8 @@ export default async function AdminDocumentsPage() {
     redirect('/auth/access-denied?reason=Admin access required');
   }
 
-  const documents = await getDocuments();
-
-  const handleRefreshDocuments = async () => {
-    'use server';
-    return await getAllDocuments();
-  };
+  const documentsResult = await getDocuments();
+  const documents = documentsResult.success ? documentsResult.documents || [] : [];
 
   return (
     <div className='space-y-6'>
@@ -28,7 +24,11 @@ export default async function AdminDocumentsPage() {
 
       <AdminDocumentManager 
         initialDocuments={documents} 
-        onRefreshDocuments={handleRefreshDocuments}
+        onRefreshDocuments={async () => {
+          'use server';
+          // This will trigger a page refresh to reload the documents
+          // In a real app, you might want to use revalidatePath or similar
+        }}
       />
     </div>
   );

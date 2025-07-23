@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { formatFileSize, getFileIcon } from '@/lib/utils/file-validation';
-import { getDocumentUrl, deleteDocument } from '@/lib/storage/supabase-storage';
+import { getDocumentUrl, deleteDocument } from '@/lib/storage/document-api';
 import { Document } from '@/lib/types/database';
 
 interface DocumentCardProps {
@@ -58,10 +58,10 @@ export function DocumentCard({
     if (!document.file_path) return;
 
     try {
-      const url = await getDocumentUrl(document.file_path);
-      if (url) {
+      const result = await getDocumentUrl(document.file_path);
+      if (result.success && result.url) {
         const link = document.createElement('a');
-        link.href = url;
+        link.href = result.url;
         link.download = document.title;
         document.body.appendChild(link);
         link.click();
@@ -75,8 +75,8 @@ export function DocumentCard({
   const handleDelete = async (): Promise<void> => {
     setIsDeleting(true);
     try {
-      const success = await deleteDocument(document.id);
-      if (success) {
+      const result = await deleteDocument(document.id);
+      if (result.success) {
         onDelete?.(document.id);
       }
     } catch (error) {

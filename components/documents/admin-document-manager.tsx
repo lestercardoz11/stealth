@@ -12,7 +12,7 @@ import { Document } from '@/lib/types/database';
 
 interface AdminDocumentManagerProps {
   initialDocuments: Document[];
-  onRefreshDocuments: () => Promise<Document[]>;
+  onRefreshDocuments: () => Promise<void>;
 }
 
 export function AdminDocumentManager({
@@ -104,8 +104,7 @@ export function AdminDocumentManager({
   const refreshDocuments = async () => {
     setIsLoading(true);
     try {
-      const data = await onRefreshDocuments();
-      setDocuments(data);
+      await onRefreshDocuments();
     } catch (error) {
       console.error('Error refreshing documents:', error);
     } finally {

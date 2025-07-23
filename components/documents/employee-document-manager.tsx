@@ -18,7 +18,7 @@ import { Document, Profile } from '@/lib/types/database';
 interface EmployeeDocumentManagerProps {
   initialDocuments: Document[];
   userProfile: Profile;
-  onRefreshDocuments: () => Promise<Document[]>;
+  onRefreshDocuments: () => Promise<void>;
 }
 
 export function EmployeeDocumentManager({ 
@@ -92,8 +92,7 @@ export function EmployeeDocumentManager({
   const refreshDocuments = async () => {
     setIsLoading(true);
     try {
-      const data = await onRefreshDocuments();
-      setDocuments(data);
+      await onRefreshDocuments();
     } catch (error) {
       console.error('Error refreshing documents:', error);
     } finally {

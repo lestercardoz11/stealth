@@ -17,7 +17,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { validateFile, formatFileSize } from '@/lib/utils/file-validation';
-import { uploadDocument } from '@/lib/storage/supabase-storage';
+import { uploadDocument } from '@/lib/storage/document-api';
 import { cn } from '@/lib/utils';
 
 interface DocumentUploadProps {
@@ -93,17 +93,8 @@ export function DocumentUpload({
     try {
       const result = await uploadDocument(
         uploadingFile.file,
-        {
-          title: uploadingFile.title,
-          fileSize: uploadingFile.file.size,
-          fileType: uploadingFile.file.type,
-          isCompanyWide: uploadingFile.isCompanyWide,
-        },
-        (progress) => {
-          setUploadingFiles((prev) =>
-            prev.map((file, i) => (i === index ? { ...file, progress } : file))
-          );
-        }
+        uploadingFile.title,
+        uploadingFile.isCompanyWide
       );
 
       setUploadingFiles((prev) =>
@@ -121,9 +112,7 @@ export function DocumentUpload({
 
       onUploadComplete?.(
         result.success,
-        result.success
-          ? 'Document uploaded successfully'
-          : result.error || 'Upload failed'
+        result.message || result.error || (result.success ? 'Upload successful' : 'Upload failed')
       );
     } catch (error) {
       setUploadingFiles((prev) =>

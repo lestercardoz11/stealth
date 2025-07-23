@@ -1,6 +1,6 @@
 import { requireApprovedUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
-import { getDocuments } from '@/lib/storage/supabase-storage';
+import { getDocuments } from '@/lib/storage/document-api';
 import { CompanyDocumentViewer } from '@/components/documents/company-document-viewer';
 
 export default async function CompanyDocumentsPage() {
@@ -11,7 +11,8 @@ export default async function CompanyDocumentsPage() {
   }
 
   const profile = await getCurrentUserProfile();
-  const companyDocuments = await getDocuments(undefined, true); // Get only company-wide documents
+  const documentsResult = await getDocuments(undefined, true); // Get only company-wide documents
+  const companyDocuments = documentsResult.success ? documentsResult.documents || [] : [];
 
   return (
     <div className='space-y-6'>

@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { formatFileSize } from '@/lib/utils/file-validation';
-import { getDocumentUrl } from '@/lib/storage/supabase-storage';
+import { getDocumentUrl } from '@/lib/storage/document-api';
 import { Document } from '@/lib/types/database';
 
 interface DocumentViewerProps {
@@ -48,8 +48,12 @@ export function DocumentViewer({ document, isOpen, onClose }: DocumentViewerProp
     setError(null);
     
     try {
-      const url = await getDocumentUrl(document.file_path);
-      setDocumentUrl(url);
+      const result = await getDocumentUrl(document.file_path);
+      if (result.success) {
+        setDocumentUrl(result.url || null);
+      } else {
+        setError(result.error || 'Failed to load document');
+      }
     } catch (err) {
       setError('Failed to load document');
       console.error('Document load error:', err);

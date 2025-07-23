@@ -1,5 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 
+import { getDocuments as getDocumentsAPI } from '@/lib/storage/document-api';
+
 export async function updateUserProfile(userId: string, data: { full_name: string }) {
   'use server';
   const supabase = await createClient();
@@ -56,41 +58,32 @@ export async function updateUserPassword(email: string, currentPassword: string,
 }
 
 export async function getUserDocuments(userId: string) {
-  'use server';
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('documents')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
+  const result = await getDocumentsAPI(userId);
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to fetch documents');
+  }
+  return result.documents || [];
 }
 
 export async function getAllDocuments() {
-  'use server';
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('documents')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
+  const result = await getDocumentsAPI();
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to fetch documents');
+  }
+  return result.documents || [];
 }
 
 export async function getChatDocuments() {
-  'use server';
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('documents')
-    .select('id, title, created_at, is_company_wide, user_id')
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
+  const result = await getDocumentsAPI();
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to fetch documents');
+  }
+  // Return only the fields needed for chat
+  return (result.documents || []).map(doc => ({
+    id: doc.id,
+    title: doc.title,
+    created_at: doc.created_at,
+    is_company_wide: doc.is_company_wide,
+    user_id: doc.user_id
+  }));
 }
