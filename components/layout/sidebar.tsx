@@ -291,7 +291,7 @@ export function Sidebar({ profile }: SidebarProps) {
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          'hidden md:flex flex-col bg-card border-r transition-all duration-300',
+          'hidden md:flex flex-col bg-card border-r transition-transform duration-300',
           isCollapsed ? 'w-16' : 'w-64'
         )}>
         {sidebarContent}

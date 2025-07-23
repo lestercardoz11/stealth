@@ -2,7 +2,7 @@
 import { Shield, Zap, Brain, Lock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-export function FuturisticHero() {
+export function Hero() {
   const [currentText, setCurrentText] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const heroTexts = [

@@ -20,16 +20,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { 
-  FileText, 
-  MoreVertical, 
-  Download, 
-  Eye, 
-  Trash2, 
-  Building2, 
+import {
+  FileText,
+  MoreVertical,
+  Download,
+  Eye,
+  Trash2,
+  Building2,
   User,
   Calendar,
-  HardDrive
+  HardDrive,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { formatFileSize, getFileIcon } from '@/lib/utils/file-validation';
@@ -45,29 +45,27 @@ interface DocumentCardProps {
   showOwner?: boolean;
 }
 
-export function DocumentCard({ 
-  document, 
-  onDelete, 
+export function DocumentCard({
+  document,
+  onDelete,
   onView,
   canDelete = false,
-  canEdit = false,
-  showOwner = false
 }: DocumentCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDownload = async (): Promise<void> => {
     if (!document.file_path) return;
-    
+
     try {
       const url = await getDocumentUrl(document.file_path);
       if (url) {
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = document.title;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // const link = Html..createElement('a');
+        // link.href = url;
+        // link.download = document.title;
+        // document.body.appendChild(link);
+        // link.click();
+        // document.body.removeChild(link);
       }
     } catch (error) {
       console.error('Download error:', error);
@@ -95,30 +93,29 @@ export function DocumentCard({
 
   return (
     <>
-      <Card className="hover:shadow-md transition-shadow cursor-pointer group">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="text-2xl">
+      <Card className='hover:shadow-md transition-shadow cursor-pointer group'>
+        <CardHeader className='pb-3'>
+          <div className='flex items-start justify-between'>
+            <div className='flex items-center gap-3 flex-1 min-w-0'>
+              <div className='text-2xl'>
                 {getFileIcon(document.file_type || '')}
               </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
+              <div className='flex-1 min-w-0'>
+                <h3 className='font-semibold truncate group-hover:text-primary transition-colors'>
                   {document.title}
                 </h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge 
+                <div className='flex items-center gap-2 mt-1'>
+                  <Badge
                     variant={document.is_company_wide ? 'default' : 'secondary'}
-                    className="text-xs"
-                  >
+                    className='text-xs'>
                     {document.is_company_wide ? (
                       <>
-                        <Building2 className="h-3 w-3 mr-1" />
+                        <Building2 className='h-3 w-3 mr-1' />
                         Company
                       </>
                     ) : (
                       <>
-                        <User className="h-3 w-3 mr-1" />
+                        <User className='h-3 w-3 mr-1' />
                         Personal
                       </>
                     )}
@@ -126,28 +123,30 @@ export function DocumentCard({
                 </div>
               </div>
             </div>
-            
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <MoreVertical className="h-4 w-4" />
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='opacity-0 group-hover:opacity-100 transition-opacity'>
+                  <MoreVertical className='h-4 w-4' />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align='end'>
                 <DropdownMenuItem onClick={handleView}>
-                  <Eye className="h-4 w-4 mr-2" />
+                  <Eye className='h-4 w-4 mr-2' />
                   View
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleDownload}>
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className='h-4 w-4 mr-2' />
                   Download
                 </DropdownMenuItem>
                 {canDelete && (
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={() => setIsDeleteDialogOpen(true)}
-                    className="text-red-600 focus:text-red-600"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
+                    className='text-red-600 focus:text-red-600'>
+                    <Trash2 className='h-4 w-4 mr-2' />
                     Delete
                   </DropdownMenuItem>
                 )}
@@ -155,28 +154,36 @@ export function DocumentCard({
             </DropdownMenu>
           </div>
         </CardHeader>
-        
-        <CardContent className="pt-0">
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-3 w-3" />
+
+        <CardContent className='pt-0'>
+          <div className='space-y-2 text-sm text-muted-foreground'>
+            <div className='flex items-center gap-2'>
+              <Calendar className='h-3 w-3' />
               <span>
-                {formatDistanceToNow(new Date(document.created_at), { addSuffix: true })}
+                {formatDistanceToNow(new Date(document.created_at), {
+                  addSuffix: true,
+                })}
               </span>
             </div>
-            
+
             {document.file_size && (
-              <div className="flex items-center gap-2">
-                <HardDrive className="h-3 w-3" />
+              <div className='flex items-center gap-2'>
+                <HardDrive className='h-3 w-3' />
                 <span>{formatFileSize(document.file_size)}</span>
               </div>
             )}
-            
+
             {document.file_type && (
-              <div className="flex items-center gap-2">
-                <FileText className="h-3 w-3" />
-                <span className="uppercase text-xs">
-                  {document.file_type.split('/').pop()?.replace('vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx')}
+              <div className='flex items-center gap-2'>
+                <FileText className='h-3 w-3' />
+                <span className='uppercase text-xs'>
+                  {document.file_type
+                    .split('/')
+                    .pop()
+                    ?.replace(
+                      'vnd.openxmlformats-officedocument.wordprocessingml.document',
+                      'docx'
+                    )}
                 </span>
               </div>
             )}
@@ -184,12 +191,15 @@ export function DocumentCard({
         </CardContent>
       </Card>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Document</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{document.title}"? This action cannot be undone.
+              Are you sure you want to delete `{document.title}`? This action
+              cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -197,8 +207,7 @@ export function DocumentCard({
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700"
-            >
+              className='bg-red-600 hover:bg-red-700'>
               {isDeleting ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>

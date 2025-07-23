@@ -14,17 +14,11 @@ export default async function AdminDashboardPage() {
     redirect('/auth/access-denied?reason=Admin access required');
   }
 
-  const [allUsers, pendingUsers, currentAdmin] = await Promise.all([
+  const [allUsers, pendingUsers] = await Promise.all([
     getAllUsers(),
     getPendingUsers(),
     getCurrentUserProfile(),
   ]);
 
-  return (
-    <AdminDashboard
-      allUsers={allUsers}
-      pendingUsers={pendingUsers}
-      currentAdmin={currentAdmin}
-    />
-  );
+  return <AdminDashboard allUsers={allUsers} pendingUsers={pendingUsers} />;
 }

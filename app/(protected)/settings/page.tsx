@@ -6,13 +6,7 @@ import { PrivacySettings } from '@/components/settings/privacy-settings';
 import { LanguageSettings } from '@/components/settings/language-settings';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Bell, 
-  Palette, 
-  Shield, 
-  Globe,
-  Settings as SettingsIcon 
-} from 'lucide-react';
+import { Bell, Palette, Shield, Globe } from 'lucide-react';
 
 export default async function SettingsPage() {
   try {
@@ -27,7 +21,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6 md:p-6'>
       <div>
         <h1 className='text-3xl font-bold'>Settings</h1>
         <p className='text-muted-foreground'>
@@ -39,8 +33,8 @@ export default async function SettingsPage() {
         {/* Theme Settings */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5" />
+            <CardTitle className='flex items-center gap-2'>
+              <Palette className='h-5 w-5' />
               Appearance
             </CardTitle>
           </CardHeader>
@@ -54,8 +48,8 @@ export default async function SettingsPage() {
         {/* Notification Settings */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
+            <CardTitle className='flex items-center gap-2'>
+              <Bell className='h-5 w-5' />
               Notifications
             </CardTitle>
           </CardHeader>
@@ -69,8 +63,8 @@ export default async function SettingsPage() {
         {/* Privacy Settings */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
+            <CardTitle className='flex items-center gap-2'>
+              <Shield className='h-5 w-5' />
               Privacy & Security
             </CardTitle>
           </CardHeader>
@@ -84,8 +78,8 @@ export default async function SettingsPage() {
         {/* Language Settings */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5" />
+            <CardTitle className='flex items-center gap-2'>
+              <Globe className='h-5 w-5' />
               Language & Region
             </CardTitle>
           </CardHeader>

@@ -6,13 +6,7 @@ import { BrandingSettings } from '@/components/admin/settings/branding-settings'
 import { DataRetentionSettings } from '@/components/admin/settings/data-retention-settings';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Server, 
-  Shield, 
-  Palette, 
-  Database,
-  Settings as SettingsIcon 
-} from 'lucide-react';
+import { Server, Shield, Palette, Database } from 'lucide-react';
 
 export default async function AdminSettingsPage() {
   try {
@@ -34,8 +28,8 @@ export default async function AdminSettingsPage() {
         {/* System Configuration */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Server className="h-5 w-5" />
+            <CardTitle className='flex items-center gap-2'>
+              <Server className='h-5 w-5' />
               System Configuration
             </CardTitle>
           </CardHeader>
@@ -49,8 +43,8 @@ export default async function AdminSettingsPage() {
         {/* Security Settings */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
+            <CardTitle className='flex items-center gap-2'>
+              <Shield className='h-5 w-5' />
               Security Settings
             </CardTitle>
           </CardHeader>
@@ -64,8 +58,8 @@ export default async function AdminSettingsPage() {
         {/* Company Branding */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5" />
+            <CardTitle className='flex items-center gap-2'>
+              <Palette className='h-5 w-5' />
               Company Branding
             </CardTitle>
           </CardHeader>
@@ -79,8 +73,8 @@ export default async function AdminSettingsPage() {
         {/* Data Retention */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Database className="h-5 w-5" />
+            <CardTitle className='flex items-center gap-2'>
+              <Database className='h-5 w-5' />
               Data Retention Policies
             </CardTitle>
           </CardHeader>

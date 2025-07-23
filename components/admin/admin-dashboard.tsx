@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MetricCard } from './metric-card';
 import { UsageChart } from './usage-chart';
@@ -17,21 +16,15 @@ import {
   MessageSquare,
   TrendingUp,
   Activity,
-  Shield,
   Zap,
 } from 'lucide-react';
 
 type Props = {
   allUsers: Profile[];
   pendingUsers: Profile[];
-  currentAdmin: Profile | null;
 };
 
-export default function AdminDashboard({
-  allUsers,
-  pendingUsers,
-  currentAdmin,
-}: Props) {
+export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
   // useEffect(() => {
   //   const fetchData = async () => {
   //     try {
@@ -66,30 +59,7 @@ export default function AdminDashboard({
   };
 
   return (
-    <div className='space-y-6'>
-      {/* Welcome Section */}
-      <div className='flex items-center justify-between bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 rounded-2xl p-6 border border-blue-100 dark:border-blue-900'>
-        <div>
-          <h1 className='text-3xl font-bold text-gray-900 dark:text-white'>
-            Welcome back,{' '}
-            {currentAdmin?.full_name || currentAdmin?.email || 'Admin'}
-          </h1>
-          <p className='text-gray-600 dark:text-gray-300 mt-2'>
-            {`Here's what's happening with your Stealth platform today`}
-          </p>
-        </div>
-        <div className='flex items-center space-x-3'>
-          <Badge variant='default' className='bg-green-500 hover:bg-green-600 shadow-sm'>
-            <Shield className='w-3 h-3 mr-1' />
-            System Secure
-          </Badge>
-          <Badge variant='outline' className='border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300'>
-            <Activity className='w-3 h-3 mr-1' />
-            All Systems Operational
-          </Badge>
-        </div>
-      </div>
-
+    <div className='space-y-6 p-6'>
       {/* Key Metrics */}
       <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
         <MetricCard
@@ -181,15 +151,21 @@ export default function AdminDashboard({
         </CardHeader>
         <CardContent>
           <div className='grid gap-4 md:grid-cols-3'>
-            <Button variant='outline' className='h-24 flex-col hover:bg-blue-50 dark:hover:bg-blue-950/50 border-blue-200 dark:border-blue-800'>
+            <Button
+              variant='outline'
+              className='h-24 flex-col hover:bg-blue-50 dark:hover:bg-blue-950/50 border-blue-200 dark:border-blue-800'>
               <Users className='h-6 w-6 mb-2' />
               <span className='font-medium'>Manage Users</span>
             </Button>
-            <Button variant='outline' className='h-24 flex-col hover:bg-green-50 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800'>
+            <Button
+              variant='outline'
+              className='h-24 flex-col hover:bg-green-50 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800'>
               <FileText className='h-6 w-6 mb-2' />
               <span className='font-medium'>Upload Documents</span>
             </Button>
-            <Button variant='outline' className='h-24 flex-col hover:bg-purple-50 dark:hover:bg-purple-950/50 border-purple-200 dark:border-purple-800'>
+            <Button
+              variant='outline'
+              className='h-24 flex-col hover:bg-purple-50 dark:hover:bg-purple-950/50 border-purple-200 dark:border-purple-800'>
               <Zap className='h-6 w-6 mb-2' />
               <span className='font-medium'>System Settings</span>
             </Button>

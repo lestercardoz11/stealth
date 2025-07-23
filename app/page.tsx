@@ -1,8 +1,8 @@
 import { createClient } from '@/utils/supabase/server';
-import { FuturisticHero } from '@/components/landing/futuristic-hero';
-import { FeaturesSection } from '@/components/landing/features-section';
-import { StealthNavigation } from '@/components/landing/stealth-navigation';
 import { Footer } from '@/components/landing/footer';
+import { Features } from '@/components/landing/features';
+import { TopNavigation } from '@/components/layout/top-navigation';
+import { Hero } from '@/components/landing/hero-section';
 
 export default async function HomePage() {
   const supabase = createClient();
@@ -23,13 +23,13 @@ export default async function HomePage() {
   return (
     <div className='min-h-screen bg-background text-foreground overflow-hidden'>
       {/* Navigation */}
-      <StealthNavigation user={user} profile={profile} />
+      <TopNavigation profile={profile} />
 
       {/* Hero Section */}
-      <FuturisticHero />
+      <Hero />
 
       {/* Features Section */}
-      <FeaturesSection />
+      <Features />
 
       {/* Footer */}
       <Footer />

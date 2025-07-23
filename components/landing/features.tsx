@@ -11,7 +11,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 
-export function FeaturesSection() {
+export function Features() {
   const features = [
     {
       icon: Brain,
@@ -95,8 +95,7 @@ export function FeaturesSection() {
                 animationDelay: `${index * 100}ms`,
               }}>
               {/* Icon */}
-              <div
-                className='relative w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300'>
+              <div className='relative w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300'>
                 <feature.icon className='w-6 h-6 text-primary-foreground' />
               </div>
 
@@ -129,11 +128,15 @@ export function FeaturesSection() {
             </p>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
               <div className='text-center'>
-                <div className='text-2xl font-bold text-card-foreground mb-2'>SOC 2</div>
+                <div className='text-2xl font-bold text-card-foreground mb-2'>
+                  SOC 2
+                </div>
                 <div className='text-muted-foreground'>Type II Certified</div>
               </div>
               <div className='text-center'>
-                <div className='text-2xl font-bold text-card-foreground mb-2'>GDPR</div>
+                <div className='text-2xl font-bold text-card-foreground mb-2'>
+                  GDPR
+                </div>
                 <div className='text-muted-foreground'>Compliant</div>
               </div>
               <div className='text-center'>
