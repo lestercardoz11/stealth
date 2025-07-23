@@ -72,18 +72,7 @@ export function Sidebar({ profile }: SidebarProps) {
     {
       title: 'Documents',
       icon: FileText,
-      children: [
-        {
-          title: 'Upload',
-          href: '/admin/documents/upload',
-          icon: Upload,
-        },
-        {
-          title: 'Library',
-          href: '/admin/documents',
-          icon: Library,
-        },
-      ],
+      href: '/admin/documents',
     },
     {
       title: 'Analytics',

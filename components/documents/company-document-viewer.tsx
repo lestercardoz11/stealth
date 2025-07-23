@@ -146,7 +146,7 @@ export function CompanyDocumentViewer({
           {filteredDocuments.map((document) => (
             <DocumentCard
               key={document.id}
-              document={document}
+              doc={document}
               onView={handleDocumentView}
               canDelete={false} // Employees cannot delete company documents
               canEdit={false} // Employees cannot edit company documents
@@ -158,7 +158,7 @@ export function CompanyDocumentViewer({
 
       {/* Document Viewer */}
       <DocumentViewer
-        document={selectedDocument}
+        doc={selectedDocument}
         isOpen={isViewerOpen}
         onClose={() => {
           setIsViewerOpen(false);

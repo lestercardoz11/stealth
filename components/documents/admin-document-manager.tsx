@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { DocumentUpload } from './document-upload';
-import { DocumentSearch, DocumentFilters } from './document-search';
-import { DocumentCard } from './document-card';
-import { DocumentViewer } from './document-viewer';
 import { Upload, FileText, Building2, User, Loader2 } from 'lucide-react';
 import { Document } from '@/lib/types/database';
+import { DocumentFilters, DocumentSearch } from './document-search';
+import { DocumentUpload } from './document-upload';
+import { DocumentViewer } from './document-viewer';
+import { DocumentCard } from './document-card';
 
 interface AdminDocumentManagerProps {
   initialDocuments: Document[];
@@ -116,8 +116,8 @@ export function AdminDocumentManager({
     setDocuments((prev) => prev.filter((doc) => doc.id !== documentId));
   };
 
-  const handleDocumentView = (document: Document) => {
-    setSelectedDocument(document);
+  const handleDocumentView = (doc: Document) => {
+    setSelectedDocument(doc);
     setIsViewerOpen(true);
   };
 
@@ -223,7 +223,7 @@ export function AdminDocumentManager({
               filters.type !== 'all' ||
               filters.fileType !== 'all'
                 ? 'Try adjusting your search criteria'
-                : 'Upload your first document to get started'}
+                : 'Upload your first doc to get started'}
             </p>
             {!showUpload && (
               <Button onClick={() => setShowUpload(true)}>
@@ -235,10 +235,10 @@ export function AdminDocumentManager({
         </Card>
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-          {filteredDocuments.map((document) => (
+          {filteredDocuments.map((doc) => (
             <DocumentCard
-              key={document.id}
-              document={document}
+              key={doc.id}
+              doc={doc}
               onDelete={handleDocumentDelete}
               onView={handleDocumentView}
               canDelete={true}
@@ -251,7 +251,7 @@ export function AdminDocumentManager({
 
       {/* Document Viewer */}
       <DocumentViewer
-        document={selectedDocument}
+        doc={selectedDocument}
         isOpen={isViewerOpen}
         onClose={() => {
           setIsViewerOpen(false);

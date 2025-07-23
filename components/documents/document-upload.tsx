@@ -43,6 +43,55 @@ export function DocumentUpload({
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
 
+  // Wrap handleUpload in useCallback to prevent recreating on every render
+  const handleUpload = useCallback(
+    async (uploadingFile: UploadingFile, index: number): Promise<void> => {
+      try {
+        const result = await uploadDocument(
+          uploadingFile.file,
+          uploadingFile.title,
+          uploadingFile.isCompanyWide
+        );
+
+        setUploadingFiles((prev) =>
+          prev.map((file, i) =>
+            i === index
+              ? {
+                  ...file,
+                  status: result.success ? 'success' : 'error',
+                  error: result.error,
+                  progress: 100,
+                }
+              : file
+          )
+        );
+
+        onUploadComplete?.(
+          result.success,
+          result.message ||
+            result.error ||
+            (result.success ? 'Upload successful' : 'Upload failed')
+        );
+      } catch (error) {
+        setUploadingFiles((prev) =>
+          prev.map((file, i) =>
+            i === index
+              ? {
+                  ...file,
+                  status: 'error',
+                  error:
+                    error instanceof Error ? error.message : 'Upload failed',
+                  progress: 0,
+                }
+              : file
+          )
+        );
+        onUploadComplete?.(false, 'Upload failed');
+      }
+    },
+    [onUploadComplete]
+  );
+
   const onDrop = useCallback(
     (acceptedFiles: File[]): void => {
       const validFiles = acceptedFiles.filter((file) => {
@@ -69,7 +118,7 @@ export function DocumentUpload({
         handleUpload(uploadingFile, uploadingFiles.length + index);
       });
     },
-    [uploadingFiles.length, onUploadComplete]
+    [uploadingFiles.length, onUploadComplete, handleUpload]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -85,51 +134,6 @@ export function DocumentUpload({
     onDragEnter: () => setDragActive(true),
     onDragLeave: () => setDragActive(false),
   });
-
-  const handleUpload = async (
-    uploadingFile: UploadingFile,
-    index: number
-  ): Promise<void> => {
-    try {
-      const result = await uploadDocument(
-        uploadingFile.file,
-        uploadingFile.title,
-        uploadingFile.isCompanyWide
-      );
-
-      setUploadingFiles((prev) =>
-        prev.map((file, i) =>
-          i === index
-            ? {
-                ...file,
-                status: result.success ? 'success' : 'error',
-                error: result.error,
-                progress: 100,
-              }
-            : file
-        )
-      );
-
-      onUploadComplete?.(
-        result.success,
-        result.message || result.error || (result.success ? 'Upload successful' : 'Upload failed')
-      );
-    } catch (error) {
-      setUploadingFiles((prev) =>
-        prev.map((file, i) =>
-          i === index
-            ? {
-                ...file,
-                status: 'error',
-                error: error instanceof Error ? error.message : 'Upload failed',
-                progress: 0,
-              }
-            : file
-        )
-      );
-      onUploadComplete?.(false, 'Upload failed');
-    }
-  };
 
   const updateFileTitle = (index: number, title: string): void => {
     setUploadingFiles((prev) =>

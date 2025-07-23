@@ -11,10 +11,12 @@ export default async function AdminDocumentsPage() {
   }
 
   const documentsResult = await getDocuments();
-  const documents = documentsResult.success ? documentsResult.documents || [] : [];
+  const documents = documentsResult.success
+    ? documentsResult.documents || []
+    : [];
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6 p-6'>
       <div>
         <h1 className='text-3xl font-bold'>Document Management</h1>
         <p className='text-muted-foreground'>
@@ -22,8 +24,8 @@ export default async function AdminDocumentsPage() {
         </p>
       </div>
 
-      <AdminDocumentManager 
-        initialDocuments={documents} 
+      <AdminDocumentManager
+        initialDocuments={documents}
         onRefreshDocuments={async () => {
           'use server';
           // This will trigger a page refresh to reload the documents

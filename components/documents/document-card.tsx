@@ -33,20 +33,20 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { formatFileSize, getFileIcon } from '@/lib/utils/file-validation';
-import { getDocumentUrl, deleteDocument } from '@/lib/storage/document-api';
 import { Document } from '@/lib/types/database';
+import { deleteDocument, getDocumentUrl } from '@/lib/storage/document-api';
 
 interface DocumentCardProps {
-  document: Document;
+  doc: Document;
   onDelete?: (documentId: string) => void;
-  onView?: (document: Document) => void;
+  onView?: (doc: Document) => void;
   canDelete?: boolean;
   canEdit?: boolean;
   showOwner?: boolean;
 }
 
 export function DocumentCard({
-  document,
+  doc,
   onDelete,
   onView,
   canDelete = false,
@@ -55,14 +55,14 @@ export function DocumentCard({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDownload = async (): Promise<void> => {
-    if (!document.file_path) return;
+    if (!doc.file_path) return;
 
     try {
-      const result = await getDocumentUrl(document.file_path);
+      const result = await getDocumentUrl(doc.file_path);
       if (result.success && result.url) {
         const link = document.createElement('a');
         link.href = result.url;
-        link.download = document.title;
+        link.download = doc.title;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -75,9 +75,9 @@ export function DocumentCard({
   const handleDelete = async (): Promise<void> => {
     setIsDeleting(true);
     try {
-      const result = await deleteDocument(document.id);
+      const result = await deleteDocument(doc.id);
       if (result.success) {
-        onDelete?.(document.id);
+        onDelete?.(doc.id);
       }
     } catch (error) {
       console.error('Delete error:', error);
@@ -88,7 +88,7 @@ export function DocumentCard({
   };
 
   const handleView = (): void => {
-    onView?.(document);
+    onView?.(doc);
   };
 
   return (
@@ -97,18 +97,16 @@ export function DocumentCard({
         <CardHeader className='pb-3'>
           <div className='flex items-start justify-between'>
             <div className='flex items-center gap-3 flex-1 min-w-0'>
-              <div className='text-2xl'>
-                {getFileIcon(document.file_type || '')}
-              </div>
+              <div className='text-2xl'>{getFileIcon(doc.file_type || '')}</div>
               <div className='flex-1 min-w-0'>
                 <h3 className='font-semibold truncate group-hover:text-primary transition-colors'>
-                  {document.title}
+                  {doc.title}
                 </h3>
                 <div className='flex items-center gap-2 mt-1'>
                   <Badge
-                    variant={document.is_company_wide ? 'default' : 'secondary'}
+                    variant={doc.is_company_wide ? 'default' : 'secondary'}
                     className='text-xs'>
-                    {document.is_company_wide ? (
+                    {doc.is_company_wide ? (
                       <>
                         <Building2 className='h-3 w-3 mr-1' />
                         Company
@@ -160,28 +158,28 @@ export function DocumentCard({
             <div className='flex items-center gap-2'>
               <Calendar className='h-3 w-3' />
               <span>
-                {formatDistanceToNow(new Date(document.created_at), {
+                {formatDistanceToNow(new Date(doc.created_at), {
                   addSuffix: true,
                 })}
               </span>
             </div>
 
-            {document.file_size && (
+            {doc.file_size && (
               <div className='flex items-center gap-2'>
                 <HardDrive className='h-3 w-3' />
-                <span>{formatFileSize(document.file_size)}</span>
+                <span>{formatFileSize(doc.file_size)}</span>
               </div>
             )}
 
-            {document.file_type && (
+            {doc.file_type && (
               <div className='flex items-center gap-2'>
                 <FileText className='h-3 w-3' />
                 <span className='uppercase text-xs'>
-                  {document.file_type
+                  {doc.file_type
                     .split('/')
                     .pop()
                     ?.replace(
-                      'vnd.openxmlformats-officedocument.wordprocessingml.document',
+                      'vnd.openxmlformats-officedocument.wordprocessingml.doc',
                       'docx'
                     )}
                 </span>
@@ -198,8 +196,8 @@ export function DocumentCard({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Document</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete `{document.title}`? This action
-              cannot be undone.
+              Are you sure you want to delete `{doc.title}`? This action cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

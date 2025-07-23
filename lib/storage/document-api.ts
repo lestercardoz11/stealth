@@ -1,13 +1,15 @@
+import { Document } from "../types/database";
+
 export interface DocumentUploadResult {
   success: boolean;
-  document?: any;
+  document?: Document;
   error?: string;
   message?: string;
 }
 
 export interface DocumentListResult {
   success: boolean;
-  documents?: any[];
+  documents?: Document[];
   error?: string;
 }
 
