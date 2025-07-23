@@ -65,9 +65,9 @@ export function DocumentUpload({
       setUploadingFiles((prev) => [...prev, ...newUploadingFiles]);
 
       // Start uploads
-      // newUploadingFiles.forEach((uploadingFile, index) => {
-      //   handleUpload(uploadingFile, uploadingFiles.length + index);
-      // });
+      newUploadingFiles.forEach((uploadingFile, index) => {
+        handleUpload(uploadingFile, uploadingFiles.length + index);
+      });
     },
     [uploadingFiles.length, onUploadComplete]
   );
@@ -86,58 +86,61 @@ export function DocumentUpload({
     onDragLeave: () => setDragActive(false),
   });
 
-  // const handleUpload = async (uploadingFile: UploadingFile, index: number): Promise<void> => {
-  //   try {
-  //     const result = await uploadDocument(
-  //       uploadingFile.file,
-  //       {
-  //         title: uploadingFile.title,
-  //         fileSize: uploadingFile.file.size,
-  //         fileType: uploadingFile.file.type,
-  //         isCompanyWide: uploadingFile.isCompanyWide,
-  //       },
-  //       (progress) => {
-  //         setUploadingFiles(prev =>
-  //           prev.map((file, i) =>
-  //             i === index ? { ...file, progress } : file
-  //           )
-  //         );
-  //       }
-  //     );
+  const handleUpload = async (
+    uploadingFile: UploadingFile,
+    index: number
+  ): Promise<void> => {
+    try {
+      const result = await uploadDocument(
+        uploadingFile.file,
+        {
+          title: uploadingFile.title,
+          fileSize: uploadingFile.file.size,
+          fileType: uploadingFile.file.type,
+          isCompanyWide: uploadingFile.isCompanyWide,
+        },
+        (progress) => {
+          setUploadingFiles((prev) =>
+            prev.map((file, i) => (i === index ? { ...file, progress } : file))
+          );
+        }
+      );
 
-  //     setUploadingFiles(prev =>
-  //       prev.map((file, i) =>
-  //         i === index
-  //           ? {
-  //               ...file,
-  //               status: result.success ? 'success' : 'error',
-  //               error: result.error,
-  //               progress: 100
-  //             }
-  //           : file
-  //       )
-  //     );
+      setUploadingFiles((prev) =>
+        prev.map((file, i) =>
+          i === index
+            ? {
+                ...file,
+                status: result.success ? 'success' : 'error',
+                error: result.error,
+                progress: 100,
+              }
+            : file
+        )
+      );
 
-  //     onUploadComplete?.(
-  //       result.success,
-  //       result.success ? 'Document uploaded successfully' : result.error || 'Upload failed'
-  //     );
-  //   } catch (error) {
-  //     setUploadingFiles(prev =>
-  //       prev.map((file, i) =>
-  //         i === index
-  //           ? {
-  //               ...file,
-  //               status: 'error',
-  //               error: error instanceof Error ? error.message : 'Upload failed',
-  //               progress: 0
-  //             }
-  //           : file
-  //       )
-  //     );
-  //     onUploadComplete?.(false, 'Upload failed');
-  //   }
-  // };
+      onUploadComplete?.(
+        result.success,
+        result.success
+          ? 'Document uploaded successfully'
+          : result.error || 'Upload failed'
+      );
+    } catch (error) {
+      setUploadingFiles((prev) =>
+        prev.map((file, i) =>
+          i === index
+            ? {
+                ...file,
+                status: 'error',
+                error: error instanceof Error ? error.message : 'Upload failed',
+                progress: 0,
+              }
+            : file
+        )
+      );
+      onUploadComplete?.(false, 'Upload failed');
+    }
+  };
 
   const updateFileTitle = (index: number, title: string): void => {
     setUploadingFiles((prev) =>

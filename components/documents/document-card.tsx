@@ -60,12 +60,12 @@ export function DocumentCard({
     try {
       const url = await getDocumentUrl(document.file_path);
       if (url) {
-        // const link = Html..createElement('a');
-        // link.href = url;
-        // link.download = document.title;
-        // document.body.appendChild(link);
-        // link.click();
-        // document.body.removeChild(link);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = document.title;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
     } catch (error) {
       console.error('Download error:', error);

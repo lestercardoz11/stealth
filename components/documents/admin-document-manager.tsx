@@ -9,7 +9,7 @@ import { DocumentCard } from './document-card';
 import { DocumentViewer } from './document-viewer';
 import { Upload, FileText, Building2, User, Loader2 } from 'lucide-react';
 import { Document } from '@/lib/types/database';
-// import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/utils/supabase/client';
 
 interface AdminDocumentManagerProps {
   initialDocuments: Document[];
@@ -103,13 +103,13 @@ export function AdminDocumentManager({
   const refreshDocuments = async () => {
     setIsLoading(true);
     try {
-      // const supabase = createClient();
-      // const { data, error } = await supabase
-      //   .from('documents')
-      //   .select('*')
-      //   .order('created_at', { ascending: false });
-      // if (error) throw error;
-      // setDocuments(data || []);
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('documents')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setDocuments(data || []);
     } catch (error) {
       console.error('Error refreshing documents:', error);
     } finally {
@@ -203,19 +203,19 @@ export function AdminDocumentManager({
       </div>
 
       {/* Upload Section */}
-      {/* {showUpload && (
+      {showUpload && (
         <DocumentUpload
           allowCompanyWide={true}
           onUploadComplete={handleUploadComplete}
         />
-      )} */}
+      )}
 
       {/* Search and Filters */}
-      {/* <DocumentSearch
+      <DocumentSearch
         filters={filters}
         onFiltersChange={setFilters}
         resultCount={filteredDocuments.length}
-      /> */}
+      />
 
       {/* Documents Grid */}
       {filteredDocuments.length === 0 ? (
@@ -240,7 +240,7 @@ export function AdminDocumentManager({
         </Card>
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-          {/* {filteredDocuments.map((document) => (
+          {filteredDocuments.map((document) => (
             <DocumentCard
               key={document.id}
               document={document}
@@ -250,19 +250,19 @@ export function AdminDocumentManager({
               canEdit={true}
               showOwner={true}
             />
-          ))} */}
+          ))}
         </div>
       )}
 
       {/* Document Viewer */}
-      {/* <DocumentViewer
+      <DocumentViewer
         document={selectedDocument}
         isOpen={isViewerOpen}
         onClose={() => {
           setIsViewerOpen(false);
           setSelectedDocument(null);
         }}
-      /> */}
+      />
     </div>
   );
 }
