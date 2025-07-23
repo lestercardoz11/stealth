@@ -9,14 +9,15 @@ import { DocumentCard } from './document-card';
 import { DocumentViewer } from './document-viewer';
 import { Upload, FileText, Building2, User, Loader2 } from 'lucide-react';
 import { Document } from '@/lib/types/database';
-import { createClient } from '@/utils/supabase/client';
 
 interface AdminDocumentManagerProps {
   initialDocuments: Document[];
+  onRefreshDocuments: () => Promise<Document[]>;
 }
 
 export function AdminDocumentManager({
   initialDocuments,
+  onRefreshDocuments,
 }: AdminDocumentManagerProps) {
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [filteredDocuments, setFilteredDocuments] =
@@ -103,13 +104,8 @@ export function AdminDocumentManager({
   const refreshDocuments = async () => {
     setIsLoading(true);
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('documents')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      setDocuments(data || []);
+      const data = await onRefreshDocuments();
+      setDocuments(data);
     } catch (error) {
       console.error('Error refreshing documents:', error);
     } finally {

@@ -2,7 +2,7 @@ import { requireApprovedUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
 import { getDocuments } from '@/lib/storage/supabase-storage';
 import { EmployeeDocumentManager } from '@/components/documents/employee-document-manager';
-
+import { getUserDocuments } from '@/lib/profile-actions';
 export default async function EmployeeDocumentsPage() {
   try {
     await requireApprovedUser();
@@ -17,6 +17,11 @@ export default async function EmployeeDocumentsPage() {
 
   const userDocuments = await getDocuments(profile.id);
 
+  const handleRefreshDocuments = async () => {
+    'use server';
+    return await getUserDocuments(profile.id);
+  };
+
   return (
     <div className='space-y-6'>
       <div>
@@ -29,6 +34,7 @@ export default async function EmployeeDocumentsPage() {
       <EmployeeDocumentManager 
         initialDocuments={userDocuments}
         userProfile={profile}
+        onRefreshDocuments={handleRefreshDocuments}
       />
     </div>
   );

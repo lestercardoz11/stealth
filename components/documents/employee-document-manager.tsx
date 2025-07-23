@@ -14,16 +14,17 @@ import {
   Loader2
 } from 'lucide-react';
 import { Document, Profile } from '@/lib/types/database';
-import { createClient } from '@/utils/supabase/client';
 
 interface EmployeeDocumentManagerProps {
   initialDocuments: Document[];
   userProfile: Profile;
+  onRefreshDocuments: () => Promise<Document[]>;
 }
 
 export function EmployeeDocumentManager({ 
   initialDocuments, 
-  userProfile 
+  userProfile,
+  onRefreshDocuments
 }: EmployeeDocumentManagerProps) {
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [filteredDocuments, setFilteredDocuments] = useState<Document[]>(initialDocuments);
@@ -91,15 +92,8 @@ export function EmployeeDocumentManager({
   const refreshDocuments = async () => {
     setIsLoading(true);
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('documents')
-        .select('*')
-        .eq('user_id', userProfile.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setDocuments(data || []);
+      const data = await onRefreshDocuments();
+      setDocuments(data);
     } catch (error) {
       console.error('Error refreshing documents:', error);
     } finally {

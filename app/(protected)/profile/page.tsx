@@ -5,6 +5,7 @@ import { PasswordChange } from '@/components/profile/password-change';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { User, Lock, Settings } from 'lucide-react';
+import { updateUserProfile, uploadUserAvatar, updateUserPassword } from '@/lib/profile-actions';
 
 export default async function ProfilePage() {
   try {
@@ -17,6 +18,21 @@ export default async function ProfilePage() {
   if (!profile) {
     redirect('/auth/login');
   }
+
+  const handleProfileUpdate = async (data: { full_name: string }) => {
+    'use server';
+    await updateUserProfile(profile.id, data);
+  };
+
+  const handleAvatarUpload = async (file: File) => {
+    'use server';
+    return await uploadUserAvatar(profile.id, file);
+  };
+
+  const handlePasswordChange = async (currentPassword: string, newPassword: string) => {
+    'use server';
+    await updateUserPassword(profile.email, currentPassword, newPassword);
+  };
 
   return (
     <div className='space-y-6 md:p-6'>
@@ -37,7 +53,11 @@ export default async function ProfilePage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ProfileForm profile={profile} />
+            <ProfileForm 
+              profile={profile} 
+              onProfileUpdate={handleProfileUpdate}
+              onAvatarUpload={handleAvatarUpload}
+            />
           </CardContent>
         </Card>
 
@@ -52,7 +72,10 @@ export default async function ProfilePage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <PasswordChange />
+            <PasswordChange 
+              onPasswordChange={handlePasswordChange}
+              userEmail={profile.email}
+            />
           </CardContent>
         </Card>
 

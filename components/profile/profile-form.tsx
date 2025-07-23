@@ -1,22 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
-import { createClient } from '@/utils/supabase/client';
 import { Profile } from '@/lib/types/database';
 import { Loader2, Upload, User, Check, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ProfileFormProps {
   profile: Profile;
+  onProfileUpdate: (formData: { full_name: string }) => Promise<void>;
+  onAvatarUpload: (file: File) => Promise<string | null>;
 }
 
-export function ProfileForm({ profile }: ProfileFormProps) {
+export function ProfileForm({ profile, onProfileUpdate, onAvatarUpload }: ProfileFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -25,7 +25,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     email: profile.email,
   });
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,19 +32,11 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     setMessage(null);
 
     try {
-      const supabase = createClient();
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: formData.full_name,
-        })
-        .eq('id', profile.id);
-
-      if (error) throw error;
+      await onProfileUpdate({
+        full_name: formData.full_name,
+      });
 
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
-      router.refresh();
     } catch (error) {
       setMessage({ 
         type: 'error', 
@@ -75,25 +66,10 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     setMessage(null);
 
     try {
-      const supabase = createClient();
-      
-      // Upload to Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${profile.id}-${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      setAvatarUrl(data.publicUrl);
+      const url = await onAvatarUpload(file);
+      if (url) {
+        setAvatarUrl(url);
+      }
       setMessage({ type: 'success', text: 'Profile picture updated!' });
     } catch (error) {
       setMessage({ 

@@ -9,12 +9,14 @@ import { MessageBubble } from './message-bubble';
 import { DocumentSelector } from './document-selector';
 import { ContextPanel } from './context-panel';
 import { Send, FileText, Brain, Loader2, AlertCircle } from 'lucide-react';
-import { createClient } from '@/utils/supabase/client';
 
-export function RAGChatInterface() {
+interface RAGChatInterfaceProps {
+  availableDocuments: any[];
+  onSendMessage: (messages: any[], documentIds: string[]) => Promise<{ response: string; sources: any[] }>;
+}
+
+export function RAGChatInterface({ availableDocuments, onSendMessage }: RAGChatInterfaceProps) {
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
-  const [availableDocuments, setAvailableDocuments] = useState<any[]>([]);
-  const [isLoadingDocs, setIsLoadingDocs] = useState(true);
   const [sources, setSources] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
@@ -43,35 +45,15 @@ export function RAGChatInterface() {
     setError(null);
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages: [...messages, userMessage].map(m => ({
-            role: m.role,
-            content: m.content,
-          })),
-          documentIds: selectedDocuments,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-
-      const data = await response.json();
+      const data = await onSendMessage(
+        [...messages, userMessage].map(m => ({
+          role: m.role,
+          content: m.content,
+        })),
+        selectedDocuments
+      );
       
-      // Extract sources from response headers
-      const sourcesHeader = response.headers.get('X-Sources');
-      if (sourcesHeader) {
-        try {
-          setSources(JSON.parse(sourcesHeader));
-        } catch (e) {
-          console.error('Error parsing sources:', e);
-        }
-      }
+      setSources(data.sources || []);
 
       const assistantMessage = {
         id: (Date.now() + 1).toString(),
@@ -88,32 +70,10 @@ export function RAGChatInterface() {
     }
   };
 
-  // Load available documents
-  useEffect(() => {
-    loadDocuments();
-  }, []);
-
   // Scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
-  const loadDocuments = async () => {
-    try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('documents')
-        .select('id, title, created_at, is_company_wide, user_id')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setAvailableDocuments(data || []);
-    } catch (error) {
-      console.error('Error loading documents:', error);
-    } finally {
-      setIsLoadingDocs(false);
-    }
-  };
 
   return (
     <div className='flex h-full bg-gray-50/50 dark:bg-gray-900/50'>
@@ -131,17 +91,11 @@ export function RAGChatInterface() {
 
         <ScrollArea className='h-[calc(100vh-200px)]'>
           <div className='p-4'>
-            {isLoadingDocs ? (
-              <div className='flex items-center justify-center py-8'>
-                <Loader2 className='h-6 w-6 animate-spin' />
-              </div>
-            ) : (
-              <DocumentSelector
-                documents={availableDocuments}
-                selected={selectedDocuments}
-                onSelect={setSelectedDocuments}
-              />
-            )}
+            <DocumentSelector
+              documents={availableDocuments}
+              selected={selectedDocuments}
+              onSelect={setSelectedDocuments}
+            />
           </div>
         </ScrollArea>
       </div>

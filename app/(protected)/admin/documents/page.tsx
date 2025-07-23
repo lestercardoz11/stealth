@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth/roles';
 import { getDocuments } from '@/lib/storage/supabase-storage';
 import { AdminDocumentManager } from '@/components/documents/admin-document-manager';
-
+import { getAllDocuments } from '@/lib/profile-actions';
 export default async function AdminDocumentsPage() {
   try {
     await requireAdmin();
@@ -11,6 +11,11 @@ export default async function AdminDocumentsPage() {
   }
 
   const documents = await getDocuments();
+
+  const handleRefreshDocuments = async () => {
+    'use server';
+    return await getAllDocuments();
+  };
 
   return (
     <div className='space-y-6'>
@@ -21,7 +26,10 @@ export default async function AdminDocumentsPage() {
         </p>
       </div>
 
-      <AdminDocumentManager initialDocuments={documents} />
+      <AdminDocumentManager 
+        initialDocuments={documents} 
+        onRefreshDocuments={handleRefreshDocuments}
+      />
     </div>
   );
 }

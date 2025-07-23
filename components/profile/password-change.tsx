@@ -5,11 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { createClient } from '@/utils/supabase/client';
 import { Loader2, Lock, Check, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export function PasswordChange() {
+interface PasswordChangeProps {
+  onPasswordChange: (currentPassword: string, newPassword: string) => Promise<void>;
+  userEmail: string;
+}
+
+export function PasswordChange({ onPasswordChange, userEmail }: PasswordChangeProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showPasswords, setShowPasswords] = useState({
@@ -42,26 +46,7 @@ export function PasswordChange() {
     }
 
     try {
-      const supabase = createClient();
-      
-      // First verify current password by attempting to sign in
-      const { error: verifyError } = await supabase.auth.signInWithPassword({
-        email: (await supabase.auth.getUser()).data.user?.email || '',
-        password: formData.currentPassword,
-      });
-
-      if (verifyError) {
-        setMessage({ type: 'error', text: 'Current password is incorrect' });
-        setIsLoading(false);
-        return;
-      }
-
-      // Update password
-      const { error } = await supabase.auth.updateUser({
-        password: formData.newPassword,
-      });
-
-      if (error) throw error;
+      await onPasswordChange(formData.currentPassword, formData.newPassword);
 
       setMessage({ type: 'success', text: 'Password updated successfully!' });
       setFormData({

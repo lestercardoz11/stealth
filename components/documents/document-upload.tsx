@@ -17,7 +17,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { validateFile, formatFileSize } from '@/lib/utils/file-validation';
-// import { uploadDocument } from '@/lib/storage/supabase-storage';
+import { uploadDocument } from '@/lib/storage/supabase-storage';
 import { cn } from '@/lib/utils';
 
 interface DocumentUploadProps {
