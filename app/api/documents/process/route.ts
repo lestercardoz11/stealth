@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/utils/supabase/server';
 import { processDocumentText } from '@/lib/ai/document-processor';
 
 export async function POST(request: NextRequest) {

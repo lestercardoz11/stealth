@@ -21,7 +21,10 @@ interface NotificationPreferences {
 
 export function NotificationSettings() {
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
   const [preferences, setPreferences] = useState<NotificationPreferences>({
     emailNotifications: true,
     documentUploads: true,
@@ -38,24 +41,34 @@ export function NotificationSettings() {
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // In a real app, you would save to your backend/database
-      localStorage.setItem('notificationPreferences', JSON.stringify(preferences));
-      
-      setMessage({ type: 'success', text: 'Notification preferences saved successfully!' });
+      localStorage.setItem(
+        'notificationPreferences',
+        JSON.stringify(preferences)
+      );
+
+      setMessage({
+        type: 'success',
+        text: 'Notification preferences saved successfully!',
+      });
     } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: 'Failed to save notification preferences' 
+      console.error('Failed to save preferences:', error);
+      setMessage({
+        type: 'error',
+        text: 'Failed to save notification preferences',
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const updatePreference = (key: keyof NotificationPreferences, value: boolean) => {
-    setPreferences(prev => ({ ...prev, [key]: value }));
+  const updatePreference = (
+    key: keyof NotificationPreferences,
+    value: boolean
+  ) => {
+    setPreferences((prev) => ({ ...prev, [key]: value }));
   };
 
   const notificationGroups = [
@@ -121,56 +134,69 @@ export function NotificationSettings() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {notificationGroups.map((group, groupIndex) => (
-        <div key={group.title} className="space-y-4">
+        <div key={group.title} className='space-y-4'>
           <div>
-            <h3 className="text-lg font-semibold">{group.title}</h3>
-            <p className="text-sm text-muted-foreground">{group.description}</p>
+            <h3 className='text-lg font-semibold'>{group.title}</h3>
+            <p className='text-sm text-muted-foreground'>{group.description}</p>
           </div>
-          
-          <div className="space-y-4">
+
+          <div className='space-y-4'>
             {group.items.map((item, itemIndex) => (
-              <div key={item.key} className="flex items-center justify-between space-x-4">
-                <div className="flex-1 space-y-1">
-                  <Label htmlFor={item.key} className="text-sm font-medium">
+              <div
+                key={itemIndex}
+                className='flex items-center justify-between space-x-4'>
+                <div className='flex-1 space-y-1'>
+                  <Label htmlFor={item.key} className='text-sm font-medium'>
                     {item.label}
                   </Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className='text-sm text-muted-foreground'>
                     {item.description}
                   </p>
                 </div>
                 <Switch
                   id={item.key}
                   checked={preferences[item.key]}
-                  onCheckedChange={(checked) => updatePreference(item.key, checked)}
-                  disabled={item.key !== 'emailNotifications' && !preferences.emailNotifications}
+                  onCheckedChange={(checked) =>
+                    updatePreference(item.key, checked)
+                  }
+                  disabled={
+                    item.key !== 'emailNotifications' &&
+                    !preferences.emailNotifications
+                  }
                 />
               </div>
             ))}
           </div>
-          
+
           {groupIndex < notificationGroups.length - 1 && <Separator />}
         </div>
       ))}
 
       {/* Status Message */}
       {message && (
-        <Card className={cn(
-          "border",
-          message.type === 'success' ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20" : "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20"
-        )}>
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
+        <Card
+          className={cn(
+            'border',
+            message.type === 'success'
+              ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
+              : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+          )}>
+          <CardContent className='p-3'>
+            <div className='flex items-center gap-2'>
               {message.type === 'success' ? (
-                <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <Check className='h-4 w-4 text-green-600 dark:text-green-400' />
               ) : (
-                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <AlertCircle className='h-4 w-4 text-red-600 dark:text-red-400' />
               )}
-              <p className={cn(
-                "text-sm",
-                message.type === 'success' ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"
-              )}>
+              <p
+                className={cn(
+                  'text-sm',
+                  message.type === 'success'
+                    ? 'text-green-700 dark:text-green-300'
+                    : 'text-red-700 dark:text-red-300'
+                )}>
                 {message.text}
               </p>
             </div>
@@ -179,15 +205,18 @@ export function NotificationSettings() {
       )}
 
       {/* Save Button */}
-      <Button onClick={handleSave} disabled={isLoading} className="w-full sm:w-auto">
+      <Button
+        onClick={handleSave}
+        disabled={isLoading}
+        className='w-full sm:w-auto'>
         {isLoading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            <Loader2 className='h-4 w-4 animate-spin mr-2' />
             Saving...
           </>
         ) : (
           <>
-            <Bell className="h-4 w-4 mr-2" />
+            <Bell className='h-4 w-4 mr-2' />
             Save Preferences
           </>
         )}

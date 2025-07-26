@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -17,7 +17,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Loader2, Shield, Check, AlertCircle, Trash2, Download } from 'lucide-react';
+import {
+  Loader2,
+  Shield,
+  Check,
+  AlertCircle,
+  Trash2,
+  Download,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PrivacyPreferences {
@@ -30,7 +37,10 @@ interface PrivacyPreferences {
 
 export function PrivacySettings() {
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
   const [preferences, setPreferences] = useState<PrivacyPreferences>({
     profileVisibility: true,
     activityTracking: true,
@@ -45,16 +55,20 @@ export function PrivacySettings() {
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // In a real app, you would save to your backend/database
       localStorage.setItem('privacyPreferences', JSON.stringify(preferences));
-      
-      setMessage({ type: 'success', text: 'Privacy settings saved successfully!' });
+
+      setMessage({
+        type: 'success',
+        text: 'Privacy settings saved successfully!',
+      });
     } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: 'Failed to save privacy settings' 
+      console.error('Failed to save preferences:', error);
+      setMessage({
+        type: 'error',
+        text: 'Failed to save privacy settings',
       });
     } finally {
       setIsLoading(false);
@@ -62,15 +76,21 @@ export function PrivacySettings() {
   };
 
   const handleDataExport = async () => {
-    setMessage({ type: 'success', text: 'Data export request submitted. You will receive an email when ready.' });
+    setMessage({
+      type: 'success',
+      text: 'Data export request submitted. You will receive an email when ready.',
+    });
   };
 
   const handleAccountDeletion = async () => {
-    setMessage({ type: 'success', text: 'Account deletion request submitted. Please check your email for confirmation.' });
+    setMessage({
+      type: 'success',
+      text: 'Account deletion request submitted. Please check your email for confirmation.',
+    });
   };
 
   const updatePreference = (key: keyof PrivacyPreferences, value: boolean) => {
-    setPreferences(prev => ({ ...prev, [key]: value }));
+    setPreferences((prev) => ({ ...prev, [key]: value }));
   };
 
   const privacyGroups = [
@@ -120,92 +140,100 @@ export function PrivacySettings() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {privacyGroups.map((group, groupIndex) => (
-        <div key={group.title} className="space-y-4">
+        <div key={group.title} className='space-y-4'>
           <div>
-            <h3 className="text-lg font-semibold">{group.title}</h3>
-            <p className="text-sm text-muted-foreground">{group.description}</p>
+            <h3 className='text-lg font-semibold'>{group.title}</h3>
+            <p className='text-sm text-muted-foreground'>{group.description}</p>
           </div>
-          
-          <div className="space-y-4">
+
+          <div className='space-y-4'>
             {group.items.map((item) => (
-              <div key={item.key} className="flex items-center justify-between space-x-4">
-                <div className="flex-1 space-y-1">
-                  <Label htmlFor={item.key} className="text-sm font-medium">
+              <div
+                key={item.key}
+                className='flex items-center justify-between space-x-4'>
+                <div className='flex-1 space-y-1'>
+                  <Label htmlFor={item.key} className='text-sm font-medium'>
                     {item.label}
                   </Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className='text-sm text-muted-foreground'>
                     {item.description}
                   </p>
                 </div>
                 <Switch
                   id={item.key}
                   checked={preferences[item.key]}
-                  onCheckedChange={(checked) => updatePreference(item.key, checked)}
+                  onCheckedChange={(checked) =>
+                    updatePreference(item.key, checked)
+                  }
                 />
               </div>
             ))}
           </div>
-          
+
           {groupIndex < privacyGroups.length - 1 && <Separator />}
         </div>
       ))}
 
       {/* Data Rights */}
-      <div className="space-y-4">
+      <div className='space-y-4'>
         <div>
-          <h3 className="text-lg font-semibold">Data Rights</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className='text-lg font-semibold'>Data Rights</h3>
+          <p className='text-sm text-muted-foreground'>
             Exercise your rights regarding your personal data
           </p>
         </div>
-        
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Card className="p-4">
-            <CardContent className="p-0 space-y-3">
-              <div className="flex items-center gap-2">
-                <Download className="h-5 w-5 text-blue-600" />
-                <h4 className="font-medium">Export Data</h4>
+
+        <div className='grid gap-4 sm:grid-cols-2'>
+          <Card className='p-4'>
+            <CardContent className='p-0 space-y-3'>
+              <div className='flex items-center gap-2'>
+                <Download className='h-5 w-5 text-blue-600' />
+                <h4 className='font-medium'>Export Data</h4>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className='text-sm text-muted-foreground'>
                 Download a copy of all your personal data
               </p>
-              <Button variant="outline" size="sm" onClick={handleDataExport}>
+              <Button variant='outline' size='sm' onClick={handleDataExport}>
                 Request Export
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="p-4">
-            <CardContent className="p-0 space-y-3">
-              <div className="flex items-center gap-2">
-                <Trash2 className="h-5 w-5 text-red-600" />
-                <h4 className="font-medium">Delete Account</h4>
+          <Card className='p-4'>
+            <CardContent className='p-0 space-y-3'>
+              <div className='flex items-center gap-2'>
+                <Trash2 className='h-5 w-5 text-red-600' />
+                <h4 className='font-medium'>Delete Account</h4>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className='text-sm text-muted-foreground'>
                 Permanently delete your account and all data
               </p>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='text-red-600 hover:text-red-700'>
                     Delete Account
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete your
-                      account and remove all your data from our servers.
+                      This action cannot be undone. This will permanently delete
+                      your account and remove all your data from our servers.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleAccountDeletion}
-                      className="bg-red-600 hover:bg-red-700"
-                    >
+                      className='bg-red-600 hover:bg-red-700'>
                       Delete Account
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -218,21 +246,27 @@ export function PrivacySettings() {
 
       {/* Status Message */}
       {message && (
-        <Card className={cn(
-          "border",
-          message.type === 'success' ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20" : "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20"
-        )}>
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
+        <Card
+          className={cn(
+            'border',
+            message.type === 'success'
+              ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
+              : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+          )}>
+          <CardContent className='p-3'>
+            <div className='flex items-center gap-2'>
               {message.type === 'success' ? (
-                <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <Check className='h-4 w-4 text-green-600 dark:text-green-400' />
               ) : (
-                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <AlertCircle className='h-4 w-4 text-red-600 dark:text-red-400' />
               )}
-              <p className={cn(
-                "text-sm",
-                message.type === 'success' ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"
-              )}>
+              <p
+                className={cn(
+                  'text-sm',
+                  message.type === 'success'
+                    ? 'text-green-700 dark:text-green-300'
+                    : 'text-red-700 dark:text-red-300'
+                )}>
                 {message.text}
               </p>
             </div>
@@ -241,15 +275,18 @@ export function PrivacySettings() {
       )}
 
       {/* Save Button */}
-      <Button onClick={handleSave} disabled={isLoading} className="w-full sm:w-auto">
+      <Button
+        onClick={handleSave}
+        disabled={isLoading}
+        className='w-full sm:w-auto'>
         {isLoading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            <Loader2 className='h-4 w-4 animate-spin mr-2' />
             Saving...
           </>
         ) : (
           <>
-            <Shield className="h-4 w-4 mr-2" />
+            <Shield className='h-4 w-4 mr-2' />
             Save Privacy Settings
           </>
         )}

@@ -1,5 +1,5 @@
-import { createClient } from '@/utils/supabase/server';
-import { createClient as createBrowserClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/utils/supabase/server';
+import { createClient as createBrowserClient } from '@/lib/utils/supabase/client';
 import { UserRole, UserStatus, Profile } from '@/lib/types/database';
 
 /**

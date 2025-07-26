@@ -159,7 +159,6 @@ export function validateSearchQuery(query: string): ValidationResult {
       // Prevent SQL injection attempts
       const sqlPatterns = [
         /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)/i,
-        /[';--]/,
         /\/\*.*\*\//
       ];
       

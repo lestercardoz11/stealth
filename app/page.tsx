@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/utils/supabase/server';
 import { Footer } from '@/components/landing/footer';
 import { Features } from '@/components/landing/features';
 import { TopNavigation } from '@/components/layout/top-navigation';

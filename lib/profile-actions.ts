@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/utils/supabase/server';
 
 import { getDocuments as getDocumentsAPI } from '@/lib/storage/document-api';
 

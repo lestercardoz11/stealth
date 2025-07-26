@@ -13,10 +13,16 @@ import { Send, FileText, Brain, Loader2, AlertCircle } from 'lucide-react';
 
 interface RAGChatInterfaceProps {
   availableDocuments: any[];
-  onSendMessage: (messages: any[], documentIds: string[]) => Promise<{ response: string; sources: any[] }>;
+  onSendMessage: (
+    messages: any[],
+    documentIds: string[]
+  ) => Promise<{ response: string; sources: any[] }>;
 }
 
-export function RAGChatInterface({ availableDocuments, onSendMessage }: RAGChatInterfaceProps) {
+export function RAGChatInterface({
+  availableDocuments,
+  onSendMessage,
+}: RAGChatInterfaceProps) {
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
   const [sources, setSources] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
@@ -40,20 +46,20 @@ export function RAGChatInterface({ availableDocuments, onSendMessage }: RAGChatI
       createdAt: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
     setError(null);
 
     try {
       const data = await onSendMessage(
-        [...messages, userMessage].map(m => ({
+        [...messages, userMessage].map((m) => ({
           role: m.role,
           content: m.content,
         })),
         selectedDocuments
       );
-      
+
       setSources(data.sources || []);
 
       const assistantMessage = {
@@ -63,7 +69,7 @@ export function RAGChatInterface({ availableDocuments, onSendMessage }: RAGChatI
         createdAt: new Date(),
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -82,7 +88,7 @@ export function RAGChatInterface({ availableDocuments, onSendMessage }: RAGChatI
       <div className='w-80 border-r bg-background'>
         <div className='p-4 border-b'>
           <div className='mb-3'>
-            <PrivacyBadge variant="compact" />
+            <PrivacyBadge variant='compact' />
           </div>
           <h3 className='font-semibold flex items-center gap-2'>
             <FileText className='h-4 w-4' />

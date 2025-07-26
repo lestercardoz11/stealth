@@ -19,6 +19,7 @@ import {
   TrendingUp,
   Activity,
   Zap,
+  Shield,
 } from 'lucide-react';
 
 type Props = {
@@ -64,9 +65,9 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
     <div className='space-y-6 p-6'>
       {/* Privacy Badge */}
       <div className='flex justify-end'>
-        <PrivacyBadge variant="detailed" />
+        <PrivacyBadge variant='detailed' />
       </div>
-      
+
       {/* Key Metrics */}
       <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
         <MetricCard
@@ -146,7 +147,7 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <SecurityStatus variant="compact" />
+            <SecurityStatus variant='compact' />
           </CardContent>
         </Card>
       </div>

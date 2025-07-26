@@ -1,16 +1,13 @@
-import { updateSession } from '@/utils/supabase/middleware';
+import { updateSession } from '@/lib/utils/supabase/middleware';
 import {
   getProfileFromRequest,
   createUnauthorizedResponse,
   createForbiddenResponse,
-  isAdminRoute,
-  isProtectedRoute,
-  requiresApproval,
 } from '@/lib/auth/middleware-utils';
 import { type NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { hasEnvVars } from '@/lib/utils';
-import { rateLimiter, RATE_LIMITS } from '@/lib/security/input-validation';
+import { rateLimiter } from '@/lib/security/input-validation';
 import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 
 export async function middleware(request: NextRequest) {

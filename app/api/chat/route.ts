@@ -1,5 +1,5 @@
 import { generateChatResponse } from '@/lib/ai/ollama-client';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/utils/supabase/server';
 import { searchDocuments } from '@/lib/ai/document-processor';
 import { rateLimiter, RATE_LIMITS } from '@/lib/security/input-validation';
 import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';

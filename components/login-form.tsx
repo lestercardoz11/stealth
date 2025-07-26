@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/utils/supabase/client';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -30,21 +30,24 @@ export function LoginForm({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate inputs
     const emailValidation = validateEmail(email);
-    const passwordValidation = validateInput(password, { required: true, minLength: 1 });
-    
+    const passwordValidation = validateInput(password, {
+      required: true,
+      minLength: 1,
+    });
+
     if (!emailValidation.isValid) {
       setError('Please enter a valid email address');
       return;
     }
-    
+
     if (!passwordValidation.isValid) {
       setError('Password is required');
       return;
     }
-    
+
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
@@ -54,7 +57,7 @@ export function LoginForm({
         email,
         password,
       });
-      
+
       if (error) {
         // Log failed login attempt
         await auditLogger.log({
@@ -62,20 +65,20 @@ export function LoginForm({
           action: AUDIT_ACTIONS.LOGIN_FAILED,
           resource: 'Authentication',
           details: `Failed login attempt: ${error.message}`,
-          severity: 'high'
+          severity: 'high',
         });
         throw error;
       }
-      
+
       // Log successful login
       await auditLogger.log({
         userEmail: email,
         action: AUDIT_ACTIONS.LOGIN_SUCCESS,
         resource: 'Authentication',
         details: 'Successful login',
-        severity: 'low'
+        severity: 'low',
       });
-      
+
       router.push('/dashboard');
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred');
