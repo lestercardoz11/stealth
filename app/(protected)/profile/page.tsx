@@ -4,6 +4,7 @@ import { ProfileForm } from '@/components/profile/profile-form';
 import { PasswordChange } from '@/components/profile/password-change';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { DataExport } from '@/components/security/data-export';
 import { User, Lock, Settings } from 'lucide-react';
 import { updateUserProfile, uploadUserAvatar, updateUserPassword } from '@/lib/profile-actions';
 
@@ -78,6 +79,11 @@ export default async function ProfilePage() {
             />
           </CardContent>
         </Card>
+
+        <Separator />
+
+        {/* Data Export */}
+        <DataExport />
 
         <Separator />
 

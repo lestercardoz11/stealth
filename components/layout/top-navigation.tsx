@@ -28,6 +28,7 @@ import {
 import { createClient } from '@/utils/supabase/client';
 import { usePathname, useRouter } from 'next/navigation';
 import { Profile } from '@/lib/types/database';
+import { PrivacyBadge } from '@/components/security/privacy-badge';
 
 interface TopNavigationProps {
   profile: Profile | null;
@@ -109,6 +110,9 @@ export function TopNavigation({ profile }: TopNavigationProps) {
         <div className='flex items-center space-x-4'>
           {profile ? (
             <div className='flex items-center gap-4'>
+              {/* Privacy Badge for authenticated users */}
+              <PrivacyBadge variant="compact" />
+              
               {/* Notifications */}
               <Button variant='ghost' size='sm' className='relative'>
                 <Bell className='h-4 w-4' />

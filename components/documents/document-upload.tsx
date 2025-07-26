@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { validateFile, formatFileSize } from '@/lib/utils/file-validation';
 import { uploadDocument } from '@/lib/storage/document-api';
+import { PrivacyBadge } from '@/components/security/privacy-badge';
 import { cn } from '@/lib/utils';
 
 interface DocumentUploadProps {
@@ -165,10 +166,13 @@ export function DocumentUpload({
       {/* Upload Area */}
       <Card>
         <CardHeader>
+          <div className='flex items-center justify-between'>
           <CardTitle className='flex items-center gap-2'>
             <Upload className='h-5 w-5' />
             Upload Documents
           </CardTitle>
+            <PrivacyBadge variant="compact" />
+          </div>
         </CardHeader>
         <CardContent>
           <div
@@ -190,6 +194,11 @@ export function DocumentUpload({
             <p className='text-sm text-muted-foreground'>
               Supports PDF, DOCX, DOC, TXT files up to 50MB
             </p>
+            <div className='mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800'>
+              <p className='text-xs text-green-700 dark:text-green-200'>
+                🔒 Your documents are processed locally and never sent to external services
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

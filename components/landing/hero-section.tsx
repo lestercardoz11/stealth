@@ -69,12 +69,16 @@ export function Hero() {
           <div className='flex items-center space-x-2 bg-card border rounded-full px-4 py-2'>
             <Lock className='w-4 h-4 text-primary' />
             <span className='text-sm text-card-foreground'>
-              Private & Secure
+              100% Private
             </span>
           </div>
           <div className='flex items-center space-x-2 bg-card border rounded-full px-4 py-2'>
             <Zap className='w-4 h-4 text-primary' />
             <span className='text-sm text-card-foreground'>Lightning Fast</span>
+          </div>
+          <div className='flex items-center space-x-2 bg-card border rounded-full px-4 py-2'>
+            <Lock className='w-4 h-4 text-primary' />
+            <span className='text-sm text-card-foreground'>No External APIs</span>
           </div>
         </div>
       </div>

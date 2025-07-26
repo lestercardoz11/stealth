@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageBubble } from './message-bubble';
 import { DocumentSelector } from './document-selector';
 import { ContextPanel } from './context-panel';
+import { PrivacyBadge } from '@/components/security/privacy-badge';
 import { Send, FileText, Brain, Loader2, AlertCircle } from 'lucide-react';
 
 interface RAGChatInterfaceProps {
@@ -80,6 +81,9 @@ export function RAGChatInterface({ availableDocuments, onSendMessage }: RAGChatI
       {/* Document Selector Sidebar */}
       <div className='w-80 border-r bg-background'>
         <div className='p-4 border-b'>
+          <div className='mb-3'>
+            <PrivacyBadge variant="compact" />
+          </div>
           <h3 className='font-semibold flex items-center gap-2'>
             <FileText className='h-4 w-4' />
             Document Context

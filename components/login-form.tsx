@@ -15,6 +15,8 @@ import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { validateEmail, validateInput } from '@/lib/security/input-validation';
+import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 
 export function LoginForm({
   className,
@@ -28,6 +30,21 @@ export function LoginForm({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate inputs
+    const emailValidation = validateEmail(email);
+    const passwordValidation = validateInput(password, { required: true, minLength: 1 });
+    
+    if (!emailValidation.isValid) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    
+    if (!passwordValidation.isValid) {
+      setError('Password is required');
+      return;
+    }
+    
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
@@ -37,7 +54,28 @@ export function LoginForm({
         email,
         password,
       });
-      if (error) throw error;
+      
+      if (error) {
+        // Log failed login attempt
+        await auditLogger.log({
+          userEmail: email,
+          action: AUDIT_ACTIONS.LOGIN_FAILED,
+          resource: 'Authentication',
+          details: `Failed login attempt: ${error.message}`,
+          severity: 'high'
+        });
+        throw error;
+      }
+      
+      // Log successful login
+      await auditLogger.log({
+        userEmail: email,
+        action: AUDIT_ACTIONS.LOGIN_SUCCESS,
+        resource: 'Authentication',
+        details: 'Successful login',
+        severity: 'low'
+      });
+      
       router.push('/dashboard');
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred');

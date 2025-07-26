@@ -8,6 +8,8 @@ import { RecentActivity } from './recent-activity';
 import { UserApprovalCard } from './user-approval-card';
 import { SystemHealth } from './system-health';
 import { Profile } from '@/lib/types/database';
+import { SecurityStatus } from '@/components/security/security-status';
+import { PrivacyBadge } from '@/components/security/privacy-badge';
 
 import {
   Users,
@@ -60,6 +62,11 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
 
   return (
     <div className='space-y-6 p-6'>
+      {/* Privacy Badge */}
+      <div className='flex justify-end'>
+        <PrivacyBadge variant="detailed" />
+      </div>
+      
       {/* Key Metrics */}
       <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
         <MetricCard
@@ -134,12 +141,12 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
         <Card className='shadow-lg'>
           <CardHeader>
             <CardTitle className='flex items-center gap-2 text-lg'>
-              <Activity className='h-5 w-5' />
-              System Health
+              <Shield className='h-5 w-5' />
+              Security Status
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <SystemHealth />
+            <SecurityStatus variant="compact" />
           </CardContent>
         </Card>
       </div>

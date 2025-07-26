@@ -9,6 +9,8 @@ import {
   FileText,
   MessageSquare,
   BarChart3,
+  Eye,
+  Server,
 } from 'lucide-react';
 
 export function Features() {
@@ -69,6 +71,20 @@ export function Features() {
         'Comprehensive analytics on usage patterns, efficiency gains, and ROI metrics.',
       gradient: 'from-violet-500 to-purple-500',
     },
+    {
+      icon: Eye,
+      title: '100% Private Processing',
+      description:
+        'All AI processing happens locally on your infrastructure. Zero external API calls or data sharing.',
+      gradient: 'from-emerald-500 to-teal-500',
+    },
+    {
+      icon: Server,
+      title: 'Local AI Models',
+      description:
+        'Run powerful AI models entirely on your own servers. Complete control over your data and processing.',
+      gradient: 'from-cyan-500 to-blue-500',
+    },
   ];
 
   return (
@@ -119,31 +135,30 @@ export function Features() {
               </div>
             </div>
             <h3 className='text-3xl font-bold text-card-foreground mb-4'>
-              Security First Approach
+              Privacy-First Architecture
             </h3>
             <p className='text-xl text-muted-foreground mb-8 max-w-2xl mx-auto'>
-              Built with the highest security standards in mind. Your data is
-              encrypted at rest and in transit, with complete audit trails and
-              compliance with legal industry requirements.
+              Built with privacy as the foundation. All AI processing happens locally on your infrastructure 
+              with zero external API calls. Your data never leaves your control.
             </p>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
               <div className='text-center'>
                 <div className='text-2xl font-bold text-card-foreground mb-2'>
-                  SOC 2
+                  100%
                 </div>
-                <div className='text-muted-foreground'>Type II Certified</div>
+                <div className='text-muted-foreground'>Private Processing</div>
               </div>
               <div className='text-center'>
                 <div className='text-2xl font-bold text-card-foreground mb-2'>
-                  GDPR
+                  Zero
                 </div>
-                <div className='text-muted-foreground'>Compliant</div>
+                <div className='text-muted-foreground'>External API Calls</div>
               </div>
               <div className='text-center'>
                 <div className='text-2xl font-bold text-card-foreground mb-2'>
-                  ISO 27001
+                  Local
                 </div>
-                <div className='text-muted-foreground'>Certified</div>
+                <div className='text-muted-foreground'>AI Models Only</div>
               </div>
             </div>
           </div>

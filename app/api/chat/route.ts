@@ -1,9 +1,16 @@
 import { generateChatResponse } from '@/lib/ai/ollama-client';
 import { createClient } from '@/utils/supabase/server';
 import { searchDocuments } from '@/lib/ai/document-processor';
+import { rateLimiter, RATE_LIMITS } from '@/lib/security/input-validation';
+import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 
 export async function POST(req: Request) {
   try {
+    // Get client IP for rate limiting and audit logging
+    const clientIP = req.headers.get('x-forwarded-for') || 
+                    req.headers.get('x-real-ip') || 
+                    'unknown';
+    
     const { messages, documentIds } = await req.json();
     
     // Get the user's query (last message)
@@ -11,6 +18,11 @@ export async function POST(req: Request) {
     
     if (!userQuery) {
       return new Response('No query provided', { status: 400 });
+    }
+
+    // Input validation
+    if (userQuery.length > 10000) {
+      return new Response('Query too long', { status: 400 });
     }
 
     // Check if user is authenticated and approved
@@ -21,6 +33,21 @@ export async function POST(req: Request) {
       return new Response('Unauthorized', { status: 401 });
     }
 
+    // Rate limiting
+    const rateLimitKey = `chat:${user.id}`;
+    if (!rateLimiter.isAllowed(rateLimitKey, RATE_LIMITS.CHAT.maxRequests, RATE_LIMITS.CHAT.windowMs)) {
+      await auditLogger.log({
+        userId: user.id,
+        userEmail: user.email,
+        action: AUDIT_ACTIONS.RATE_LIMIT_EXCEEDED,
+        resource: 'Chat API',
+        details: 'Chat rate limit exceeded',
+        ipAddress: clientIP,
+        severity: 'medium'
+      });
+      
+      return new Response('Rate limit exceeded', { status: 429 });
+    }
     // Check user profile and status
     const { data: profile } = await supabase
       .from('profiles')
@@ -67,6 +94,21 @@ export async function POST(req: Request) {
     // Generate response using Ollama
     const response = await generateChatResponse(messages, context);
 
+    // Log successful chat interaction
+    await auditLogger.log({
+      userId: user.id,
+      userEmail: profile.email,
+      action: AUDIT_ACTIONS.AI_QUERY_PROCESSED,
+      resource: 'Chat API',
+      details: `Processed AI query with ${documentIds?.length || 0} documents`,
+      ipAddress: clientIP,
+      severity: 'low',
+      metadata: {
+        documentCount: documentIds?.length || 0,
+        queryLength: userQuery.length,
+        responseLength: response.length
+      }
+    });
     // Save the conversation to database
     try {
       const { data: conversation, error: convError } = await supabase
@@ -109,6 +151,25 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error('Chat API error:', error);
+    
+    // Log error for security monitoring
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      await auditLogger.log({
+        userId: user?.id,
+        userEmail: user?.email,
+        action: 'CHAT_API_ERROR',
+        resource: 'Chat API',
+        details: `Chat API error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        ipAddress: req.headers.get('x-forwarded-for') || 'unknown',
+        severity: 'high'
+      });
+    } catch (auditError) {
+      console.error('Failed to log audit event:', auditError);
+    }
+    
     return new Response('Internal server error', { status: 500 });
   }
 }

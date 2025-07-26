@@ -27,6 +27,7 @@ import {
   ChevronRight,
   Menu,
   X,
+  Shield,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -83,6 +84,11 @@ export function Sidebar({ profile }: SidebarProps) {
       title: 'Settings',
       href: '/admin/settings',
       icon: Settings,
+    },
+    {
+      title: 'Security',
+      href: '/admin/security',
+      icon: Shield,
     },
   ];
 

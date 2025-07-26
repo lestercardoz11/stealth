@@ -10,8 +10,14 @@ import {
 import { type NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { hasEnvVars } from '@/lib/utils';
+import { rateLimiter, RATE_LIMITS } from '@/lib/security/input-validation';
+import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 
 export async function middleware(request: NextRequest) {
+  const clientIP = request.headers.get('x-forwarded-for') || 
+                  request.headers.get('x-real-ip') || 
+                  'unknown';
+  
   // First, update the session
   const response = await updateSession(request);
 
@@ -22,6 +28,21 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
+  // Rate limiting for sensitive endpoints
+  if (pathname.startsWith('/api/')) {
+    const rateLimitKey = `api:${clientIP}`;
+    if (!rateLimiter.isAllowed(rateLimitKey, 100, 60 * 1000)) { // 100 requests per minute
+      await auditLogger.log({
+        action: AUDIT_ACTIONS.RATE_LIMIT_EXCEEDED,
+        resource: 'API',
+        details: `API rate limit exceeded for ${pathname}`,
+        ipAddress: clientIP,
+        severity: 'medium'
+      });
+      
+      return new NextResponse('Rate limit exceeded', { status: 429 });
+    }
+  }
   // Skip middleware for auth routes, static files, and API routes
   if (
     pathname.startsWith('/auth') ||
@@ -68,16 +89,40 @@ export async function middleware(request: NextRequest) {
 
     // Check if user is rejected
     if (profile.status === 'rejected') {
+      await auditLogger.log({
+        userId: profile.id,
+        action: AUDIT_ACTIONS.UNAUTHORIZED_ACCESS_ATTEMPT,
+        resource: 'Route Access',
+        details: `Rejected user attempted to access ${pathname}`,
+        ipAddress: clientIP,
+        severity: 'high'
+      });
       return createForbiddenResponse(request, 'Account access denied');
     }
 
     // Check if user is pending approval
     if (profile.status === 'pending') {
+      await auditLogger.log({
+        userId: profile.id,
+        action: AUDIT_ACTIONS.UNAUTHORIZED_ACCESS_ATTEMPT,
+        resource: 'Route Access',
+        details: `Pending user attempted to access ${pathname}`,
+        ipAddress: clientIP,
+        severity: 'medium'
+      });
       return createForbiddenResponse(request, 'Account pending approval');
     }
 
     // Check admin routes
     if (isAdminPath && profile.role !== 'admin') {
+      await auditLogger.log({
+        userId: profile.id,
+        action: AUDIT_ACTIONS.UNAUTHORIZED_ACCESS_ATTEMPT,
+        resource: 'Admin Route',
+        details: `Non-admin user attempted to access ${pathname}`,
+        ipAddress: clientIP,
+        severity: 'high'
+      });
       return createForbiddenResponse(request, 'Admin access required');
     }
 
