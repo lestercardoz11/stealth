@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { SkipNavigation } from "@/components/accessibility/skip-nav";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -27,14 +29,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
+        <SkipNavigation />
+        <ErrorBoundary>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+            <div id="main-content">
+              {children}
+            </div>
         </ThemeProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

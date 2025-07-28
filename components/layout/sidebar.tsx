@@ -263,17 +263,6 @@ export function Sidebar({ profile }: SidebarProps) {
   return (
     <>
       {/* Mobile Menu Button */}
-      <Button
-        variant='ghost'
-        size='sm'
-        className='fixed top-4 left-4 z-50 md:hidden'
-        onClick={() => setIsMobileOpen(!isMobileOpen)}>
-        {isMobileOpen ? (
-          <X className='h-4 w-4' />
-        ) : (
-          <Menu className='h-4 w-4' />
-        )}
-      </Button>
 
       {/* Mobile Overlay */}
       {isMobileOpen && (
@@ -286,7 +275,7 @@ export function Sidebar({ profile }: SidebarProps) {
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          'hidden md:flex flex-col bg-card border-r transition-transform duration-300',
+          'hidden md:flex flex-col bg-card border-r transition-all duration-300 ease-in-out',
           isCollapsed ? 'w-16' : 'w-64'
         )}>
         {sidebarContent}
@@ -295,7 +284,7 @@ export function Sidebar({ profile }: SidebarProps) {
       {/* Mobile Sidebar */}
       <aside
         className={cn(
-          'fixed left-0 top-0 z-50 h-full w-64 bg-card border-r transition-transform duration-300 md:hidden',
+          'fixed left-0 top-0 z-50 h-full w-64 bg-card border-r transition-all duration-300 ease-in-out md:hidden',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}>
         {sidebarContent}

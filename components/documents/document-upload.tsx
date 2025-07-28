@@ -19,6 +19,8 @@ import {
 import { validateFile, formatFileSize } from '@/lib/utils/file-validation';
 import { uploadDocument } from '@/lib/storage/document-api';
 import { PrivacyBadge } from '@/components/security/privacy-badge';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { cn } from '@/lib/utils';
 
 interface DocumentUploadProps {
@@ -164,10 +166,11 @@ export function DocumentUpload({
   return (
     <div className={cn('space-y-6', className)}>
       {/* Upload Area */}
+      <ErrorBoundary>
       <Card>
         <CardHeader>
           <div className='flex items-center justify-between'>
-          <CardTitle className='flex items-center gap-2'>
+            <CardTitle className='flex items-center gap-2 text-base md:text-lg'>
             <Upload className='h-5 w-5' />
             Upload Documents
           </CardTitle>
@@ -178,36 +181,38 @@ export function DocumentUpload({
           <div
             {...getRootProps()}
             className={cn(
-              'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
+                'border-2 border-dashed rounded-lg p-4 md:p-8 text-center cursor-pointer transition-colors',
               isDragActive || dragActive
                 ? 'border-primary bg-primary/5'
                 : 'border-muted-foreground/25 hover:border-primary/50'
             )}>
             <input {...getInputProps()} />
-            <Upload className='h-12 w-12 mx-auto mb-4 text-muted-foreground' />
-            <h3 className='text-lg font-semibold mb-2'>
+              <Upload className='h-8 w-8 md:h-12 md:w-12 mx-auto mb-4 text-muted-foreground' />
+              <h3 className='text-base md:text-lg font-semibold mb-2'>
               {isDragActive ? 'Drop files here' : 'Drag & drop files here'}
             </h3>
-            <p className='text-muted-foreground mb-4'>
+              <p className='text-muted-foreground mb-4 text-sm md:text-base'>
               or click to browse files
             </p>
-            <p className='text-sm text-muted-foreground'>
+              <p className='text-xs md:text-sm text-muted-foreground'>
               Supports PDF, DOCX, DOC, TXT files up to 50MB
             </p>
-            <div className='mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800'>
-              <p className='text-xs text-green-700 dark:text-green-200'>
+              <div className='mt-4 p-2 md:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800'>
+                <p className='text-xs text-green-700 dark:text-green-200'>
                 🔒 Your documents are processed locally and never sent to external services
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
+      </ErrorBoundary>
 
       {/* Uploading Files */}
       {uploadingFiles.length > 0 && (
+        <ErrorBoundary>
         <Card>
           <CardHeader className='flex flex-row items-center justify-between'>
-            <CardTitle>Upload Progress</CardTitle>
+              <CardTitle className='text-base md:text-lg'>Upload Progress</CardTitle>
             <Button
               variant='outline'
               size='sm'
@@ -218,10 +223,10 @@ export function DocumentUpload({
           </CardHeader>
           <CardContent className='space-y-4'>
             {uploadingFiles.map((uploadingFile, index) => (
-              <div key={index} className='space-y-3 p-4 border rounded-lg'>
+                <div key={index} className='space-y-3 p-3 md:p-4 border rounded-lg'>
                 <div className='flex items-start justify-between'>
                   <div className='flex items-center gap-3 flex-1'>
-                    <File className='h-8 w-8 text-muted-foreground' />
+                      <File className='h-6 w-6 md:h-8 md:w-8 text-muted-foreground shrink-0' />
                     <div className='flex-1 space-y-2'>
                       <div className='flex items-center gap-2'>
                         <Input
@@ -244,7 +249,7 @@ export function DocumentUpload({
                         )}
                       </div>
 
-                      <div className='flex items-center justify-between text-sm text-muted-foreground'>
+                        <div className='flex items-center justify-between text-xs md:text-sm text-muted-foreground'>
                         <span>{formatFileSize(uploadingFile.file.size)}</span>
                         <span>{uploadingFile.file.type}</span>
                       </div>
@@ -261,7 +266,7 @@ export function DocumentUpload({
                           />
                           <Label
                             htmlFor={`company-wide-${index}`}
-                            className='text-sm'>
+                              className='text-xs md:text-sm'>
                             Make available company-wide
                           </Label>
                         </div>
@@ -276,7 +281,7 @@ export function DocumentUpload({
 
                       {uploadingFile.status === 'error' &&
                         uploadingFile.error && (
-                          <p className='text-sm text-red-500'>
+                            <p className='text-xs md:text-sm text-red-500'>
                             {uploadingFile.error}
                           </p>
                         )}
@@ -295,6 +300,7 @@ export function DocumentUpload({
             ))}
           </CardContent>
         </Card>
+        </ErrorBoundary>
       )}
     </div>
   );

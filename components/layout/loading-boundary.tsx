@@ -1,26 +1,24 @@
 "use client";
 
 import { Suspense } from "react";
-import { Loader2 } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface LoadingBoundaryProps {
   children: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
-function LoadingSpinner() {
+function DefaultLoadingSpinner() {
   return (
-    <div className="flex items-center justify-center min-h-[200px]">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        <span>Loading...</span>
-      </div>
+    <div className="flex items-center justify-center min-h-[200px] animate-fade-in">
+      <LoadingSpinner text="Loading..." />
     </div>
   );
 }
 
-export function LoadingBoundary({ children }: LoadingBoundaryProps) {
+export function LoadingBoundary({ children, fallback }: LoadingBoundaryProps) {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={fallback || <DefaultLoadingSpinner />}>
       {children}
     </Suspense>
   );

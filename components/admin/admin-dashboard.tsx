@@ -10,6 +10,8 @@ import { SystemHealth } from './system-health';
 import { Profile } from '@/lib/types/database';
 import { SecurityStatus } from '@/components/security/security-status';
 import { PrivacyBadge } from '@/components/security/privacy-badge';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 import {
   Users,
@@ -62,14 +64,19 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
   };
 
   return (
+    <ErrorBoundary>
     <div className='space-y-6 p-6'>
       {/* Privacy Badge */}
-      <div className='flex justify-end'>
+        <div className='flex flex-col md:flex-row md:justify-end gap-4'>
+          <div className='md:hidden'>
+            <h1 className='text-2xl font-bold'>Admin Dashboard</h1>
+            <p className='text-muted-foreground'>Platform overview and management</p>
+          </div>
         <PrivacyBadge variant='detailed' />
       </div>
 
       {/* Key Metrics */}
-      <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
+        <div className='grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4'>
         <MetricCard
           title='Total Users'
           value={allUsers.length}
@@ -107,14 +114,14 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
 
       {/* Pending Users Alert */}
       {pendingUsers.length > 0 && (
-        <div className='animate-pulse'>
+          <div className='animate-pulse'>
           <UserApprovalCard pendingUsers={pendingUsers} />
         </div>
       )}
 
-      <Card className='shadow-lg'>
+        <Card className='shadow-lg'>
         <CardHeader>
-          <CardTitle className='flex items-center gap-2 text-lg'>
+            <CardTitle className='flex items-center gap-2 text-base md:text-lg'>
             <TrendingUp className='h-5 w-5' />
             Usage Analytics
           </CardTitle>
@@ -125,11 +132,11 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
       </Card>
 
       {/* Charts and Analytics */}
-      <div className='grid gap-6 md:grid-cols-2'>
+        <div className='grid gap-4 md:gap-6 lg:grid-cols-2'>
         {/* Recent Activity */}
-        <Card className='shadow-lg'>
+          <Card className='shadow-lg'>
           <CardHeader>
-            <CardTitle className='flex items-center gap-2 text-lg'>
+              <CardTitle className='flex items-center gap-2 text-base md:text-lg'>
               <Activity className='h-5 w-5' />
               Recent Activity
             </CardTitle>
@@ -139,9 +146,9 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
           </CardContent>
         </Card>
 
-        <Card className='shadow-lg'>
+          <Card className='shadow-lg'>
           <CardHeader>
-            <CardTitle className='flex items-center gap-2 text-lg'>
+              <CardTitle className='flex items-center gap-2 text-base md:text-lg'>
               <Shield className='h-5 w-5' />
               Security Status
             </CardTitle>
@@ -153,33 +160,34 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
       </div>
 
       {/* Quick Actions */}
-      <Card className='shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900'>
+        <Card className='shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900'>
         <CardHeader>
-          <CardTitle className='text-lg'>Quick Actions</CardTitle>
+            <CardTitle className='text-base md:text-lg'>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='grid gap-4 md:grid-cols-3'>
+            <div className='grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-3'>
             <Button
               variant='outline'
-              className='h-24 flex-col hover:bg-blue-50 dark:hover:bg-blue-950/50 border-blue-200 dark:border-blue-800'>
+                className='h-20 md:h-24 flex-col hover:bg-blue-50 dark:hover:bg-blue-950/50 border-blue-200 dark:border-blue-800'>
               <Users className='h-6 w-6 mb-2' />
-              <span className='font-medium'>Manage Users</span>
+                <span className='font-medium text-sm md:text-base'>Manage Users</span>
             </Button>
             <Button
               variant='outline'
-              className='h-24 flex-col hover:bg-green-50 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800'>
+                className='h-20 md:h-24 flex-col hover:bg-green-50 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800'>
               <FileText className='h-6 w-6 mb-2' />
-              <span className='font-medium'>Upload Documents</span>
+                <span className='font-medium text-sm md:text-base'>Upload Documents</span>
             </Button>
             <Button
               variant='outline'
-              className='h-24 flex-col hover:bg-purple-50 dark:hover:bg-purple-950/50 border-purple-200 dark:border-purple-800'>
+                className='h-20 md:h-24 flex-col hover:bg-purple-50 dark:hover:bg-purple-950/50 border-purple-200 dark:border-purple-800'>
               <Zap className='h-6 w-6 mb-2' />
-              <span className='font-medium'>System Settings</span>
+                <span className='font-medium text-sm md:text-base'>System Settings</span>
             </Button>
           </div>
         </CardContent>
       </Card>
     </div>
+    </ErrorBoundary>
   );
 }
