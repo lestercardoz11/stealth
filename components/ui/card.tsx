@@ -60,6 +60,8 @@ const CardContent = React.forwardRef<
   <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
     ref={ref}
     className={cn('p-4 md:p-6 pt-0', className)}
+)
+)
 
 const CardFooter = React.forwardRef<
   HTMLDivElement,
