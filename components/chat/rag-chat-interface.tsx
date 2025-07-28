@@ -15,16 +15,36 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { RetryButton } from '@/components/ui/retry-button';
 import { sendChatMessage } from '@/lib/actions/chat-actions';
 
+interface Document {
+  id: string;
+  name: string;
+  uploaded_at: string;
+}
+
 interface RAGChatInterfaceProps {
-  availableDocuments: any[];
+  availableDocuments: Document[];
+}
+
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: Date;
+}
+
+interface Source {
+  documentId: string;
+  documentTitle: string;
+  similarity: number;
+  content: string;
 }
 
 export function RAGChatInterface({
   availableDocuments,
 }: RAGChatInterfaceProps) {
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
-  const [sources, setSources] = useState<any[]>([]);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [sources, setSources] = useState<Source[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

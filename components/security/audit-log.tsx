@@ -14,7 +14,6 @@ import {
   AlertTriangle,
   Search,
   Download,
-  Filter,
   Clock
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';

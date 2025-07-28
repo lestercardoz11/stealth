@@ -255,7 +255,7 @@ export function FAQSection() {
           <HelpCircle className='h-8 w-8 text-blue-600 mx-auto mb-3' />
           <h3 className='font-semibold mb-2'>Still need help?</h3>
           <p className='text-sm text-muted-foreground mb-4'>
-            Can't find the answer you're looking for? Contact your administrator or reach out to our support team.
+            Can&apos;t find the answer you&apos;re looking for? Contact your administrator or reach out to our support team.
           </p>
           <div className='flex justify-center gap-2'>
             <button className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm'>
