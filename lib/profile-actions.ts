@@ -74,7 +74,7 @@ export async function getAllDocuments() {
 }
 
 export async function getChatDocuments() {
-  const result = await getDocumentsAPI();
+  const result = await getAllDocuments();
   if (!result.success) {
     throw new Error(result.error || 'Failed to fetch documents');
   }
