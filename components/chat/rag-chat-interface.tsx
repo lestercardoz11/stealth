@@ -14,6 +14,7 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { RetryButton } from '@/components/ui/retry-button';
 import { sendChatMessage } from '@/lib/actions/chat-actions';
+import { Message } from '@/lib/types/database';
 
 interface Document {
   id: string;
@@ -23,13 +24,6 @@ interface Document {
 
 interface RAGChatInterfaceProps {
   availableDocuments: Document[];
-}
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  createdAt: Date;
 }
 
 interface Source {
@@ -59,11 +53,12 @@ export function RAGChatInterface({
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMessage = {
+    const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user' as const,
       content: input,
-      createdAt: new Date(),
+      created_at: new Date().toISOString(),
+      conversation_id: '', // This will be set by the server
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -83,11 +78,12 @@ export function RAGChatInterface({
 
       setSources(data.sources || []);
 
-      const assistantMessage = {
+      const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant' as const,
         content: data.response,
-        createdAt: new Date(),
+        created_at: new Date().toISOString(),
+        conversation_id: '', // This will be set by the server
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
