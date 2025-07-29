@@ -60,7 +60,13 @@ export async function POST(req: Request) {
     }
 
     let context = '';
-    let sources: any[] = [];
+    interface Source {
+      documentId: string;
+      documentTitle: string;
+      similarity: number;
+      content: string;
+    }
+    let sources: Source[] = [];
 
     // If we have document IDs or should search all accessible documents
     if (documentIds && documentIds.length > 0) {
@@ -74,11 +80,17 @@ export async function POST(req: Request) {
         );
 
         if (relevantChunks && relevantChunks.length > 0) {
+          interface Chunk {
+            document_title: string;
+            content: string;
+            document_id: string;
+            similarity: number;
+          }
           context = relevantChunks
-            .map((chunk: any) => `Document: ${chunk.document_title}\nContent: ${chunk.content}`)
+            .map((chunk: Chunk) => `Document: ${chunk.document_title}\nContent: ${chunk.content}`)
             .join('\n\n---\n\n');
           
-          sources = relevantChunks.map((chunk: any) => ({
+          sources = relevantChunks.map((chunk: Chunk) => ({
             documentId: chunk.document_id,
             documentTitle: chunk.document_title,
             similarity: chunk.similarity,

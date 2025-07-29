@@ -51,7 +51,7 @@ export function BrandingSettings() {
       localStorage.setItem('brandingConfig', JSON.stringify(config));
       
       setMessage({ type: 'success', text: 'Branding settings saved successfully!' });
-    } catch (error) {
+    } catch {
       setMessage({ 
         type: 'error', 
         text: 'Failed to save branding settings' 
@@ -140,7 +140,7 @@ export function BrandingSettings() {
           <Card className="p-4">
             <CardContent className="p-0 space-y-4">
               <div className="flex items-center gap-2">
-                <Image className="h-5 w-5" />
+                <Image alt="Company Logo" className="h-5 w-5" />
                 <h4 className="font-medium">Company Logo</h4>
               </div>
               <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
@@ -175,7 +175,7 @@ export function BrandingSettings() {
           <Card className="p-4">
             <CardContent className="p-0 space-y-4">
               <div className="flex items-center gap-2">
-                <Image className="h-5 w-5" />
+                <Image alt="Favicon" className="h-5 w-5" />
                 <h4 className="font-medium">Favicon</h4>
               </div>
               <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
@@ -216,7 +216,7 @@ export function BrandingSettings() {
         <div>
           <h3 className="text-lg font-semibold">Color Scheme</h3>
           <p className="text-sm text-muted-foreground">
-            Customize the platform's color palette
+            Customize the platform&apos;s color palette
           </p>
         </div>
         

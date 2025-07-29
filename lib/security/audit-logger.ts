@@ -9,7 +9,7 @@ export interface AuditEvent {
   ipAddress?: string;
   userAgent?: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AuditLogEntry extends AuditEvent {

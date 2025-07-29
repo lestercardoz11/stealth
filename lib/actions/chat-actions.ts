@@ -2,9 +2,16 @@
 
 import { Message } from '@/lib/types/database';
 
+interface Source {
+  documentId: string;
+  documentTitle: string;
+  similarity: number;
+  content: string;
+}
+
 export interface ChatResponse {
   response: string;
-  sources: any[];
+  sources: Source[];
 }
 
 export async function sendChatMessage(

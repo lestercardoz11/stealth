@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth/roles';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Shield, Activity, Users, FileText, AlertTriangle, Download } from 'lucide-react';
+import { Shield, Activity, Users, FileText, AlertTriangle } from 'lucide-react';
 import { SecurityStatus } from '@/components/security/security-status';
 import { AuditLog } from '@/components/security/audit-log';
 import { SessionManager } from '@/components/security/session-manager';

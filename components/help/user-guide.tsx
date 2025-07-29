@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import {
   Collapsible,
   CollapsibleContent,
@@ -18,13 +17,10 @@ import {
   BookOpen,
   MessageSquare,
   FileText,
-  Shield,
   Users,
-  Settings,
   HelpCircle,
   ExternalLink,
   Play,
-  CheckCircle,
 } from 'lucide-react';
 
 interface GuideSection {
@@ -619,7 +615,7 @@ Keep your platform secure with comprehensive monitoring.
             <div>
               <h3 className='font-semibold mb-2'>Need More Help?</h3>
               <p className='text-sm text-muted-foreground mb-4'>
-                Can't find what you're looking for? Contact your administrator or check our FAQ.
+                Can&apos;t find what you&apos;re looking for? Contact your administrator or check our FAQ.
               </p>
               <div className='flex justify-center gap-2'>
                 <Button variant='outline' size='sm'>

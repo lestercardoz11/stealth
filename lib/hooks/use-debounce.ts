@@ -18,13 +18,13 @@ export function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-export function useDebouncedCallback<T extends (...args: any[]) => any>(
+export function useDebouncedCallback<T extends (...args: Parameters<T>) => ReturnType<T>>(
   callback: T,
   delay: number
 ): T {
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout>();
 
-  const debouncedCallback = ((...args: any[]) => {
+  const debouncedCallback = ((...args: Parameters<T>) => {
     if (debounceTimer) {
       clearTimeout(debounceTimer);
     }

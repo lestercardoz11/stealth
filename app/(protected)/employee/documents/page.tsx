@@ -2,7 +2,6 @@ import { requireApprovedUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
 import { getDocuments } from '@/lib/storage/document-api';
 import { EmployeeDocumentManager } from '@/components/documents/employee-document-manager';
-import { useRouter } from 'next/navigation';
 
 export default async function EmployeeDocumentsPage() {
   try {

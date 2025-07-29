@@ -51,10 +51,7 @@ export function MessageBubble({ message, sources = [] }: MessageBubbleProps) {
     if (!message.created_at) return '';
 
     try {
-      const date =
-        typeof message.created_at === 'string'
-          ? new Date(message.created_at)
-          : message.created_at;
+      const date = new Date(message.created_at);
       return date.toLocaleTimeString();
     } catch (err) {
       console.error('Invalid date format:', err);

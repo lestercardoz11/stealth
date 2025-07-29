@@ -6,12 +6,10 @@ import { MetricCard } from './metric-card';
 import { UsageChart } from './usage-chart';
 import { RecentActivity } from './recent-activity';
 import { UserApprovalCard } from './user-approval-card';
-import { SystemHealth } from './system-health';
 import { Profile } from '@/lib/types/database';
 import { SecurityStatus } from '@/components/security/security-status';
 import { PrivacyBadge } from '@/components/security/privacy-badge';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 import {
   Users,

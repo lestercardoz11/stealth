@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -61,7 +60,7 @@ export function DataRetentionSettings() {
       localStorage.setItem('dataRetentionConfig', JSON.stringify(config));
       
       setMessage({ type: 'success', text: 'Data retention settings saved successfully!' });
-    } catch (error) {
+    } catch {
       setMessage({ 
         type: 'error', 
         text: 'Failed to save data retention settings' 

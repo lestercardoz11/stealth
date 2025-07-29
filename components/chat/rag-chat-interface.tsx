@@ -14,17 +14,33 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { RetryButton } from '@/components/ui/retry-button';
 import { sendChatMessage } from '@/lib/actions/chat-actions';
+import { Message } from '@/lib/types/database';
+
+interface Document {
+  id: string;
+  title: string;
+  created_at: string;
+  is_company_wide: boolean;
+  user_id: string;
+}
 
 interface RAGChatInterfaceProps {
-  availableDocuments: any[];
+  availableDocuments: Document[];
+}
+
+interface Source {
+  documentId: string;
+  documentTitle: string;
+  similarity: number;
+  content: string;
 }
 
 export function RAGChatInterface({
   availableDocuments,
 }: RAGChatInterfaceProps) {
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
-  const [sources, setSources] = useState<any[]>([]);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [sources, setSources] = useState<Source[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,11 +55,12 @@ export function RAGChatInterface({
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMessage = {
+    const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user' as const,
       content: input,
-      createdAt: new Date(),
+      created_at: new Date().toISOString(),
+      conversation_id: '', // This will be set by the server
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -54,20 +71,18 @@ export function RAGChatInterface({
 
     try {
       const data = await sendChatMessage(
-        [...messages, userMessage].map((m) => ({
-          role: m.role,
-          content: m.content,
-        })),
+        [...messages, userMessage],
         selectedDocuments
       );
 
       setSources(data.sources || []);
 
-      const assistantMessage = {
+      const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant' as const,
         content: data.response,
-        createdAt: new Date(),
+        created_at: new Date().toISOString(),
+        conversation_id: '', // This will be set by the server
       };
 
       setMessages((prev) => [...prev, assistantMessage]);

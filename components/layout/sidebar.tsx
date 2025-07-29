@@ -25,8 +25,6 @@ import {
   UserCheck,
   ChevronDown,
   ChevronRight,
-  Menu,
-  X,
   Shield,
 } from 'lucide-react';
 

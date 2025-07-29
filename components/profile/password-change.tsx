@@ -13,7 +13,7 @@ interface PasswordChangeProps {
   userEmail: string;
 }
 
-export function PasswordChange({ onPasswordChange, userEmail }: PasswordChangeProps) {
+export function PasswordChange({ onPasswordChange }: Omit<PasswordChangeProps, 'userEmail'>) {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showPasswords, setShowPasswords] = useState({

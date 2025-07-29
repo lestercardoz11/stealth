@@ -19,7 +19,6 @@ import {
 import { validateFile, formatFileSize } from '@/lib/utils/file-validation';
 import { uploadDocument } from '@/lib/storage/document-api';
 import { PrivacyBadge } from '@/components/security/privacy-badge';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { cn } from '@/lib/utils';
 

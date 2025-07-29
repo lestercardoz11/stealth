@@ -5,13 +5,13 @@ export interface ProcessedChunk {
   content: string;
   embedding: number[];
   chunkIndex: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export async function processDocumentText(
   documentId: string,
   text: string,
-  metadata: Record<string, any> = {}
+  metadata: Record<string, unknown> = {}
 ): Promise<void> {
   const supabase = await createClient();
   
