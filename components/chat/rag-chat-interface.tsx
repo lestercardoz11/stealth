@@ -18,8 +18,10 @@ import { Message } from '@/lib/types/database';
 
 interface Document {
   id: string;
-  name: string;
-  uploaded_at: string;
+  title: string;
+  created_at: string;
+  is_company_wide: boolean;
+  user_id: string;
 }
 
 interface RAGChatInterfaceProps {
@@ -69,10 +71,7 @@ export function RAGChatInterface({
 
     try {
       const data = await sendChatMessage(
-        [...messages, userMessage].map((m) => ({
-          role: m.role,
-          content: m.content,
-        })),
+        [...messages, userMessage],
         selectedDocuments
       );
 
