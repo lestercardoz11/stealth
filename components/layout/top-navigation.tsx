@@ -18,9 +18,6 @@ import {
   LogOut,
   Shield,
   MessageSquare,
-  FileText,
-  Users,
-  BarChart3,
   Menu,
   X,
   Bell,
@@ -62,21 +59,10 @@ export function TopNavigation({ profile }: TopNavigationProps) {
     if (!profile || profile.status !== 'approved') return [];
 
     if (profile.role === 'admin') {
-      return [
-        { icon: Shield, label: 'Admin Dashboard', href: '/admin' },
-        { icon: Users, label: 'User Management', href: '/admin/users' },
-        { icon: FileText, label: 'Documents', href: '/admin/documents' },
-        { icon: BarChart3, label: 'Analytics', href: '/admin/analytics' },
-      ];
+      return [{ icon: Shield, label: 'Dashboard', href: '/admin' }];
     } else {
       return [
         { icon: MessageSquare, label: 'AI Chat', href: '/employee/chat' },
-        { icon: FileText, label: 'My Documents', href: '/employee/documents' },
-        {
-          icon: FileText,
-          label: 'Company Docs',
-          href: '/employee/company-documents',
-        },
       ];
     }
   };
@@ -121,13 +107,11 @@ export function TopNavigation({ profile }: TopNavigationProps) {
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className='relative h-10 w-auto text-white bg-transparent hover:bg-transparent'>
-                    <Avatar className='h-8 w-8'>
-                      <AvatarFallback className='bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm'>
-                        {getInitials(profile.full_name, profile.email)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
+                  <Avatar className='h-8 w-8 cursor-pointer'>
+                    <AvatarFallback className='bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm'>
+                      {getInitials(profile.full_name, profile.email)}
+                    </AvatarFallback>
+                  </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   className='w-64 focus:outline-none'
@@ -147,9 +131,6 @@ export function TopNavigation({ profile }: TopNavigationProps) {
                   {pathname === '/' && quickActions.length > 0 && (
                     <>
                       <DropdownMenuSeparator />
-                      <DropdownMenuLabel className='text-xs text-muted-foreground uppercase tracking-wider'>
-                        Quick Actions
-                      </DropdownMenuLabel>
                       {quickActions.map((action) => (
                         <DropdownMenuItem
                           key={action.href}
@@ -163,8 +144,6 @@ export function TopNavigation({ profile }: TopNavigationProps) {
                       ))}
                     </>
                   )}
-
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem className='cursor-pointer' asChild>
                     <Link href='/profile'>
                       <User className='mr-2 h-4 w-4' />
@@ -182,7 +161,7 @@ export function TopNavigation({ profile }: TopNavigationProps) {
                     className='cursor-pointer text-destructive'
                     onClick={handleSignOut}>
                     <LogOut className='mr-2 h-4 w-4 text-destructive' />
-                    <span>Sign Out</span>
+                    <span className=' text-destructive'>Sign Out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -196,7 +175,7 @@ export function TopNavigation({ profile }: TopNavigationProps) {
                 <Link href='/auth/login'>Sign In</Link>
               </Button>
               <Button asChild className='bg-primary hover:bg-primary/90'>
-                <Link href='/auth/sign-up'>Get Started</Link>
+                <Link href='/auth/sign-up'>Sign Up</Link>
               </Button>
             </div>
           )}
