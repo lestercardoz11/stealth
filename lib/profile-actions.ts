@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/utils/supabase/server';
 
-import { getDocuments as getDocumentsAPI } from '@/lib/storage/document-api';
+import { createClient } from '@/lib/utils/supabase/server';
 
 export async function updateUserProfile(userId: string, data: { full_name: string }) {
   'use server';
@@ -58,32 +58,43 @@ export async function updateUserPassword(email: string, currentPassword: string,
 }
 
 export async function getUserDocuments(userId: string) {
-  const result = await getDocumentsAPI(userId);
-  if (!result.success) {
-    throw new Error(result.error || 'Failed to fetch documents');
-  }
-  return result.documents || [];
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('documents')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  
+  if (error) throw error;
+  return data || [];
 }
 
 export async function getAllDocuments() {
-  const result = await getDocumentsAPI();
-  if (!result.success) {
-    throw new Error(result.error || 'Failed to fetch documents');
-  }
-  return result.documents || [];
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('documents')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (error) throw error;
+  return data || [];
 }
 
 export async function getChatDocuments() {
-  const result = await getDocumentsAPI();
-  if (!result.success) {
-    throw new Error(result.error || 'Failed to fetch documents');
-  }
-  // Return only the fields needed for chat
-  return (result.documents || []).map(doc => ({
-    id: doc.id,
-    title: doc.title,
-    created_at: doc.created_at,
-    is_company_wide: doc.is_company_wide,
-    user_id: doc.user_id
-  }));
+  const supabase = await createClient();
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+  
+  // Get user's own documents and company-wide documents
+  const { data, error } = await supabase
+    .from('documents')
+    .select('id, title, created_at, is_company_wide, user_id')
+    .or(`user_id.eq.${user.id},is_company_wide.eq.true`)
+    .order('created_at', { ascending: false });
+  
+  if (error) throw error;
+  return data || [];
 }

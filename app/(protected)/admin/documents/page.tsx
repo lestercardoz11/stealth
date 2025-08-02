@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth/roles';
-import { getDocuments } from '@/lib/storage/document-api';
+import { getAllDocuments } from '@/lib/profile-actions';
 import { AdminDocumentManager } from '@/components/documents/admin-document-manager';
 
 export default async function AdminDocumentsPage() {
@@ -10,10 +10,7 @@ export default async function AdminDocumentsPage() {
     redirect('/auth/access-denied?reason=Admin access required');
   }
 
-  const documentsResult = await getDocuments();
-  const documents = documentsResult.success
-    ? documentsResult.documents || []
-    : [];
+  const documents = await getAllDocuments();
 
   return (
     <div className='space-y-6 p-6'>
