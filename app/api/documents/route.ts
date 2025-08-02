@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/lib/utils/supabase/server';
 import { rateLimiter, RATE_LIMITS, validateFileName, sanitizeInput } from '@/lib/security/input-validation';
 import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     // Check user profile and status
     const { data: profile } = await supabase
       .from('profiles')
-      .select('status, role')
+      .select('status, role, email')
       .eq('id', user.id)
       .single();
 
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     // Check user profile and status
     const { data: profile } = await supabase
       .from('profiles')
-      .select('status, role')
+      .select('status, role, email')
       .eq('id', user.id)
       .single();
 

@@ -70,7 +70,7 @@ export async function getAllDocuments() {
   if (!result.success) {
     throw new Error(result.error || 'Failed to fetch documents');
   }
-  return result.documents || [];
+  return result || [];
 }
 
 export async function getChatDocuments() {
