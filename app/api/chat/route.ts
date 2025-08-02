@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     // Check user profile and status
     const { data: profile } = await supabase
       .from('profiles')
-      .select('status, role')
+      .select('status, role, email')
       .eq('id', user.id)
       .single();
 
