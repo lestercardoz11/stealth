@@ -1,6 +1,6 @@
 import { requireApprovedUser } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
-import { getChatDocuments } from '@/lib/profile-actions';
+import { getChatDocuments } from '@/lib/actions/profile-actions';
 import { RAGChatInterface } from '@/components/chat/rag-chat-interface';
 
 export default async function ChatPage() {

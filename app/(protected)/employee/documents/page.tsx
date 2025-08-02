@@ -1,6 +1,6 @@
 import { requireApprovedUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
-import { getUserDocuments } from '@/lib/profile-actions';
+import { getUserDocuments } from '@/lib/actions/profile-actions';
 import { EmployeeDocumentManager } from '@/components/documents/employee-document-manager';
 
 export default async function EmployeeDocumentsPage() {
@@ -26,7 +26,7 @@ export default async function EmployeeDocumentsPage() {
         </p>
       </div>
 
-      <EmployeeDocumentManager 
+      <EmployeeDocumentManager
         initialDocuments={userDocuments}
         userProfile={profile}
         onRefreshDocuments={async () => {

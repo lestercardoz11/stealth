@@ -1,7 +1,5 @@
 import { createClient } from '@/lib/utils/supabase/server';
 
-import { createClient } from '@/lib/utils/supabase/server';
-
 export async function updateUserProfile(userId: string, data: { full_name: string }) {
   'use server';
   const supabase = await createClient();

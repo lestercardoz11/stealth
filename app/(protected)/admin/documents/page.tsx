@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/auth/roles';
-import { getAllDocuments } from '@/lib/profile-actions';
+import { getAllDocuments } from '@/lib/actions/profile-actions';
 import { AdminDocumentManager } from '@/components/documents/admin-document-manager';
 
 export default async function AdminDocumentsPage() {
