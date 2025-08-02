@@ -115,13 +115,6 @@ export function EmployeeDocumentManager({
     setIsViewerOpen(true);
   };
 
-  const handleUploadComplete = (success: boolean, message: string) => {
-    console.log(message);
-    if (success) {
-      refreshDocuments();
-    }
-  };
-
   return (
     <div className='space-y-6'>
       {/* Stats Card */}
@@ -160,9 +153,7 @@ export function EmployeeDocumentManager({
       </div>
 
       {/* Upload Section */}
-      {showUpload && (
-        <DocumentUpload allowCompanyWide={false} />
-      )}
+      {showUpload && <DocumentUpload allowCompanyWide={false} />}
 
       {/* Search and Filters - Hide type filter since employees only see their own docs */}
       <div className='space-y-4'>

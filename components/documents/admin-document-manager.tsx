@@ -121,12 +121,6 @@ export function AdminDocumentManager({
     setIsViewerOpen(true);
   };
 
-  const handleUploadComplete = (success: boolean) => {
-    if (success) {
-      refreshDocuments();
-    }
-  };
-
   const stats = {
     total: documents.length,
     company: documents.filter((doc) => doc.is_company_wide).length,
@@ -197,9 +191,7 @@ export function AdminDocumentManager({
       </div>
 
       {/* Upload Section */}
-      {showUpload && (
-        <DocumentUpload allowCompanyWide={true} />
-      )}
+      {showUpload && <DocumentUpload allowCompanyWide={true} />}
 
       {/* Search and Filters */}
       <DocumentSearch

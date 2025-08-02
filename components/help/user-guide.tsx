@@ -22,6 +22,7 @@ import {
   ExternalLink,
   Play,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface GuideSection {
   id: string;
@@ -45,8 +46,12 @@ interface GuideArticle {
 export function UserGuide() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [expandedSections, setExpandedSections] = useState<string[]>(['getting-started']);
-  const [selectedArticle, setSelectedArticle] = useState<GuideArticle | null>(null);
+  const [expandedSections, setExpandedSections] = useState<string[]>([
+    'getting-started',
+  ]);
+  const [selectedArticle, setSelectedArticle] = useState<GuideArticle | null>(
+    null
+  );
 
   const guideSections: GuideSection[] = [
     {
@@ -89,7 +94,8 @@ Your data never leaves your infrastructure. All processing is done locally with 
         {
           id: 'first-steps',
           title: 'Your First Steps',
-          description: 'Complete your account setup and upload your first document',
+          description:
+            'Complete your account setup and upload your first document',
           readTime: '5 min',
           difficulty: 'beginner',
           content: `
@@ -379,22 +385,25 @@ Keep your platform secure with comprehensive monitoring.
     { id: 'security', label: 'Security' },
   ];
 
-  const filteredSections = guideSections.filter(section => {
-    const matchesCategory = selectedCategory === 'all' || section.category === selectedCategory;
-    const matchesSearch = !searchTerm || 
+  const filteredSections = guideSections.filter((section) => {
+    const matchesCategory =
+      selectedCategory === 'all' || section.category === selectedCategory;
+    const matchesSearch =
+      !searchTerm ||
       section.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      section.articles.some(article => 
-        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.description.toLowerCase().includes(searchTerm.toLowerCase())
+      section.articles.some(
+        (article) =>
+          article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          article.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
-    
+
     return matchesCategory && matchesSearch;
   });
 
   const toggleSection = (sectionId: string) => {
-    setExpandedSections(prev =>
+    setExpandedSections((prev) =>
       prev.includes(sectionId)
-        ? prev.filter(id => id !== sectionId)
+        ? prev.filter((id) => id !== sectionId)
         : [...prev, sectionId]
     );
   };
@@ -416,10 +425,7 @@ Keep your platform secure with comprehensive monitoring.
     return (
       <div className='space-y-6'>
         <div className='flex items-center gap-4'>
-          <Button
-            variant='outline'
-            onClick={() => setSelectedArticle(null)}
-          >
+          <Button variant='outline' onClick={() => setSelectedArticle(null)}>
             ← Back to Guide
           </Button>
           <div>
@@ -438,9 +444,11 @@ Keep your platform secure with comprehensive monitoring.
         <Card>
           <CardContent className='p-6'>
             <div className='prose prose-sm max-w-none dark:prose-invert'>
-              <div dangerouslySetInnerHTML={{ 
-                __html: selectedArticle.content.replace(/\n/g, '<br>') 
-              }} />
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: selectedArticle.content.replace(/\n/g, '<br>'),
+                }}
+              />
             </div>
           </CardContent>
         </Card>
@@ -472,15 +480,14 @@ Keep your platform secure with comprehensive monitoring.
             className='pl-10'
           />
         </div>
-        
+
         <div className='flex gap-2 flex-wrap'>
           {categories.map((category) => (
             <Button
               key={category.id}
               variant={selectedCategory === category.id ? 'default' : 'outline'}
               size='sm'
-              onClick={() => setSelectedCategory(category.id)}
-            >
+              onClick={() => setSelectedCategory(category.id)}>
               {category.label}
             </Button>
           ))}
@@ -508,7 +515,7 @@ Keep your platform secure with comprehensive monitoring.
                 </p>
               </div>
             </div>
-            
+
             <div className='flex items-start gap-3'>
               <div className='w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold'>
                 2
@@ -520,7 +527,7 @@ Keep your platform secure with comprehensive monitoring.
                 </p>
               </div>
             </div>
-            
+
             <div className='flex items-start gap-3'>
               <div className='w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold'>
                 3
@@ -542,8 +549,7 @@ Keep your platform secure with comprehensive monitoring.
           <Card key={section.id}>
             <Collapsible
               open={expandedSections.includes(section.id)}
-              onOpenChange={() => toggleSection(section.id)}
-            >
+              onOpenChange={() => toggleSection(section.id)}>
               <CollapsibleTrigger asChild>
                 <CardHeader className='cursor-pointer hover:bg-accent/50 transition-colors'>
                   <div className='flex items-center justify-between'>
@@ -552,20 +558,24 @@ Keep your platform secure with comprehensive monitoring.
                         <section.icon className='h-5 w-5 text-primary' />
                       </div>
                       <div className='text-left'>
-                        <CardTitle className='text-lg'>{section.title}</CardTitle>
+                        <CardTitle className='text-lg'>
+                          {section.title}
+                        </CardTitle>
                         <p className='text-sm text-muted-foreground'>
                           {section.description}
                         </p>
                       </div>
                     </div>
-                    <ChevronDown className={cn(
-                      'h-5 w-5 transition-transform',
-                      expandedSections.includes(section.id) && 'rotate-180'
-                    )} />
+                    <ChevronDown
+                      className={cn(
+                        'h-5 w-5 transition-transform',
+                        expandedSections.includes(section.id) && 'rotate-180'
+                      )}
+                    />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
-              
+
               <CollapsibleContent>
                 <CardContent className='pt-0'>
                   <div className='space-y-3'>
@@ -573,16 +583,20 @@ Keep your platform secure with comprehensive monitoring.
                       <div
                         key={article.id}
                         className='p-4 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer'
-                        onClick={() => setSelectedArticle(article)}
-                      >
+                        onClick={() => setSelectedArticle(article)}>
                         <div className='flex items-start justify-between'>
                           <div className='flex-1'>
-                            <h4 className='font-medium mb-1'>{article.title}</h4>
+                            <h4 className='font-medium mb-1'>
+                              {article.title}
+                            </h4>
                             <p className='text-sm text-muted-foreground mb-2'>
                               {article.description}
                             </p>
                             <div className='flex items-center gap-2'>
-                              <Badge className={getDifficultyColor(article.difficulty)}>
+                              <Badge
+                                className={getDifficultyColor(
+                                  article.difficulty
+                                )}>
                                 {article.difficulty}
                               </Badge>
                               <span className='text-xs text-muted-foreground'>
@@ -615,7 +629,8 @@ Keep your platform secure with comprehensive monitoring.
             <div>
               <h3 className='font-semibold mb-2'>Need More Help?</h3>
               <p className='text-sm text-muted-foreground mb-4'>
-                Can&apos;t find what you&apos;re looking for? Contact your administrator or check our FAQ.
+                Can&apos;t find what you&apos;re looking for? Contact your
+                administrator or check our FAQ.
               </p>
               <div className='flex justify-center gap-2'>
                 <Button variant='outline' size='sm'>

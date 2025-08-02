@@ -5,15 +5,15 @@ import { FAQSection } from '@/components/help/faq-section';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  BookOpen, 
-  HelpCircle, 
-  MessageSquare, 
-  Mail, 
+import {
+  BookOpen,
+  HelpCircle,
+  MessageSquare,
+  Mail,
   ExternalLink,
   Shield,
   Zap,
-  FileText
+  FileText,
 } from 'lucide-react';
 
 export default async function EmployeeHelpPage() {
@@ -24,7 +24,7 @@ export default async function EmployeeHelpPage() {
   }
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6 p-6'>
       <div>
         <h1 className='text-3xl font-bold'>Help & Support</h1>
         <p className='text-muted-foreground'>
@@ -118,7 +118,7 @@ export default async function EmployeeHelpPage() {
             <div className='space-y-3'>
               <h4 className='font-medium'>Contact Your Administrator</h4>
               <p className='text-sm text-muted-foreground'>
-                For account issues, permissions, or platform-specific questions, 
+                For account issues, permissions, or platform-specific questions,
                 contact your system administrator.
               </p>
               <Button variant='outline' size='sm'>
@@ -126,11 +126,11 @@ export default async function EmployeeHelpPage() {
                 Contact Admin
               </Button>
             </div>
-            
+
             <div className='space-y-3'>
               <h4 className='font-medium'>Technical Support</h4>
               <p className='text-sm text-muted-foreground'>
-                For technical issues, bugs, or feature requests, reach out to 
+                For technical issues, bugs, or feature requests, reach out to
                 our support team.
               </p>
               <Button variant='outline' size='sm'>

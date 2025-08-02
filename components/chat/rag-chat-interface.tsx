@@ -107,35 +107,35 @@ export function RAGChatInterface({
 
   return (
     <ErrorBoundary>
-      <div className='flex h-full bg-gray-50/50 dark:bg-gray-900/50'>
-      {/* Document Selector Sidebar */}
+      <div className='flex bg-gray-50/50 dark:bg-gray-900/50'>
+        {/* Document Selector Sidebar */}
         <div className='hidden lg:block w-80 border-r bg-background'>
-        <div className='p-4 border-b'>
-          <div className='mb-3'>
-            <PrivacyBadge variant='compact' />
+          <div className='p-4 border-b'>
+            <div className='mb-3'>
+              <PrivacyBadge variant='compact' />
+            </div>
+            <h3 className='font-semibold flex items-center gap-2'>
+              <FileText className='h-4 w-4' />
+              Document Context
+            </h3>
+            <p className='text-sm text-muted-foreground mt-1'>
+              Select documents to provide context for your AI assistant
+            </p>
           </div>
-          <h3 className='font-semibold flex items-center gap-2'>
-            <FileText className='h-4 w-4' />
-            Document Context
-          </h3>
-          <p className='text-sm text-muted-foreground mt-1'>
-            Select documents to provide context for your AI assistant
-          </p>
+
+          <ScrollArea className='h-[calc(100vh-200px)]'>
+            <div className='p-4'>
+              <DocumentSelector
+                documents={availableDocuments}
+                selected={selectedDocuments}
+                onSelect={setSelectedDocuments}
+              />
+            </div>
+          </ScrollArea>
         </div>
 
-        <ScrollArea className='h-[calc(100vh-200px)]'>
-          <div className='p-4'>
-            <DocumentSelector
-              documents={availableDocuments}
-              selected={selectedDocuments}
-              onSelect={setSelectedDocuments}
-            />
-          </div>
-        </ScrollArea>
-      </div>
-
-      {/* Main Chat Interface */}
-      <div className='flex-1 flex flex-col'>
+        {/* Main Chat Interface */}
+        <div className='flex-1 flex flex-col'>
           {/* Mobile Document Selector */}
           <div className='lg:hidden border-b bg-background p-4'>
             <div className='flex items-center justify-between mb-2'>
@@ -143,133 +143,140 @@ export function RAGChatInterface({
               <PrivacyBadge variant='compact' />
             </div>
             <p className='text-xs text-muted-foreground'>
-              {selectedDocuments.length} document{selectedDocuments.length !== 1 ? 's' : ''} selected
+              {selectedDocuments.length} document
+              {selectedDocuments.length !== 1 ? 's' : ''} selected
             </p>
           </div>
 
-        {/* Messages Area */}
+          {/* Messages Area */}
           <ScrollArea className='flex-1 p-2 md:p-4'>
-          <div className='space-y-4 max-w-4xl mx-auto'>
-            {messages.length === 0 && (
+            <div className='space-y-4 max-w-4xl mx-auto'>
+              {messages.length === 0 && (
                 <div className='text-center py-4 md:py-8'>
-                <div className='w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
-                  <Brain className='h-8 w-8 text-white' />
-                </div>
+                  <div className='w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
+                    <Brain className='h-8 w-8 text-white' />
+                  </div>
                   <h3 className='text-lg md:text-xl font-semibold mb-2'>
-                  Welcome to Stealth AI
-                </h3>
+                    Welcome to Stealth AI
+                  </h3>
                   <p className='text-muted-foreground mb-4 text-sm md:text-base px-4'>
-                    Your intelligent legal document assistant. 
-                    <span className='hidden lg:inline'>Select documents from the sidebar and</span>
-                    <span className='lg:hidden'>Select documents and</span> start asking questions.
-                </p>
+                    Your intelligent legal document assistant.
+                    <span className='hidden lg:inline'>
+                      Select documents from the sidebar and
+                    </span>
+                    <span className='lg:hidden'>Select documents and</span>{' '}
+                    start asking questions.
+                  </p>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 max-w-2xl mx-auto px-4'>
-                  <Card className='p-3 hover:bg-accent/50 transition-colors cursor-pointer'>
+                    <Card className='p-3 hover:bg-accent/50 transition-colors cursor-pointer'>
                       <p className='text-xs md:text-sm font-medium'>
-                      Analyze contract terms
-                    </p>
+                        Analyze contract terms
+                      </p>
                       <p className='text-xs text-muted-foreground'>
-                      Review key clauses and obligations
-                    </p>
-                  </Card>
-                  <Card className='p-3 hover:bg-accent/50 transition-colors cursor-pointer'>
-                      <p className='text-xs md:text-sm font-medium'>Summarize documents</p>
-                      <p className='text-xs text-muted-foreground'>
-                      Get concise overviews of lengthy documents
-                    </p>
-                  </Card>
-                  <Card className='p-3 hover:bg-accent/50 transition-colors cursor-pointer'>
+                        Review key clauses and obligations
+                      </p>
+                    </Card>
+                    <Card className='p-3 hover:bg-accent/50 transition-colors cursor-pointer'>
                       <p className='text-xs md:text-sm font-medium'>
-                      Find specific information
-                    </p>
+                        Summarize documents
+                      </p>
                       <p className='text-xs text-muted-foreground'>
-                      Search across multiple documents
-                    </p>
-                  </Card>
-                  <Card className='p-3 hover:bg-accent/50 transition-colors cursor-pointer'>
-                      <p className='text-xs md:text-sm font-medium'>Legal research</p>
+                        Get concise overviews of lengthy documents
+                      </p>
+                    </Card>
+                    <Card className='p-3 hover:bg-accent/50 transition-colors cursor-pointer'>
+                      <p className='text-xs md:text-sm font-medium'>
+                        Find specific information
+                      </p>
                       <p className='text-xs text-muted-foreground'>
-                      Get insights on legal precedents
-                    </p>
-                  </Card>
+                        Search across multiple documents
+                      </p>
+                    </Card>
+                    <Card className='p-3 hover:bg-accent/50 transition-colors cursor-pointer'>
+                      <p className='text-xs md:text-sm font-medium'>
+                        Legal research
+                      </p>
+                      <p className='text-xs text-muted-foreground'>
+                        Get insights on legal precedents
+                      </p>
+                    </Card>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {messages.map((message) => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                sources={message.role === 'assistant' ? sources : []}
-              />
-            ))}
+              {messages.map((message) => (
+                <MessageBubble
+                  key={message.id}
+                  message={message}
+                  sources={message.role === 'assistant' ? sources : []}
+                />
+              ))}
 
-            {isLoading && (
+              {isLoading && (
                 <div className='flex justify-center'>
                   <LoadingSpinner text='Stealth AI is thinking...' />
-              </div>
-            )}
+                </div>
+              )}
 
-            {error && (
+              {error && (
                 <div className='flex flex-col items-center gap-3 text-red-600 bg-red-50 dark:bg-red-900/20 p-4 rounded-lg'>
                   <div className='flex items-center gap-2'>
                     <AlertCircle className='h-4 w-4' />
                     <span className='text-sm'>Error: {error}</span>
                   </div>
                   <RetryButton onRetry={handleRetry} />
-              </div>
-            )}
+                </div>
+              )}
 
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
-
-        {/* Input Area */}
-        <div className='border-t bg-background p-4'>
-          <form onSubmit={handleSubmit} className='max-w-4xl mx-auto'>
-              <div className='flex gap-2'>
-              <Input
-                value={input}
-                onChange={handleInputChange}
-                placeholder={
-                  selectedDocuments.length > 0
-                    ? 'Ask about your selected documents...'
-                      : 'Select documents first, then ask questions...'
-                }
-                disabled={isLoading}
-                  className='flex-1 text-sm md:text-base'
-              />
-              <Button
-                type='submit'
-                disabled={isLoading || !input.trim()}
-                  size='icon'
-                  className='shrink-0'
-                >
-                {isLoading ? (
-                  <Loader2 className='h-4 w-4 animate-spin' />
-                ) : (
-                  <Send className='h-4 w-4' />
-                )}
-              </Button>
+              <div ref={messagesEndRef} />
             </div>
+          </ScrollArea>
 
-            {selectedDocuments.length === 0 && (
-              <p className='text-xs text-muted-foreground mt-2 text-center'>
-                💡 Tip: Select documents from the sidebar to enable
-                context-aware responses
-              </p>
-            )}
-          </form>
+          {/* Input Area */}
+          <div className='border-t bg-background p-4'>
+            <form onSubmit={handleSubmit} className='max-w-4xl mx-auto'>
+              <div className='flex gap-2'>
+                <Input
+                  value={input}
+                  onChange={handleInputChange}
+                  placeholder={
+                    selectedDocuments.length > 0
+                      ? 'Ask about your selected documents...'
+                      : 'Select documents first, then ask questions...'
+                  }
+                  disabled={isLoading}
+                  className='flex-1 text-sm md:text-base'
+                />
+                <Button
+                  type='submit'
+                  disabled={isLoading || !input.trim()}
+                  size='icon'
+                  className='shrink-0'>
+                  {isLoading ? (
+                    <Loader2 className='h-4 w-4 animate-spin' />
+                  ) : (
+                    <Send className='h-4 w-4' />
+                  )}
+                </Button>
+              </div>
+
+              {selectedDocuments.length === 0 && (
+                <p className='text-xs text-muted-foreground mt-2 text-center'>
+                  💡 Tip: Select documents from the sidebar to enable
+                  context-aware responses
+                </p>
+              )}
+            </form>
+          </div>
         </div>
-      </div>
 
-      {/* Context Panel (optional, can be toggled) */}
+        {/* Context Panel (optional, can be toggled) */}
         {sources.length > 0 && (
           <div className='hidden xl:block'>
             <ContextPanel sources={sources} />
           </div>
         )}
-    </div>
+      </div>
     </ErrorBoundary>
   );
 }

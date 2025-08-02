@@ -15,14 +15,10 @@ import {
   Home,
   Users,
   FileText,
-  BarChart3,
   Settings,
   MessageSquare,
   Building2,
   HelpCircle,
-  Upload,
-  Library,
-  UserCheck,
   ChevronDown,
   ChevronRight,
   Shield,
@@ -42,7 +38,7 @@ interface NavItem {
 
 export function Sidebar({ profile }: SidebarProps) {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const adminNavItems: NavItem[] = [
@@ -52,31 +48,14 @@ export function Sidebar({ profile }: SidebarProps) {
       icon: Home,
     },
     {
-      title: 'User Management',
+      title: 'Users',
       icon: Users,
-      children: [
-        {
-          title: 'Pending Approvals',
-          href: '/admin/users/pending',
-          icon: UserCheck,
-          // badge: '3', // This would be dynamic
-        },
-        {
-          title: 'All Users',
-          href: '/admin/users',
-          icon: Users,
-        },
-      ],
+      href: '/admin/users',
     },
     {
       title: 'Documents',
       icon: FileText,
       href: '/admin/documents',
-    },
-    {
-      title: 'Analytics',
-      href: '/admin/analytics',
-      icon: BarChart3,
     },
     {
       title: 'Settings',
@@ -99,18 +78,7 @@ export function Sidebar({ profile }: SidebarProps) {
     {
       title: 'My Documents',
       icon: FileText,
-      children: [
-        {
-          title: 'Upload',
-          href: '/employee/documents/upload',
-          icon: Upload,
-        },
-        {
-          title: 'My Library',
-          href: '/employee/documents',
-          icon: Library,
-        },
-      ],
+      href: '/employee/documents',
     },
     {
       title: 'Company Documents',

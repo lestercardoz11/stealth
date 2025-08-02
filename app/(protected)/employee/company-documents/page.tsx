@@ -11,7 +11,7 @@ export default async function CompanyDocumentsPage() {
   }
 
   const profile = await getCurrentUserProfile();
-  
+
   // Get only company-wide documents
   const supabase = await createClient();
   const { data: companyDocuments, error } = await supabase
@@ -19,13 +19,13 @@ export default async function CompanyDocumentsPage() {
     .select('*')
     .eq('is_company_wide', true)
     .order('created_at', { ascending: false });
-  
+
   if (error) {
     console.error('Error fetching company documents:', error);
   }
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6 p-6'>
       <div>
         <h1 className='text-3xl font-bold'>Company Documents</h1>
         <p className='text-muted-foreground'>
@@ -33,8 +33,8 @@ export default async function CompanyDocumentsPage() {
         </p>
       </div>
 
-      <CompanyDocumentViewer 
-        documents={companyDocuments || []} 
+      <CompanyDocumentViewer
+        documents={companyDocuments || []}
         userProfile={profile}
       />
     </div>
