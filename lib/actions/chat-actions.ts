@@ -19,9 +19,8 @@ export async function sendChatMessage(
   documentIds: string[]
 ): Promise<ChatResponse> {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:3000'}/api/chat`,
-      {
+    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,8 +29,7 @@ export async function sendChatMessage(
           messages,
           documentIds,
         }),
-      }
-    );
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -73,9 +71,8 @@ export async function saveChatSession(
 ): Promise<{ sessionId: string }> {
   // Implementation for saving chat sessions
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/api/chat/sessions`,
-      {
+    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/chat/sessions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,8 +81,7 @@ export async function saveChatSession(
           messages,
           sessionId,
         }),
-      }
-    );
+    });
 
     if (!response.ok) {
       throw new Error('Failed to save chat session');
