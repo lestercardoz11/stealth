@@ -80,10 +80,7 @@ export default async function ProfilePage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <PasswordChange
-              onPasswordChange={handlePasswordChange}
-              userEmail={profile.email}
-            />
+            <PasswordChange onPasswordChange={handlePasswordChange} />
           </CardContent>
         </Card>
 
