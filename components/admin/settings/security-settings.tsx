@@ -52,7 +52,7 @@ export function SecuritySettings() {
       localStorage.setItem('securityConfig', JSON.stringify(config));
       
       setMessage({ type: 'success', text: 'Security settings saved successfully!' });
-    } catch (error) {
+    } catch {
       setMessage({ 
         type: 'error', 
         text: 'Failed to save security settings' 
