@@ -28,17 +28,7 @@ export default async function EmployeeDocumentUploadPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <DocumentUpload 
-            allowCompanyWide={false}
-            onUploadComplete={(success, message) => {
-              if (success) {
-                // Could add toast notification here
-                console.log('Upload successful:', message);
-              } else {
-                console.error('Upload failed:', message);
-              }
-            }}
-          />
+          <DocumentUpload allowCompanyWide={false} />
         </CardContent>
       </Card>
     </div>

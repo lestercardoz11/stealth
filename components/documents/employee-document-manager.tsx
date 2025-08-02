@@ -119,7 +119,6 @@ export function EmployeeDocumentManager({
     console.log(message);
     if (success) {
       refreshDocuments();
-      setShowUpload(false);
     }
   };
 
@@ -162,10 +161,7 @@ export function EmployeeDocumentManager({
 
       {/* Upload Section */}
       {showUpload && (
-        <DocumentUpload
-          allowCompanyWide={false}
-          onUploadComplete={handleUploadComplete}
-        />
+        <DocumentUpload allowCompanyWide={false} />
       )}
 
       {/* Search and Filters - Hide type filter since employees only see their own docs */}

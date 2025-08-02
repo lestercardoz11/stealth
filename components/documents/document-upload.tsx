@@ -23,7 +23,6 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { cn } from '@/lib/utils';
 
 interface DocumentUploadProps {
-  onUploadComplete?: (success: boolean, message: string) => void;
   allowCompanyWide?: boolean;
   className?: string;
 }
@@ -38,12 +37,12 @@ interface UploadingFile {
 }
 
 export function DocumentUpload({
-  onUploadComplete,
   allowCompanyWide = false,
   className,
 }: DocumentUploadProps) {
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Wrap handleUpload in useCallback to prevent recreating on every render
   const handleUpload = useCallback(
@@ -68,12 +67,10 @@ export function DocumentUpload({
           )
         );
 
-        onUploadComplete?.(
-          result.success,
-          result.message ||
-            result.error ||
-            (result.success ? 'Upload successful' : 'Upload failed')
-        );
+        setMessage({
+          type: result.success ? 'success' : 'error',
+          text: result.message || result.error || (result.success ? 'Upload successful' : 'Upload failed')
+        });
       } catch (error) {
         setUploadingFiles((prev) =>
           prev.map((file, i) =>
@@ -88,10 +85,10 @@ export function DocumentUpload({
               : file
           )
         );
-        onUploadComplete?.(false, 'Upload failed');
+        setMessage({ type: 'error', text: 'Upload failed' });
       }
     },
-    [onUploadComplete]
+    []
   );
 
   const onDrop = useCallback(
@@ -99,7 +96,7 @@ export function DocumentUpload({
       const validFiles = acceptedFiles.filter((file) => {
         const validation = validateFile(file);
         if (!validation.isValid) {
-          onUploadComplete?.(false, validation.error || 'Invalid file');
+          setMessage({ type: 'error', text: validation.error || 'Invalid file' });
           return false;
         }
         return true;
@@ -120,7 +117,7 @@ export function DocumentUpload({
         handleUpload(uploadingFile, uploadingFiles.length + index);
       });
     },
-    [uploadingFiles.length, onUploadComplete, handleUpload]
+    [uploadingFiles.length, handleUpload]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -205,6 +202,30 @@ export function DocumentUpload({
         </CardContent>
       </Card>
       </ErrorBoundary>
+
+      {/* Status Message */}
+      {message && (
+        <Card className={cn(
+          "border",
+          message.type === 'success' ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20" : "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20"
+        )}>
+          <CardContent className="p-3">
+            <div className="flex items-center gap-2">
+              {message.type === 'success' ? (
+                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+              )}
+              <p className={cn(
+                "text-sm",
+                message.type === 'success' ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"
+              )}>
+                {message.text}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Uploading Files */}
       {uploadingFiles.length > 0 && (

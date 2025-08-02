@@ -124,7 +124,6 @@ export function AdminDocumentManager({
   const handleUploadComplete = (success: boolean) => {
     if (success) {
       refreshDocuments();
-      setShowUpload(false);
     }
   };
 
@@ -199,10 +198,7 @@ export function AdminDocumentManager({
 
       {/* Upload Section */}
       {showUpload && (
-        <DocumentUpload
-          allowCompanyWide={true}
-          onUploadComplete={handleUploadComplete}
-        />
+        <DocumentUpload allowCompanyWide={true} />
       )}
 
       {/* Search and Filters */}

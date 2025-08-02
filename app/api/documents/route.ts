@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/utils/supabase/server';
-import { rateLimiter, RATE_LIMITS, validateFileName, sanitizeInput } from '@/lib/security/input-validation';
-import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,7 +17,7 @@ export async function GET(request: NextRequest) {
     // Check user profile and status
     const { data: profile } = await supabase
       .from('profiles')
-      .select('status, role, email')
+      .select('status, role')
       .eq('id', user.id)
       .single();
 
@@ -57,10 +55,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const clientIP = request.headers.get('x-forwarded-for') || 
-                    request.headers.get('x-real-ip') || 
-                    'unknown';
-                    
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const title = formData.get('title') as string;
@@ -70,14 +64,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File and title are required' }, { status: 400 });
     }
 
-    // Validate and sanitize inputs
-    const sanitizedTitle = sanitizeInput(title);
-    const titleValidation = validateFileName(sanitizedTitle);
-    if (!titleValidation.isValid) {
-      return NextResponse.json({ 
-        error: `Invalid title: ${titleValidation.errors.join(', ')}` 
-      }, { status: 400 });
-    }
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -85,25 +71,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Rate limiting
-    const rateLimitKey = `upload:${user.id}`;
-    if (!rateLimiter.isAllowed(rateLimitKey, RATE_LIMITS.UPLOAD.maxRequests, RATE_LIMITS.UPLOAD.windowMs)) {
-      await auditLogger.log({
-        userId: user.id,
-        userEmail: user.email,
-        action: AUDIT_ACTIONS.RATE_LIMIT_EXCEEDED,
-        resource: 'Document Upload',
-        details: 'Upload rate limit exceeded',
-        ipAddress: clientIP,
-        severity: 'medium'
-      });
-      
-      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
-    }
     // Check user profile and status
     const { data: profile } = await supabase
       .from('profiles')
-      .select('status, role, email')
+      .select('status, role')
       .eq('id', user.id)
       .single();
 
@@ -133,7 +104,7 @@ export async function POST(request: NextRequest) {
       .from('documents')
       .insert({
         user_id: user.id,
-        title: sanitizedTitle,
+        title,
         file_path: uploadData.path,
         file_size: file.size,
         file_type: file.type,
@@ -148,22 +119,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: dbError.message }, { status: 500 });
     }
 
-    // Log successful upload
-    await auditLogger.log({
-      userId: user.id,
-      userEmail: profile.email,
-      action: AUDIT_ACTIONS.DOCUMENT_UPLOADED,
-      resource: 'Document Management',
-      details: `Uploaded document: ${sanitizedTitle}`,
-      ipAddress: clientIP,
-      severity: 'low',
-      metadata: {
-        documentId: document.id,
-        fileSize: file.size,
-        fileType: file.type,
-        isCompanyWide
-      }
-    });
     return NextResponse.json({ 
       success: true, 
       document,
@@ -172,25 +127,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Document upload error:', error);
-    
-    // Log error for security monitoring
-    try {
-      const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      await auditLogger.log({
-        userId: user?.id,
-        userEmail: user?.email,
-        action: 'DOCUMENT_UPLOAD_ERROR',
-        resource: 'Document Management',
-        details: `Upload error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-        severity: 'high'
-      });
-    } catch (auditError) {
-      console.error('Failed to log audit event:', auditError);
-    }
-    
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
