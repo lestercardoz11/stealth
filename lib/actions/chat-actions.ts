@@ -1,13 +1,6 @@
 'use server';
 
-import { Message } from '@/lib/types/database';
-
-interface Source {
-  documentId: string;
-  documentTitle: string;
-  similarity: number;
-  content: string;
-}
+import { Message, Source } from '@/lib/types/database';
 
 export interface ChatResponse {
   response: string;

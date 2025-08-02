@@ -9,7 +9,7 @@ interface RetryButtonProps {
   onRetry: () => Promise<void> | void;
   disabled?: boolean;
   variant?: 'default' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
   children?: React.ReactNode;
 }
@@ -20,13 +20,13 @@ export function RetryButton({
   variant = 'outline',
   size = 'sm',
   className,
-  children = 'Try Again'
+  children = 'Try Again',
 }: RetryButtonProps) {
   const [isRetrying, setIsRetrying] = useState(false);
 
   const handleRetry = async () => {
     if (disabled || isRetrying) return;
-    
+
     setIsRetrying(true);
     try {
       await onRetry();
@@ -43,12 +43,8 @@ export function RetryButton({
       size={size}
       onClick={handleRetry}
       disabled={disabled || isRetrying}
-      className={cn('gap-2', className)}
-    >
-      <RefreshCw className={cn(
-        'h-4 w-4',
-        isRetrying && 'animate-spin'
-      )} />
+      className={cn('gap-2', className)}>
+      <RefreshCw className={cn('h-4 w-4', isRetrying && 'animate-spin')} />
       {isRetrying ? 'Retrying...' : children}
     </Button>
   );

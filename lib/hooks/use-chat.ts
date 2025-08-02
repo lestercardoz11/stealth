@@ -70,6 +70,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       content: content.trim(),
       role: 'user',
       created_at: new Date().toISOString(),
+      conversation_id: '',
+      sources: [], // Initially empty, will be filled by the response
     };
 
     // Add user message immediately

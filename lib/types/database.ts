@@ -33,10 +33,18 @@ export interface Conversation {
 
 export interface Message {
   id: string;
-  conversation_id: string;
+  conversation_id?: string;
   role: MessageRole;
   content: string;
   created_at: string;
+  sources: Source[]; // Array of sources related to the message
+}
+
+export interface Source {
+  documentId: string;
+  documentTitle: string;
+  similarity: number;
+  content: string;
 }
 
 export interface Database {

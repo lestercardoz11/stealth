@@ -61,6 +61,7 @@ export function RAGChatInterface({
       content: input,
       created_at: new Date().toISOString(),
       conversation_id: '', // This will be set by the server
+      sources: [], // Initially empty, will be filled by the response
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -83,6 +84,7 @@ export function RAGChatInterface({
         content: data.response,
         created_at: new Date().toISOString(),
         conversation_id: '', // This will be set by the server
+        sources: data.sources,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
