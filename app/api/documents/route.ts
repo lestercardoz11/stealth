@@ -3,7 +3,6 @@ import { createClient } from '@/lib/utils/supabase/server';
 import { processDocumentText } from '@/lib/ai/document-processor';
 import pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
-import { fileTypeFromBuffer } from 'file-type';
 
 export async function GET(request: NextRequest) {
   try {

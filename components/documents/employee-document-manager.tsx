@@ -9,6 +9,7 @@ import { DocumentCard } from './document-card';
 import { DocumentViewer } from './document-viewer';
 import { Upload, FileText, User, Loader2 } from 'lucide-react';
 import { Document, Profile } from '@/lib/types/database';
+import { getDocuments } from '@/lib/storage/document-api';
 
 interface EmployeeDocumentManagerProps {
   userProfile: Profile;
@@ -132,10 +133,10 @@ export function EmployeeDocumentManager({
 
   if (isInitialLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-          <p className="text-muted-foreground">Loading your documents...</p>
+      <div className='flex items-center justify-center min-h-[400px]'>
+        <div className='text-center space-y-4'>
+          <Loader2 className='h-8 w-8 animate-spin mx-auto' />
+          <p className='text-muted-foreground'>Loading your documents...</p>
         </div>
       </div>
     );
@@ -180,8 +181,8 @@ export function EmployeeDocumentManager({
 
       {/* Upload Section */}
       {showUpload && (
-        <DocumentUpload 
-          allowCompanyWide={false} 
+        <DocumentUpload
+          allowCompanyWide={false}
           onUploadComplete={handleUploadComplete}
         />
       )}

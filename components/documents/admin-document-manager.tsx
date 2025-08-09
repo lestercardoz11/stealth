@@ -9,12 +9,9 @@ import { DocumentFilters, DocumentSearch } from './document-search';
 import { DocumentUpload } from './document-upload';
 import { DocumentViewer } from './document-viewer';
 import { DocumentCard } from './document-card';
+import { getDocuments } from '@/lib/storage/document-api';
 
-interface AdminDocumentManagerProps {
-}
-
-export function AdminDocumentManager({
-}: AdminDocumentManagerProps) {
+export function AdminDocumentManager() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(
@@ -143,10 +140,10 @@ export function AdminDocumentManager({
 
   if (isInitialLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-          <p className="text-muted-foreground">Loading documents...</p>
+      <div className='flex items-center justify-center min-h-[400px]'>
+        <div className='text-center space-y-4'>
+          <Loader2 className='h-8 w-8 animate-spin mx-auto' />
+          <p className='text-muted-foreground'>Loading documents...</p>
         </div>
       </div>
     );
@@ -217,8 +214,8 @@ export function AdminDocumentManager({
 
       {/* Upload Section */}
       {showUpload && (
-        <DocumentUpload 
-          allowCompanyWide={true} 
+        <DocumentUpload
+          allowCompanyWide={true}
           onUploadComplete={handleUploadComplete}
         />
       )}

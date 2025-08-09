@@ -38,6 +38,8 @@ export async function uploadDocument(
 
     const data = await response.json();
 
+    console.log('Upload response:', data);
+
     if (!response.ok) {
       return { success: false, error: data.error || 'Upload failed' };
     }
