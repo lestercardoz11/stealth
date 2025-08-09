@@ -1,5 +1,6 @@
 import { requireApprovedUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
+import { getUserDocuments } from '@/lib/actions/profile-actions';
 import { EmployeeDocumentManager } from '@/components/documents/employee-document-manager';
 
 export default async function EmployeeDocumentsPage() {
@@ -14,6 +15,9 @@ export default async function EmployeeDocumentsPage() {
     redirect('/auth/login');
   }
 
+  // Fetch user's documents on the server side
+  const documents = await getUserDocuments(profile.id);
+
   return (
     <div className='space-y-6 p-6'>
       <div>
@@ -23,7 +27,7 @@ export default async function EmployeeDocumentsPage() {
         </p>
       </div>
 
-      <EmployeeDocumentManager userProfile={profile} />
+      <EmployeeDocumentManager userProfile={profile} initialDocuments={documents} />
     </div>
   );
 }

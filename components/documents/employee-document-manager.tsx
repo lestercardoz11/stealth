@@ -13,12 +13,14 @@ import { getDocuments } from '@/lib/storage/document-api';
 
 interface EmployeeDocumentManagerProps {
   userProfile: Profile;
+  initialDocuments: Document[];
 }
 
 export function EmployeeDocumentManager({
   userProfile,
+  initialDocuments,
 }: EmployeeDocumentManagerProps) {
-  const [documents, setDocuments] = useState<Document[]>([]);
+  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(
     null
@@ -35,23 +37,11 @@ export function EmployeeDocumentManager({
     sortBy: 'newest',
   });
 
-  // Load documents on component mount
+  // Initialize documents from props
   useEffect(() => {
-    loadDocuments();
-  }, []);
-
-  const loadDocuments = async () => {
-    try {
-      const result = await getDocuments(userProfile.id);
-      if (result.success) {
-        setDocuments(result.documents || []);
-      }
-    } catch (error) {
-      console.error('Error loading documents:', error);
-    } finally {
-      setIsInitialLoading(false);
-    }
-  };
+    setDocuments(initialDocuments);
+    setIsInitialLoading(false);
+  }, [initialDocuments]);
 
   // Filter and sort documents
   useEffect(() => {
@@ -113,7 +103,8 @@ export function EmployeeDocumentManager({
 
   const handleRefreshDocuments = async () => {
     setIsLoading(true);
-    await loadDocuments();
+    // Refresh the page to reload server data
+    window.location.reload();
     setIsLoading(false);
   };
 
@@ -127,7 +118,8 @@ export function EmployeeDocumentManager({
   };
 
   const handleUploadComplete = () => {
-    loadDocuments(); // Refresh documents after upload
+    // Refresh the page to reload server data
+    window.location.reload();
     setShowUpload(false); // Hide upload section
   };
 

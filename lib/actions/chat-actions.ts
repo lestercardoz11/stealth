@@ -12,8 +12,7 @@ export async function sendChatMessage(
   documentIds: string[]
 ): Promise<ChatResponse> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/chat`, {
+    const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -64,8 +63,7 @@ export async function saveChatSession(
 ): Promise<{ sessionId: string }> {
   // Implementation for saving chat sessions
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/chat/sessions`, {
+    const response = await fetch('/api/chat/sessions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

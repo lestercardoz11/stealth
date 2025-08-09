@@ -25,13 +25,12 @@ export async function uploadDocument(
   isCompanyWide: boolean = false
 ): Promise<DocumentUploadResult> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:3000';
     const formData = new FormData();
     formData.append('file', file);
     formData.append('title', title);
     formData.append('isCompanyWide', isCompanyWide.toString());
 
-    const response = await fetch(`${baseUrl}/api/documents`, {
+    const response = await fetch('/api/documents', {
       method: 'POST',
       body: formData,
     });
@@ -62,12 +61,11 @@ export async function getDocuments(
   companyWideOnly: boolean = false
 ): Promise<DocumentListResult> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:3000';
     const params = new URLSearchParams();
     if (userId) params.append('userId', userId);
     if (companyWideOnly) params.append('companyWideOnly', 'true');
 
-    const response = await fetch(`${baseUrl}/api/documents?${params.toString()}`);
+    const response = await fetch(`/api/documents?${params.toString()}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -88,8 +86,7 @@ export async function getDocuments(
 
 export async function deleteDocument(documentId: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/documents/${documentId}`, {
+    const response = await fetch(`/api/documents/${documentId}`, {
       method: 'DELETE',
     });
 
@@ -110,8 +107,7 @@ export async function deleteDocument(documentId: string): Promise<{ success: boo
 
 export async function getDocumentUrl(filePath: string): Promise<DocumentUrlResult> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/documents/url`, {
+    const response = await fetch('/api/documents/url', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
