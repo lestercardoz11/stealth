@@ -11,24 +11,21 @@ import { Upload, FileText, User, Loader2 } from 'lucide-react';
 import { Document, Profile } from '@/lib/types/database';
 
 interface EmployeeDocumentManagerProps {
-  initialDocuments: Document[];
   userProfile: Profile;
-  onRefreshDocuments: () => Promise<void>;
 }
 
 export function EmployeeDocumentManager({
-  initialDocuments,
-  onRefreshDocuments,
+  userProfile,
 }: EmployeeDocumentManagerProps) {
-  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
-  const [filteredDocuments, setFilteredDocuments] =
-    useState<Document[]>(initialDocuments);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(
     null
   );
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const [filters, setFilters] = useState<DocumentFilters>({
     search: '',
@@ -36,6 +33,24 @@ export function EmployeeDocumentManager({
     fileType: 'all',
     sortBy: 'newest',
   });
+
+  // Load documents on component mount
+  useEffect(() => {
+    loadDocuments();
+  }, []);
+
+  const loadDocuments = async () => {
+    try {
+      const result = await getDocuments(userProfile.id);
+      if (result.success) {
+        setDocuments(result.documents || []);
+      }
+    } catch (error) {
+      console.error('Error loading documents:', error);
+    } finally {
+      setIsInitialLoading(false);
+    }
+  };
 
   // Filter and sort documents
   useEffect(() => {
@@ -95,15 +110,10 @@ export function EmployeeDocumentManager({
     setFilteredDocuments(filtered);
   }, [documents, filters]);
 
-  const refreshDocuments = async () => {
+  const handleRefreshDocuments = async () => {
     setIsLoading(true);
-    try {
-      await onRefreshDocuments();
-    } catch (error) {
-      console.error('Error refreshing documents:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    await loadDocuments();
+    setIsLoading(false);
   };
 
   const handleDocumentDelete = (documentId: string) => {
@@ -114,6 +124,22 @@ export function EmployeeDocumentManager({
     setSelectedDocument(doc);
     setIsViewerOpen(true);
   };
+
+  const handleUploadComplete = () => {
+    loadDocuments(); // Refresh documents after upload
+    setShowUpload(false); // Hide upload section
+  };
+
+  if (isInitialLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+          <p className="text-muted-foreground">Loading your documents...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>
@@ -141,7 +167,7 @@ export function EmployeeDocumentManager({
           </Button>
           <Button
             variant='outline'
-            onClick={refreshDocuments}
+            onClick={handleRefreshDocuments}
             disabled={isLoading}>
             {isLoading ? (
               <Loader2 className='h-4 w-4 animate-spin' />
@@ -153,7 +179,12 @@ export function EmployeeDocumentManager({
       </div>
 
       {/* Upload Section */}
-      {showUpload && <DocumentUpload allowCompanyWide={false} />}
+      {showUpload && (
+        <DocumentUpload 
+          allowCompanyWide={false} 
+          onUploadComplete={handleUploadComplete}
+        />
+      )}
 
       {/* Search and Filters - Hide type filter since employees only see their own docs */}
       <div className='space-y-4'>

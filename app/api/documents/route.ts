@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/utils/supabase/server';
+import { processDocumentText } from '@/lib/ai/document-processor';
+import pdfParse from 'pdf-parse';
+import mammoth from 'mammoth';
+import { fileTypeFromBuffer } from 'file-type';
 
 export async function GET(request: NextRequest) {
   try {
@@ -64,6 +68,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File and title are required' }, { status: 400 });
     }
 
+    // Validate file size (50MB limit)
+    if (file.size > 50 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File size must be less than 50MB' }, { status: 400 });
+    }
+
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -80,6 +89,28 @@ export async function POST(request: NextRequest) {
 
     if (!profile || profile.status !== 'approved') {
       return NextResponse.json({ error: 'Account not approved' }, { status: 403 });
+    }
+
+    // Convert file to buffer for processing
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    
+    // Extract text content based on file type
+    let extractedText = '';
+    try {
+      if (file.type === 'application/pdf') {
+        const pdfData = await pdfParse(fileBuffer);
+        extractedText = pdfData.text;
+      } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        const result = await mammoth.extractRawText({ buffer: fileBuffer });
+        extractedText = result.value;
+      } else if (file.type === 'text/plain') {
+        extractedText = fileBuffer.toString('utf-8');
+      } else {
+        return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 });
+      }
+    } catch (extractError) {
+      console.error('Text extraction error:', extractError);
+      return NextResponse.json({ error: 'Failed to extract text from document' }, { status: 500 });
     }
 
     // Generate unique file path
@@ -105,6 +136,7 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: user.id,
         title,
+        content: extractedText,
         file_path: uploadData.path,
         file_size: file.size,
         file_type: file.type,
@@ -117,6 +149,19 @@ export async function POST(request: NextRequest) {
       // Clean up uploaded file if database insert fails
       await supabase.storage.from('documents').remove([uploadData.path]);
       return NextResponse.json({ error: dbError.message }, { status: 500 });
+    }
+
+    // Process document for vector search (background task)
+    try {
+      await processDocumentText(document.id, extractedText, {
+        title,
+        fileType: file.type,
+        fileSize: file.size,
+        isCompanyWide,
+      });
+    } catch (processError) {
+      console.error('Document processing error:', processError);
+      // Don't fail the upload if processing fails
     }
 
     return NextResponse.json({ 

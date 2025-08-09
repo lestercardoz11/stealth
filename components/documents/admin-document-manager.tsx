@@ -11,23 +11,19 @@ import { DocumentViewer } from './document-viewer';
 import { DocumentCard } from './document-card';
 
 interface AdminDocumentManagerProps {
-  initialDocuments: Document[];
-  onRefreshDocuments: () => Promise<void>;
 }
 
 export function AdminDocumentManager({
-  initialDocuments,
-  onRefreshDocuments,
 }: AdminDocumentManagerProps) {
-  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
-  const [filteredDocuments, setFilteredDocuments] =
-    useState<Document[]>(initialDocuments);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(
     null
   );
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const [filters, setFilters] = useState<DocumentFilters>({
     search: '',
@@ -35,6 +31,24 @@ export function AdminDocumentManager({
     fileType: 'all',
     sortBy: 'newest',
   });
+
+  // Load documents on component mount
+  useEffect(() => {
+    loadDocuments();
+  }, []);
+
+  const loadDocuments = async () => {
+    try {
+      const result = await getDocuments(); // Get all documents for admin
+      if (result.success) {
+        setDocuments(result.documents || []);
+      }
+    } catch (error) {
+      console.error('Error loading documents:', error);
+    } finally {
+      setIsInitialLoading(false);
+    }
+  };
 
   // Filter and sort documents
   useEffect(() => {
@@ -101,15 +115,10 @@ export function AdminDocumentManager({
     setFilteredDocuments(filtered);
   }, [documents, filters]);
 
-  const refreshDocuments = async () => {
+  const handleRefreshDocuments = async () => {
     setIsLoading(true);
-    try {
-      await onRefreshDocuments();
-    } catch (error) {
-      console.error('Error refreshing documents:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    await loadDocuments();
+    setIsLoading(false);
   };
 
   const handleDocumentDelete = (documentId: string) => {
@@ -121,11 +130,27 @@ export function AdminDocumentManager({
     setIsViewerOpen(true);
   };
 
+  const handleUploadComplete = () => {
+    loadDocuments(); // Refresh documents after upload
+    setShowUpload(false); // Hide upload section
+  };
+
   const stats = {
     total: documents.length,
     company: documents.filter((doc) => doc.is_company_wide).length,
     personal: documents.filter((doc) => !doc.is_company_wide).length,
   };
+
+  if (isInitialLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+          <p className="text-muted-foreground">Loading documents...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>
@@ -179,7 +204,7 @@ export function AdminDocumentManager({
           </Button>
           <Button
             variant='outline'
-            onClick={refreshDocuments}
+            onClick={handleRefreshDocuments}
             disabled={isLoading}>
             {isLoading ? (
               <Loader2 className='h-4 w-4 animate-spin' />
@@ -191,7 +216,12 @@ export function AdminDocumentManager({
       </div>
 
       {/* Upload Section */}
-      {showUpload && <DocumentUpload allowCompanyWide={true} />}
+      {showUpload && (
+        <DocumentUpload 
+          allowCompanyWide={true} 
+          onUploadComplete={handleUploadComplete}
+        />
+      )}
 
       {/* Search and Filters */}
       <DocumentSearch

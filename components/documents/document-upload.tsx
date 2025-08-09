@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 interface DocumentUploadProps {
   allowCompanyWide?: boolean;
   className?: string;
+  onUploadComplete?: () => void;
 }
 
 interface UploadingFile {
@@ -39,6 +40,7 @@ interface UploadingFile {
 export function DocumentUpload({
   allowCompanyWide = false,
   className,
+  onUploadComplete,
 }: DocumentUploadProps) {
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -71,6 +73,11 @@ export function DocumentUpload({
           type: result.success ? 'success' : 'error',
           text: result.message || result.error || (result.success ? 'Upload successful' : 'Upload failed')
         });
+
+        // Call onUploadComplete if upload was successful
+        if (result.success && onUploadComplete) {
+          onUploadComplete();
+        }
       } catch (error) {
         setUploadingFiles((prev) =>
           prev.map((file, i) =>
@@ -88,7 +95,7 @@ export function DocumentUpload({
         setMessage({ type: 'error', text: 'Upload failed' });
       }
     },
-    []
+    [onUploadComplete]
   );
 
   const onDrop = useCallback(

@@ -1,6 +1,5 @@
 import { requireApprovedUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
-import { getUserDocuments } from '@/lib/actions/profile-actions';
 import { EmployeeDocumentManager } from '@/components/documents/employee-document-manager';
 
 export default async function EmployeeDocumentsPage() {
@@ -15,8 +14,6 @@ export default async function EmployeeDocumentsPage() {
     redirect('/auth/login');
   }
 
-  const userDocuments = await getUserDocuments(profile.id);
-
   return (
     <div className='space-y-6 p-6'>
       <div>
@@ -26,15 +23,7 @@ export default async function EmployeeDocumentsPage() {
         </p>
       </div>
 
-      <EmployeeDocumentManager
-        initialDocuments={userDocuments}
-        userProfile={profile}
-        onRefreshDocuments={async () => {
-          'use server';
-          // This will trigger a page refresh to reload the documents
-          // In a real app, you might want to use revalidatePath or similar
-        }}
-      />
+      <EmployeeDocumentManager userProfile={profile} />
     </div>
   );
 }

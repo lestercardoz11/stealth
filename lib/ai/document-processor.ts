@@ -69,7 +69,7 @@ export async function searchDocuments(
   documentIds?: string[],
   threshold: number = 0.7,
   limit: number = 5
-) {
+): Promise<any[]> {
   const supabase = await createClient();
   
   try {
