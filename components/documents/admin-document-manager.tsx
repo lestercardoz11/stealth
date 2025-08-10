@@ -9,13 +9,14 @@ import { DocumentFilters, DocumentSearch } from './document-search';
 import { DocumentUpload } from './document-upload';
 import { DocumentViewer } from './document-viewer';
 import { DocumentCard } from './document-card';
-import { getDocuments } from '@/lib/storage/document-api';
 
 interface AdminDocumentManagerProps {
   initialDocuments: Document[];
 }
 
-export function AdminDocumentManager({ initialDocuments }: AdminDocumentManagerProps) {
+export function AdminDocumentManager({
+  initialDocuments,
+}: AdminDocumentManagerProps) {
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(

@@ -8,16 +8,13 @@ import { DocumentSearch, DocumentFilters } from './document-search';
 import { DocumentCard } from './document-card';
 import { DocumentViewer } from './document-viewer';
 import { Upload, FileText, User, Loader2 } from 'lucide-react';
-import { Document, Profile } from '@/lib/types/database';
-import { getDocuments } from '@/lib/storage/document-api';
+import { Document } from '@/lib/types/database';
 
 interface EmployeeDocumentManagerProps {
-  userProfile: Profile;
   initialDocuments: Document[];
 }
 
 export function EmployeeDocumentManager({
-  userProfile,
   initialDocuments,
 }: EmployeeDocumentManagerProps) {
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);

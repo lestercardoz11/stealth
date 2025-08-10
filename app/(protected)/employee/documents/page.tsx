@@ -27,7 +27,7 @@ export default async function EmployeeDocumentsPage() {
         </p>
       </div>
 
-      <EmployeeDocumentManager userProfile={profile} initialDocuments={documents} />
+      <EmployeeDocumentManager initialDocuments={documents} />
     </div>
   );
 }
