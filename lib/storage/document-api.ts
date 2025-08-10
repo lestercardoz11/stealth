@@ -22,10 +22,10 @@ export interface DocumentUrlResult {
 export async function uploadDocument(
   file: File,
   title: string,
-  isCompanyWide: boolean = false
+  isCompanyWide: boolean
 ): Promise<DocumentUploadResult> {
   try {
-    console.log('Starting document upload:', { fileName: file.name, size: file.size, type: file.type });
+    console.log('Starting document upload:', { fileName: file.name, size: file.size, type: file.type, isCompanyWide: isCompanyWide.toString() });
     
     const formData = new FormData();
     formData.append('file', file);

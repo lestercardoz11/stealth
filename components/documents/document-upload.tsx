@@ -23,7 +23,7 @@ import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { cn } from '@/lib/utils';
 
 interface DocumentUploadProps {
-  allowCompanyWide?: boolean;
+  allowCompanyWide: boolean;
   className?: string;
   onUploadComplete?: () => void;
 }
@@ -38,13 +38,16 @@ interface UploadingFile {
 }
 
 export function DocumentUpload({
-  allowCompanyWide = false,
+  allowCompanyWide,
   className,
   onUploadComplete,
 }: DocumentUploadProps) {
   const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
 
   // Wrap handleUpload in useCallback to prevent recreating on every render
   const handleUpload = useCallback(
@@ -55,8 +58,6 @@ export function DocumentUpload({
           uploadingFile.title,
           uploadingFile.isCompanyWide
         );
-
-        console.log('Upload result:', result);
 
         setUploadingFiles((prev) =>
           prev.map((file, i) =>
@@ -73,7 +74,12 @@ export function DocumentUpload({
 
         setMessage({
           type: result.success ? 'success' : 'error',
-          text: result.message || result.error || (result.success ? 'Document uploaded successfully!' : 'Upload failed')
+          text:
+            result.message ||
+            result.error ||
+            (result.success
+              ? 'Document uploaded successfully!'
+              : 'Upload failed'),
         });
 
         // Call onUploadComplete if upload was successful
@@ -95,9 +101,12 @@ export function DocumentUpload({
               : file
           )
         );
-        setMessage({ 
-          type: 'error', 
-          text: error instanceof Error ? error.message : 'Upload failed - please try again' 
+        setMessage({
+          type: 'error',
+          text:
+            error instanceof Error
+              ? error.message
+              : 'Upload failed - please try again',
         });
       }
     },
@@ -109,7 +118,10 @@ export function DocumentUpload({
       const validFiles = acceptedFiles.filter((file) => {
         const validation = validateFile(file);
         if (!validation.isValid) {
-          setMessage({ type: 'error', text: validation.error || 'Invalid file' });
+          setMessage({
+            type: 'error',
+            text: validation.error || 'Invalid file',
+          });
           return false;
         }
         return true;
@@ -118,7 +130,7 @@ export function DocumentUpload({
       const newUploadingFiles = validFiles.map((file) => ({
         file,
         title: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
-        isCompanyWide: false,
+        isCompanyWide: allowCompanyWide,
         progress: 0,
         status: 'uploading' as const,
       }));
@@ -176,63 +188,70 @@ export function DocumentUpload({
     <div className={cn('space-y-6', className)}>
       {/* Upload Area */}
       <ErrorBoundary>
-      <Card>
-        <CardHeader>
-          <div className='flex items-center justify-between'>
-            <CardTitle className='flex items-center gap-2 text-base md:text-lg'>
-            <Upload className='h-5 w-5' />
-            Upload Documents
-          </CardTitle>
-            <PrivacyBadge variant="compact" />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div
-            {...getRootProps()}
-            className={cn(
+        <Card>
+          <CardHeader>
+            <div className='flex items-center justify-between'>
+              <CardTitle className='flex items-center gap-2 text-base md:text-lg'>
+                <Upload className='h-5 w-5' />
+                Upload Documents
+              </CardTitle>
+              <PrivacyBadge variant='compact' />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div
+              {...getRootProps()}
+              className={cn(
                 'border-2 border-dashed rounded-lg p-4 md:p-8 text-center cursor-pointer transition-colors',
-              isDragActive || dragActive
-                ? 'border-primary bg-primary/5'
-                : 'border-muted-foreground/25 hover:border-primary/50'
-            )}>
-            <input {...getInputProps()} />
+                isDragActive || dragActive
+                  ? 'border-primary bg-primary/5'
+                  : 'border-muted-foreground/25 hover:border-primary/50'
+              )}>
+              <input {...getInputProps()} />
               <Upload className='h-8 w-8 md:h-12 md:w-12 mx-auto mb-4 text-muted-foreground' />
               <h3 className='text-base md:text-lg font-semibold mb-2'>
-              {isDragActive ? 'Drop files here' : 'Drag & drop files here'}
-            </h3>
+                {isDragActive ? 'Drop files here' : 'Drag & drop files here'}
+              </h3>
               <p className='text-muted-foreground mb-4 text-sm md:text-base'>
-              or click to browse files
-            </p>
+                or click to browse files
+              </p>
               <p className='text-xs md:text-sm text-muted-foreground'>
-              Supports PDF, DOCX, DOC, TXT files up to 50MB
-            </p>
+                Supports PDF, DOCX, DOC, TXT files up to 50MB
+              </p>
               <div className='mt-4 p-2 md:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800'>
                 <p className='text-xs text-green-700 dark:text-green-200'>
-                🔒 Your documents are processed locally and never sent to external services
-              </p>
+                  🔒 Your documents are processed locally and never sent to
+                  external services
+                </p>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
       </ErrorBoundary>
 
       {/* Status Message */}
       {message && (
-        <Card className={cn(
-          "border",
-          message.type === 'success' ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20" : "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20"
-        )}>
-          <CardContent className="p-3">
-            <div className="flex items-center gap-2">
+        <Card
+          className={cn(
+            'border',
+            message.type === 'success'
+              ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
+              : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+          )}>
+          <CardContent className='p-3'>
+            <div className='flex items-center gap-2'>
               {message.type === 'success' ? (
-                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <CheckCircle className='h-4 w-4 text-green-600 dark:text-green-400' />
               ) : (
-                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <AlertCircle className='h-4 w-4 text-red-600 dark:text-red-400' />
               )}
-              <p className={cn(
-                "text-sm",
-                message.type === 'success' ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"
-              )}>
+              <p
+                className={cn(
+                  'text-sm',
+                  message.type === 'success'
+                    ? 'text-green-700 dark:text-green-300'
+                    : 'text-red-700 dark:text-red-300'
+                )}>
                 {message.text}
               </p>
             </div>
@@ -243,96 +262,102 @@ export function DocumentUpload({
       {/* Uploading Files */}
       {uploadingFiles.length > 0 && (
         <ErrorBoundary>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between'>
-              <CardTitle className='text-base md:text-lg'>Upload Progress</CardTitle>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={clearCompleted}
-              disabled={!uploadingFiles.some((f) => f.status !== 'uploading')}>
-              Clear Completed
-            </Button>
-          </CardHeader>
-          <CardContent className='space-y-4'>
-            {uploadingFiles.map((uploadingFile, index) => (
-                <div key={index} className='space-y-3 p-3 md:p-4 border rounded-lg'>
-                <div className='flex items-start justify-between'>
-                  <div className='flex items-center gap-3 flex-1'>
+          <Card>
+            <CardHeader className='flex flex-row items-center justify-between'>
+              <CardTitle className='text-base md:text-lg'>
+                Upload Progress
+              </CardTitle>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={clearCompleted}
+                disabled={
+                  !uploadingFiles.some((f) => f.status !== 'uploading')
+                }>
+                Clear Completed
+              </Button>
+            </CardHeader>
+            <CardContent className='space-y-4'>
+              {uploadingFiles.map((uploadingFile, index) => (
+                <div
+                  key={index}
+                  className='space-y-3 p-3 md:p-4 border rounded-lg'>
+                  <div className='flex items-start justify-between'>
+                    <div className='flex items-center gap-3 flex-1'>
                       <File className='h-6 w-6 md:h-8 md:w-8 text-muted-foreground shrink-0' />
-                    <div className='flex-1 space-y-2'>
-                      <div className='flex items-center gap-2'>
-                        <Input
-                          value={uploadingFile.title}
-                          onChange={(e) =>
-                            updateFileTitle(index, e.target.value)
-                          }
-                          placeholder='Document title'
-                          disabled={uploadingFile.status !== 'uploading'}
-                          className='flex-1'
-                        />
-                        {uploadingFile.status === 'success' && (
-                          <CheckCircle className='h-5 w-5 text-green-500' />
-                        )}
-                        {uploadingFile.status === 'error' && (
-                          <AlertCircle className='h-5 w-5 text-red-500' />
-                        )}
-                        {uploadingFile.status === 'uploading' && (
-                          <Loader2 className='h-5 w-5 animate-spin text-blue-500' />
-                        )}
-                      </div>
+                      <div className='flex-1 space-y-2'>
+                        <div className='flex items-center gap-2'>
+                          <Input
+                            value={uploadingFile.title}
+                            onChange={(e) =>
+                              updateFileTitle(index, e.target.value)
+                            }
+                            placeholder='Document title'
+                            disabled={uploadingFile.status !== 'uploading'}
+                            className='flex-1'
+                          />
+                          {uploadingFile.status === 'success' && (
+                            <CheckCircle className='h-5 w-5 text-green-500' />
+                          )}
+                          {uploadingFile.status === 'error' && (
+                            <AlertCircle className='h-5 w-5 text-red-500' />
+                          )}
+                          {uploadingFile.status === 'uploading' && (
+                            <Loader2 className='h-5 w-5 animate-spin text-blue-500' />
+                          )}
+                        </div>
 
                         <div className='flex items-center justify-between text-xs md:text-sm text-muted-foreground'>
-                        <span>{formatFileSize(uploadingFile.file.size)}</span>
-                        <span>{uploadingFile.file.type}</span>
-                      </div>
-
-                      {allowCompanyWide && (
-                        <div className='flex items-center space-x-2'>
-                          <Checkbox
-                            id={`company-wide-${index}`}
-                            checked={uploadingFile.isCompanyWide}
-                            onCheckedChange={(checked) =>
-                              updateFileCompanyWide(index, checked as boolean)
-                            }
-                            disabled={uploadingFile.status !== 'uploading'}
-                          />
-                          <Label
-                            htmlFor={`company-wide-${index}`}
-                              className='text-xs md:text-sm'>
-                            Make available company-wide
-                          </Label>
+                          <span>{formatFileSize(uploadingFile.file.size)}</span>
+                          <span>{uploadingFile.file.type}</span>
                         </div>
-                      )}
 
-                      {uploadingFile.status === 'uploading' && (
-                        <Progress
-                          value={uploadingFile.progress}
-                          className='w-full'
-                        />
-                      )}
-
-                      {uploadingFile.status === 'error' &&
-                        uploadingFile.error && (
-                            <p className='text-xs md:text-sm text-red-500'>
-                            {uploadingFile.error}
-                          </p>
+                        {allowCompanyWide && (
+                          <div className='flex items-center space-x-2'>
+                            <Checkbox
+                              id={`company-wide-${index}`}
+                              checked={uploadingFile.isCompanyWide}
+                              onCheckedChange={(checked) =>
+                                updateFileCompanyWide(index, checked as boolean)
+                              }
+                              disabled={uploadingFile.status !== 'uploading'}
+                            />
+                            <Label
+                              htmlFor={`company-wide-${index}`}
+                              className='text-xs md:text-sm'>
+                              Make available company-wide
+                            </Label>
+                          </div>
                         )}
-                    </div>
-                  </div>
 
-                  <Button
-                    variant='ghost'
-                    size='sm'
-                    onClick={() => removeFile(index)}
-                    disabled={uploadingFile.status === 'uploading'}>
-                    <X className='h-4 w-4' />
-                  </Button>
+                        {uploadingFile.status === 'uploading' && (
+                          <Progress
+                            value={uploadingFile.progress}
+                            className='w-full'
+                          />
+                        )}
+
+                        {uploadingFile.status === 'error' &&
+                          uploadingFile.error && (
+                            <p className='text-xs md:text-sm text-red-500'>
+                              {uploadingFile.error}
+                            </p>
+                          )}
+                      </div>
+                    </div>
+
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      onClick={() => removeFile(index)}
+                      disabled={uploadingFile.status === 'uploading'}>
+                      <X className='h-4 w-4' />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+            </CardContent>
+          </Card>
         </ErrorBoundary>
       )}
     </div>
