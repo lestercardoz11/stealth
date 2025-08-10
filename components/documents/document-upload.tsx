@@ -56,6 +56,8 @@ export function DocumentUpload({
           uploadingFile.isCompanyWide
         );
 
+        console.log('Upload result:', result);
+
         setUploadingFiles((prev) =>
           prev.map((file, i) =>
             i === index
@@ -71,7 +73,7 @@ export function DocumentUpload({
 
         setMessage({
           type: result.success ? 'success' : 'error',
-          text: result.message || result.error || (result.success ? 'Upload successful' : 'Upload failed')
+          text: result.message || result.error || (result.success ? 'Document uploaded successfully!' : 'Upload failed')
         });
 
         // Call onUploadComplete if upload was successful
@@ -79,6 +81,7 @@ export function DocumentUpload({
           onUploadComplete();
         }
       } catch (error) {
+        console.error('Upload error in component:', error);
         setUploadingFiles((prev) =>
           prev.map((file, i) =>
             i === index
@@ -92,7 +95,10 @@ export function DocumentUpload({
               : file
           )
         );
-        setMessage({ type: 'error', text: 'Upload failed' });
+        setMessage({ 
+          type: 'error', 
+          text: error instanceof Error ? error.message : 'Upload failed - please try again' 
+        });
       }
     },
     [onUploadComplete]

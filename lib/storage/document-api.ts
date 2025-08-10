@@ -25,6 +25,8 @@ export async function uploadDocument(
   isCompanyWide: boolean = false
 ): Promise<DocumentUploadResult> {
   try {
+    console.log('Starting document upload:', { fileName: file.name, size: file.size, type: file.type });
+    
     const formData = new FormData();
     formData.append('file', file);
     formData.append('title', title);
@@ -35,10 +37,22 @@ export async function uploadDocument(
       body: formData,
     });
 
+    console.log('Upload response status:', response.status);
+    console.log('Upload response headers:', Object.fromEntries(response.headers.entries()));
+
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const textResponse = await response.text();
+      console.error('Non-JSON response:', textResponse);
+      return {
+        success: false,
+        error: 'Server returned invalid response format'
+      };
+    }
+
     const data = await response.json();
-
-    console.log('Upload response:', data);
-
+    console.log('Upload response data:', data);
     if (!response.ok) {
       return { success: false, error: data.error || 'Upload failed' };
     }
