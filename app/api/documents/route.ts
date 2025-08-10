@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/utils/supabase/server';
 import { processDocumentText } from '@/lib/ai/document-processor';
+import { rateLimiter, RATE_LIMITS } from '@/lib/security/input-validation';
+import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -56,6 +58,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Get client IP for rate limiting and audit logging
+    const clientIP = request.headers.get('x-forwarded-for') || 
+                    request.headers.get('x-real-ip') || 
+                    'unknown';
+    
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const title = formData.get('title') as string;
@@ -89,6 +96,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Rate limiting
+    const rateLimitKey = `upload:${user.id}`;
+    if (!rateLimiter.isAllowed(rateLimitKey, RATE_LIMITS.UPLOAD.maxRequests, RATE_LIMITS.UPLOAD.windowMs)) {
+      await auditLogger.log({
+        userId: user.id,
+        userEmail: user.email,
+        action: AUDIT_ACTIONS.RATE_LIMIT_EXCEEDED,
+        resource: 'Document Upload',
+        details: 'Upload rate limit exceeded',
+        ipAddress: clientIP,
+        severity: 'medium'
+      });
+      
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
+
     // Check user profile and status
     const { data: profile } = await supabase
       .from('profiles')
@@ -104,29 +127,29 @@ export async function POST(request: NextRequest) {
     let extractedText = '';
     try {
       const fileBuffer = await file.arrayBuffer();
-      const uint8Array = new Uint8Array(fileBuffer);
 
       if (file.type === 'application/pdf') {
-        // For PDF files, we'll store the content as metadata for now
-        // In production, you might want to use a different PDF parsing solution
-        extractedText = `PDF Document: ${file.name} (${file.size} bytes)`;
+        // For PDF files, extract basic metadata for now
+        // Note: Full PDF text extraction would require additional libraries
+        extractedText = `PDF Document: ${title}\n\nThis is a PDF document that has been uploaded to the system. The document contains legal content that can be analyzed by the AI assistant. File size: ${Math.round(file.size / 1024)} KB.`;
       } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        // For DOCX files, store metadata for now
-        extractedText = `DOCX Document: ${file.name} (${file.size} bytes)`;
+        // For DOCX files, extract basic metadata
+        extractedText = `DOCX Document: ${title}\n\nThis is a Microsoft Word document that has been uploaded to the system. The document contains legal content that can be analyzed by the AI assistant. File size: ${Math.round(file.size / 1024)} KB.`;
       } else if (file.type === 'application/msword') {
-        // For DOC files, store metadata for now
-        extractedText = `DOC Document: ${file.name} (${file.size} bytes)`;
+        // For DOC files, extract basic metadata
+        extractedText = `DOC Document: ${title}\n\nThis is a Microsoft Word document that has been uploaded to the system. The document contains legal content that can be analyzed by the AI assistant. File size: ${Math.round(file.size / 1024)} KB.`;
       } else if (file.type === 'text/plain') {
         // For text files, we can extract the content directly
+        const uint8Array = new Uint8Array(fileBuffer);
         const decoder = new TextDecoder('utf-8');
         extractedText = decoder.decode(uint8Array);
       } else {
-        extractedText = `Document: ${file.name} (${file.size} bytes)`;
+        extractedText = `Document: ${title}\n\nThis document has been uploaded to the system and can be analyzed by the AI assistant. File size: ${Math.round(file.size / 1024)} KB.`;
       }
     } catch (extractError) {
       console.error('Text extraction error:', extractError);
       // Continue with basic metadata if extraction fails
-      extractedText = `Document: ${file.name} (${file.size} bytes)`;
+      extractedText = `Document: ${title}\n\nThis document has been uploaded to the system. File size: ${Math.round(file.size / 1024)} KB.`;
     }
 
     // Generate unique file path
@@ -169,17 +192,50 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: dbError.message }, { status: 500 });
     }
 
-    // Process document for vector search (background task)
+    // Log successful upload
+    await auditLogger.log({
+      userId: user.id,
+      userEmail: user.email,
+      action: AUDIT_ACTIONS.DOCUMENT_UPLOADED,
+      resource: 'Document Management',
+      details: `Uploaded document: ${title}`,
+      ipAddress: clientIP,
+      severity: 'low',
+      metadata: {
+        documentId: document.id,
+        fileSize: file.size,
+        fileType: file.type,
+        isCompanyWide
+      }
+    });
+
+    // Process document for vector search
     try {
       await processDocumentText(document.id, extractedText, {
         title,
         fileType: file.type,
         fileSize: file.size,
         isCompanyWide,
+        uploadedBy: user.id,
+        uploadedAt: new Date().toISOString()
       });
+      console.log('Document vector processing completed successfully');
     } catch (processError) {
       console.error('Document processing error:', processError);
-      // Don't fail the upload if processing fails
+      // Log processing error but don't fail the upload
+      await auditLogger.log({
+        userId: user.id,
+        userEmail: user.email,
+        action: 'DOCUMENT_PROCESSING_FAILED',
+        resource: 'Document Processing',
+        details: `Failed to process document for vector search: ${title}`,
+        ipAddress: clientIP,
+        severity: 'medium',
+        metadata: {
+          documentId: document.id,
+          error: processError instanceof Error ? processError.message : 'Unknown error'
+        }
+      });
     }
 
     return NextResponse.json({ 

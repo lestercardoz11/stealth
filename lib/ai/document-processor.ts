@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/utils/supabase/server';
-// import { generateEmbedding, chunkText } from './embeddings';
+import { generateEmbedding, chunkText } from './embeddings';
 
 export interface ProcessedChunk {
   content: string;
@@ -13,13 +13,60 @@ export async function processDocumentText(
   text: string,
   metadata: Record<string, unknown> = {}
 ): Promise<void> {
-  // Temporarily disable vector processing to avoid dependency issues
-  console.log('Document processing queued for:', documentId);
-  console.log('Text length:', text.length);
-  console.log('Metadata:', metadata);
-  
-  // TODO: Implement vector processing when Ollama is available
-  return Promise.resolve();
+  try {
+    console.log('Starting document processing for:', documentId);
+    
+    // Chunk the text into smaller pieces
+    const chunks = chunkText(text, 1000);
+    console.log(`Created ${chunks.length} chunks for document ${documentId}`);
+    
+    const supabase = await createClient();
+    
+    // Process each chunk
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      
+      try {
+        // Generate embedding for this chunk
+        const embedding = await generateEmbedding(chunk);
+        
+        // Store chunk and embedding in database
+        const { error } = await supabase
+          .from('document_chunks')
+          .insert({
+            document_id: documentId,
+            content: chunk,
+            embedding: embedding,
+            chunk_index: i,
+            metadata: {
+              ...metadata,
+              chunkLength: chunk.length,
+              processedAt: new Date().toISOString()
+            }
+          });
+        
+        if (error) {
+          console.error(`Error storing chunk ${i}:`, error);
+          throw error;
+        }
+        
+        console.log(`Processed chunk ${i + 1}/${chunks.length} for document ${documentId}`);
+        
+        // Add small delay to avoid overwhelming Ollama
+        if (i < chunks.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      } catch (chunkError) {
+        console.error(`Error processing chunk ${i}:`, chunkError);
+        // Continue with other chunks even if one fails
+      }
+    }
+    
+    console.log(`Document processing completed for ${documentId}`);
+  } catch (error) {
+    console.error('Document processing error:', error);
+    throw new Error('Failed to process document for vector search');
+  }
 }
 
 export async function searchDocuments(
@@ -27,9 +74,39 @@ export async function searchDocuments(
   documentIds?: string[],
   threshold: number = 0.7,
   limit: number = 5
-): Promise<any[]> {
-  // Temporarily return empty results until vector search is implemented
-  console.log('Document search requested for:', query);
-  console.log('Document IDs:', documentIds);
-  return [];
+): Promise<Array<{
+  id: string;
+  document_id: string;
+  content: string;
+  metadata: any;
+  similarity: number;
+  document_title: string;
+}>> {
+  try {
+    console.log('Starting document search for query:', query);
+    
+    // Generate embedding for the search query
+    const queryEmbedding = await generateEmbedding(query);
+    
+    const supabase = await createClient();
+    
+    // Call the vector similarity search function
+    const { data, error } = await supabase.rpc('match_documents', {
+      query_embedding: queryEmbedding,
+      match_threshold: threshold,
+      match_count: limit,
+      document_ids: documentIds || null
+    });
+    
+    if (error) {
+      console.error('Vector search error:', error);
+      throw error;
+    }
+    
+    console.log(`Found ${data?.length || 0} relevant chunks`);
+    return data || [];
+  } catch (error) {
+    console.error('Document search error:', error);
+    throw new Error('Failed to search documents');
+  }
 }

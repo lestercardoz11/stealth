@@ -48,6 +48,7 @@ export async function POST(req: Request) {
       
       return new Response('Rate limit exceeded', { status: 429 });
     }
+
     // Check user profile and status
     const { data: profile } = await supabase
       .from('profiles')
@@ -60,13 +61,12 @@ export async function POST(req: Request) {
     }
 
     let context = '';
-    interface Source {
+    let sources: Array<{
       documentId: string;
       documentTitle: string;
       similarity: number;
       content: string;
-    }
-    let sources: Source[] = [];
+    }> = [];
 
     // If we have document IDs or should search all accessible documents
     if (documentIds && documentIds.length > 0) {
@@ -80,26 +80,24 @@ export async function POST(req: Request) {
         );
 
         if (relevantChunks && relevantChunks.length > 0) {
-          interface Chunk {
-            document_title: string;
-            content: string;
-            document_id: string;
-            similarity: number;
-          }
           context = relevantChunks
-            .map((chunk: Chunk) => `Document: ${chunk.document_title}\nContent: ${chunk.content}`)
+            .map((chunk) => `Document: ${chunk.document_title}\nContent: ${chunk.content}`)
             .join('\n\n---\n\n');
           
-          sources = relevantChunks.map((chunk: Chunk) => ({
+          sources = relevantChunks.map((chunk) => ({
             documentId: chunk.document_id,
             documentTitle: chunk.document_title,
             similarity: chunk.similarity,
-            content: chunk.content.substring(0, 200) + '...',
+            content: chunk.content.substring(0, 200) + (chunk.content.length > 200 ? '...' : ''),
           }));
+          
+          console.log(`Using context from ${relevantChunks.length} document chunks`);
         }
       } catch (searchError) {
         console.error('Document search error:', searchError);
         // Continue without context if search fails
+        context = '';
+        sources = [];
       }
     }
 
@@ -121,6 +119,7 @@ export async function POST(req: Request) {
         responseLength: response.length
       }
     });
+
     // Save the conversation to database
     try {
       const { data: conversation, error: convError } = await supabase

@@ -3,6 +3,7 @@ import { generateEmbedding as ollamaGenerateEmbedding } from './ollama-client';
 
 export async function generateEmbedding(text: string): Promise<number[]> {
   try {
+    console.log('Generating embedding for text length:', text.length);
     return await ollamaGenerateEmbedding(text);
   } catch (error) {
     console.error('Error generating embedding:', error);
@@ -11,6 +12,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 }
 
 export function chunkText(text: string, maxChunkSize: number = 1000): string[] {
+  console.log('Chunking text of length:', text.length);
+  
   const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
   const chunks: string[] = [];
   let currentChunk = '';
@@ -29,5 +32,8 @@ export function chunkText(text: string, maxChunkSize: number = 1000): string[] {
     chunks.push(currentChunk.trim());
   }
 
-  return chunks.filter(chunk => chunk.length > 50); // Filter out very short chunks
+  const filteredChunks = chunks.filter(chunk => chunk.length > 50); // Filter out very short chunks
+  console.log(`Created ${filteredChunks.length} chunks from ${chunks.length} initial chunks`);
+  
+  return filteredChunks;
 }

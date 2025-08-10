@@ -154,11 +154,11 @@ export function MessageBubble({ message, sources = [] }: MessageBubbleProps) {
 
         {/* Sources (only for assistant messages) */}
         {!isUser && normalizedSources.length > 0 && (
-          <Card className='p-3 bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800'>
+          <Card className='p-3 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 border-blue-200 dark:border-blue-800'>
             <div className='flex items-center gap-2 mb-3'>
               <Quote className='h-3 w-3 text-blue-600' />
               <span className='text-xs font-medium text-blue-700 dark:text-blue-300'>
-                Sources Referenced ({normalizedSources.length})
+                RAG Sources Referenced ({normalizedSources.length})
               </span>
             </div>
 
@@ -182,7 +182,7 @@ export function MessageBubble({ message, sources = [] }: MessageBubbleProps) {
                     </p>
                     <div className='flex items-center gap-2 mt-1'>
                       <Badge variant='outline' className='text-xs px-1 py-0'>
-                        {Math.round(source.similarity * 100)}% relevance
+                        {Math.round(source.similarity * 100)}% similarity
                       </Badge>
                       <Button
                         variant='ghost'
