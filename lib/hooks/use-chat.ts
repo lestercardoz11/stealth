@@ -71,7 +71,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       role: 'user',
       created_at: new Date().toISOString(),
       conversation_id: '',
-      sources: [], // Initially empty, will be filled by the response
+      sources: [],
     };
 
     // Add user message immediately
@@ -93,6 +93,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         content: response.response,
         role: 'assistant',
         created_at: new Date().toISOString(),
+        conversation_id: '',
         sources: response.sources,
       };
 

@@ -1,20 +1,19 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageBubble } from './message-bubble';
 import { DocumentSelector } from './document-selector';
 import { ContextPanel } from './context-panel';
 import { PrivacyBadge } from '@/components/security/privacy-badge';
-import { Send, FileText, Brain, Loader2, AlertCircle } from 'lucide-react';
+import { Send, FileText, Brain, AlertCircle } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { RetryButton } from '@/components/ui/retry-button';
-import { sendChatMessage } from '@/lib/actions/chat-actions';
-import { Message } from '@/lib/types/database';
+import { useChat } from '@/lib/hooks/use-chat';
+import { Card } from '@/components/ui/card';
 
 interface Document {
   id: string;
@@ -28,90 +27,45 @@ interface RAGChatInterfaceProps {
   availableDocuments: Document[];
 }
 
-interface Source {
-  documentId: string;
-  documentTitle: string;
-  similarity: number;
-  content: string;
-}
-
 export function RAGChatInterface({
   availableDocuments,
 }: RAGChatInterfaceProps) {
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
-  const [sources, setSources] = useState<Source[]>([]);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lastQuery, setLastQuery] = useState<string>('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const {
+    messages,
+    isLoading,
+    error,
+    sendMessage,
+    clearError,
+    retryLastMessage,
+  } = useChat({
+    onError: (error) => {
+      console.error('Chat error:', error);
+    },
+    onResponse: (response) => {
+      console.log('Chat response received:', response);
+    },
+  });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  };
+  const [input, setInput] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    console.log('Submitting chat message:', input);
-    console.log('Selected documents:', selectedDocuments);
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user' as const,
-      content: input,
-      created_at: new Date().toISOString(),
-      conversation_id: '', // This will be set by the server
-      sources: [], // Initially empty, will be filled by the response
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+    const messageContent = input.trim();
     setInput('');
-    setIsLoading(true);
-    setError(null);
-    setLastQuery(input);
-
-    try {
-      const data = await sendChatMessage(
-        [...messages, userMessage],
-        selectedDocuments
-      );
-
-      console.log('Chat response received:', data);
-
-      setSources(data.sources || []);
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant' as const,
-        content: data.response,
-        created_at: new Date().toISOString(),
-        conversation_id: '', // This will be set by the server
-        sources: data.sources,
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (err) {
-      console.error('Chat error:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
-    }
+    
+    await sendMessage(messageContent, selectedDocuments);
   };
 
-  const handleRetry = async () => {
-    if (lastQuery) {
-      setInput(lastQuery);
-      await handleSubmit({ preventDefault: () => {} } as React.FormEvent);
-    }
-  };
-
-  // Scroll to bottom when new messages arrive
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  // Get sources from the last assistant message
+  const lastAssistantMessage = messages
+    .slice()
+    .reverse()
+    .find(m => m.role === 'assistant');
+  const sources = lastAssistantMessage?.sources || [];
 
   return (
     <ErrorBoundary>
@@ -221,7 +175,6 @@ export function RAGChatInterface({
                 <MessageBubble
                   key={message.id}
                   message={message}
-                  sources={message.role === 'assistant' ? sources : []}
                 />
               ))}
 
@@ -242,11 +195,13 @@ export function RAGChatInterface({
                     <AlertCircle className='h-4 w-4' />
                     <span className='text-sm'>Error: {error}</span>
                   </div>
-                  <RetryButton onRetry={handleRetry} />
+                  <RetryButton onRetry={retryLastMessage} />
+                  <Button variant="ghost" size="sm" onClick={clearError}>
+                    Dismiss
+                  </Button>
                 </div>
               )}
 
-              <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
 
@@ -256,7 +211,7 @@ export function RAGChatInterface({
               <div className='flex gap-2'>
                 <Input
                   value={input}
-                  onChange={handleInputChange}
+                  onChange={(e) => setInput(e.target.value)}
                   placeholder={
                     selectedDocuments.length > 0
                       ? 'Ask about your selected documents...'
@@ -270,11 +225,7 @@ export function RAGChatInterface({
                   disabled={isLoading || !input.trim()}
                   size='icon'
                   className='shrink-0'>
-                  {isLoading ? (
-                    <Loader2 className='h-4 w-4 animate-spin' />
-                  ) : (
-                    <Send className='h-4 w-4' />
-                  )}
+                  <Send className='h-4 w-4' />
                 </Button>
               </div>
 

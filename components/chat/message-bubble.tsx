@@ -18,21 +18,10 @@ import { cn } from '@/lib/utils';
 import { Message } from '@/lib/types/database';
 
 interface MessageBubbleProps {
-  message: Message; // Use your database Message type
-  sources?: Array<{
-    documentId?: string;
-    document_id?: string; // Support both naming conventions
-    documentTitle?: string;
-    document_title?: string;
-    title?: string;
-    similarity?: number;
-    confidence?: number;
-    content: string;
-    page?: number;
-  }>;
+  message: Message;
 }
 
-export function MessageBubble({ message, sources = [] }: MessageBubbleProps) {
+export function MessageBubble({ message }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
 
@@ -59,18 +48,8 @@ export function MessageBubble({ message, sources = [] }: MessageBubbleProps) {
     }
   };
 
-  // Normalize source data to handle different API response formats
-  const normalizedSources = sources.map((source) => ({
-    id: source.documentId || source.document_id || '',
-    title:
-      source.documentTitle ||
-      source.document_title ||
-      source.title ||
-      'Unknown Document',
-    content: source.content,
-    similarity: source.similarity || source.confidence || 0,
-    page: source.page,
-  }));
+  // Get sources from the message
+  const sources = message.sources || [];
 
   return (
     <div
@@ -153,29 +132,24 @@ export function MessageBubble({ message, sources = [] }: MessageBubbleProps) {
         </Card>
 
         {/* Sources (only for assistant messages) */}
-        {!isUser && normalizedSources.length > 0 && (
+        {!isUser && sources.length > 0 && (
           <Card className='p-3 bg-gradient-to-r from-blue-50/50 to-purple-50/50 dark:from-blue-900/10 dark:to-purple-900/10 border-blue-200 dark:border-blue-800'>
             <div className='flex items-center gap-2 mb-3'>
               <Quote className='h-3 w-3 text-blue-600' />
               <span className='text-xs font-medium text-blue-700 dark:text-blue-300'>
-                RAG Sources Referenced ({normalizedSources.length})
+                RAG Sources Referenced ({sources.length})
               </span>
             </div>
 
             <div className='space-y-2'>
-              {normalizedSources.slice(0, 3).map((source, index) => (
+              {sources.slice(0, 3).map((source, index) => (
                 <div
-                  key={`${source.id}-${index}`}
+                  key={`${source.documentId}-${index}`}
                   className='flex items-start gap-2 p-2 bg-white dark:bg-gray-800 rounded border'>
                   <FileText className='h-3 w-3 text-blue-600 mt-0.5 shrink-0' />
                   <div className='flex-1 min-w-0'>
                     <p className='text-xs font-medium truncate'>
-                      {source.title}
-                      {source.page && (
-                        <span className='text-muted-foreground ml-1'>
-                          (page {source.page})
-                        </span>
-                      )}
+                      {source.documentTitle}
                     </p>
                     <p className='text-xs text-muted-foreground line-clamp-2 mt-1'>
                       {source.content}
@@ -190,7 +164,7 @@ export function MessageBubble({ message, sources = [] }: MessageBubbleProps) {
                         className='h-4 text-xs p-0 text-blue-600 hover:text-blue-700'
                         onClick={() => {
                           // Handle viewing the source document
-                          console.log('View source:', source.id);
+                          console.log('View source:', source.documentId);
                           // You could emit an event or call a callback here
                         }}>
                         <ExternalLink className='h-2 w-2 mr-1' />
@@ -201,7 +175,7 @@ export function MessageBubble({ message, sources = [] }: MessageBubbleProps) {
                 </div>
               ))}
 
-              {normalizedSources.length > 3 && (
+              {sources.length > 3 && (
                 <Button
                   variant='ghost'
                   size='sm'
@@ -210,7 +184,7 @@ export function MessageBubble({ message, sources = [] }: MessageBubbleProps) {
                     // Could expand to show all sources
                     console.log('Show all sources');
                   }}>
-                  Show {normalizedSources.length - 3} more sources
+                  Show {sources.length - 3} more sources
                 </Button>
               )}
             </div>
