@@ -4,16 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import {
-  User,
-  Brain,
-  Copy,
-  Check,
-  ExternalLink,
-  FileText,
-  Quote,
-} from 'lucide-react';
-import { useState } from 'react';
+import { User, Brain, ExternalLink, FileText, Quote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Message } from '@/lib/types/database';
 
@@ -22,18 +13,7 @@ interface MessageBubbleProps {
 }
 
 export function MessageBubble({ message }: MessageBubbleProps) {
-  const [copied, setCopied] = useState(false);
   const isUser = message.role === 'user';
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(message.content);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy text:', err);
-    }
-  };
 
   // Handle different date formats from the database
   const getFormattedTime = () => {
@@ -86,33 +66,6 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               : 'mr-auto bg-background border'
           )}>
           <div className='space-y-2'>
-            {/* Role Badge */}
-            <div className='flex items-center justify-between'>
-              <Badge
-                variant={isUser ? 'secondary' : 'outline'}
-                className='text-xs'>
-                {isUser ? 'You' : 'Stealth AI'}
-              </Badge>
-
-              <Button
-                variant='ghost'
-                size='sm'
-                onClick={handleCopy}
-                className={cn(
-                  'h-6 w-6 p-0 transition-colors',
-                  isUser
-                    ? 'text-primary-foreground/70 hover:text-primary-foreground'
-                    : 'hover:bg-accent'
-                )}
-                aria-label='Copy message'>
-                {copied ? (
-                  <Check className='h-3 w-3' />
-                ) : (
-                  <Copy className='h-3 w-3' />
-                )}
-              </Button>
-            </div>
-
             {/* Message Text */}
             <div className='prose prose-sm max-w-none dark:prose-invert'>
               <p className='whitespace-pre-wrap leading-relaxed m-0'>

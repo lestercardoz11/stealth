@@ -78,12 +78,14 @@ export async function searchDocuments(
   id: string;
   document_id: string;
   content: string;
-  metadata: any;
+  metadata: Record<string, unknown>;
   similarity: number;
   document_title: string;
 }>> {
   try {
     console.log('Starting document search for query:', query);
+    console.log('Using document IDs:', documentIds);
+    console.log(`Threshold: ${threshold}, Limit: ${limit}`);
     
     // Generate embedding for the search query
     const queryEmbedding = await generateEmbedding(query);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -31,7 +31,7 @@ export function RAGChatInterface({
   availableDocuments,
 }: RAGChatInterfaceProps) {
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
-  
+
   const {
     messages,
     isLoading,
@@ -56,7 +56,7 @@ export function RAGChatInterface({
 
     const messageContent = input.trim();
     setInput('');
-    
+
     await sendMessage(messageContent, selectedDocuments);
   };
 
@@ -64,7 +64,7 @@ export function RAGChatInterface({
   const lastAssistantMessage = messages
     .slice()
     .reverse()
-    .find(m => m.role === 'assistant');
+    .find((m) => m.role === 'assistant');
   const sources = lastAssistantMessage?.sources || [];
 
   return (
@@ -131,7 +131,9 @@ export function RAGChatInterface({
                   </p>
                   <div className='mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 max-w-md mx-auto'>
                     <p className='text-xs text-blue-700 dark:text-blue-200'>
-                      💡 <strong>RAG-Powered:</strong> The AI will search through your selected documents to provide contextual, accurate responses with source citations.
+                      💡 <strong>RAG-Powered:</strong> The AI will search
+                      through your selected documents to provide contextual,
+                      accurate responses with source citations.
                     </p>
                   </div>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 max-w-2xl mx-auto px-4'>
@@ -172,10 +174,7 @@ export function RAGChatInterface({
               )}
 
               {messages.map((message) => (
-                <MessageBubble
-                  key={message.id}
-                  message={message}
-                />
+                <MessageBubble key={message.id} message={message} />
               ))}
 
               {isLoading && (
@@ -183,7 +182,8 @@ export function RAGChatInterface({
                   <div className='flex flex-col items-center gap-2'>
                     <LoadingSpinner text='Stealth AI is analyzing documents...' />
                     <p className='text-xs text-muted-foreground'>
-                      Searching through {selectedDocuments.length} selected document{selectedDocuments.length !== 1 ? 's' : ''}
+                      Searching through {selectedDocuments.length} selected
+                      document{selectedDocuments.length !== 1 ? 's' : ''}
                     </p>
                   </div>
                 </div>
@@ -196,12 +196,11 @@ export function RAGChatInterface({
                     <span className='text-sm'>Error: {error}</span>
                   </div>
                   <RetryButton onRetry={retryLastMessage} />
-                  <Button variant="ghost" size="sm" onClick={clearError}>
+                  <Button variant='ghost' size='sm' onClick={clearError}>
                     Dismiss
                   </Button>
                 </div>
               )}
-
             </div>
           </ScrollArea>
 
@@ -231,13 +230,16 @@ export function RAGChatInterface({
 
               {selectedDocuments.length === 0 && (
                 <p className='text-xs text-muted-foreground mt-2 text-center'>
-                  💡 Tip: Select documents from the sidebar to enable RAG-powered, context-aware responses with source citations
+                  💡 Tip: Select documents from the sidebar to enable
+                  RAG-powered, context-aware responses with source citations
                 </p>
               )}
-              
+
               {selectedDocuments.length > 0 && (
                 <p className='text-xs text-green-600 dark:text-green-400 mt-2 text-center'>
-                  🔍 RAG Mode: AI will search through {selectedDocuments.length} selected document{selectedDocuments.length !== 1 ? 's' : ''} for relevant context
+                  🔍 RAG Mode: AI will search through {selectedDocuments.length}{' '}
+                  selected document{selectedDocuments.length !== 1 ? 's' : ''}{' '}
+                  for relevant context
                 </p>
               )}
             </form>
