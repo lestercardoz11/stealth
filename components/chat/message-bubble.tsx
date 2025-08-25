@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User, Brain, ExternalLink, FileText, Quote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Message } from '@/lib/types/database';
+import ReactMarkdown from 'react-markdown';
 
 interface MessageBubbleProps {
   message: Message;
@@ -68,9 +69,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           <div className='space-y-2'>
             {/* Message Text */}
             <div className='prose prose-sm max-w-none dark:prose-invert'>
-              <p className='whitespace-pre-wrap leading-relaxed m-0'>
-                {message.content}
-              </p>
+              <ReactMarkdown>{message.content}</ReactMarkdown>
             </div>
 
             {/* Timestamp */}
@@ -104,9 +103,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
                     <p className='text-xs font-medium truncate'>
                       {source.documentTitle}
                     </p>
-                    <p className='text-xs text-muted-foreground line-clamp-2 mt-1'>
-                      {source.content}
-                    </p>
+                    <ReactMarkdown>{source.content}</ReactMarkdown>
                     <div className='flex items-center gap-2 mt-1'>
                       <Badge variant='outline' className='text-xs px-1 py-0'>
                         {Math.round(source.similarity * 100)}% similarity
