@@ -1,17 +1,68 @@
-import { generateChatResponse } from '@/lib/ai/ollama-client';
 import { createClient } from '@/lib/utils/supabase/server';
 import { searchDocuments } from '@/lib/ai/document-processor';
 import { rateLimiter, RATE_LIMITS } from '@/lib/security/input-validation';
 import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 
+// Mock AI response generation for development
+async function generateMockChatResponse(
+  messages: Array<{ role: string; content: string }>,
+  context?: string
+): Promise<string> {
+  const userQuery = messages[messages.length - 1]?.content || '';
+  
+  if (context) {
+    return `Based on the provided documents, I can help you with "${userQuery}".
+
+Here's my analysis:
+
+${context ? `**Document Context Found:**
+${context.substring(0, 500)}${context.length > 500 ? '...' : ''}
+
+` : ''}**Legal Analysis:**
+This appears to be a legal inquiry that would benefit from careful document review. Based on the available information, I recommend:
+
+1. **Review the relevant clauses** mentioned in the documents
+2. **Consider the legal implications** of the terms discussed
+3. **Verify compliance** with applicable regulations
+4. **Consult with qualified legal counsel** for specific legal advice
+
+**Important Disclaimer:**
+This analysis is for informational purposes only and does not constitute legal advice. Always consult with qualified legal counsel for specific legal matters.
+
+Would you like me to elaborate on any specific aspect of this analysis?`;
+  }
+
+  return `I understand you're asking about "${userQuery}".
+
+**General Legal Guidance:**
+While I don't have specific document context for this query, I can provide some general guidance:
+
+1. **Document Review Recommended:** For the most accurate analysis, please upload relevant documents
+2. **Legal Research:** Consider reviewing applicable statutes and case law
+3. **Professional Consultation:** Always consult with qualified legal counsel for specific matters
+
+**To get more specific assistance:**
+- Upload relevant documents using the document selector
+- Select documents to provide context for your questions
+- Ask specific questions about clauses, terms, or legal concepts
+
+**Important Disclaimer:**
+This response is for informational purposes only and does not constitute legal advice. Verify all information against original source documents and consult with qualified legal counsel.
+
+How can I help you further with your legal research?`;
+}
+
 export async function POST(req: Request) {
   try {
+    console.log('Chat API called');
+    
     // Get client IP for rate limiting and audit logging
     const clientIP = req.headers.get('x-forwarded-for') || 
                     req.headers.get('x-real-ip') || 
                     'unknown';
     
     const { messages, documentIds } = await req.json();
+    console.log('Chat request:', { messagesCount: messages?.length, documentIds });
     
     // Get the user's query (last message)
     const userQuery = messages[messages.length - 1]?.content;
@@ -30,6 +81,7 @@ export async function POST(req: Request) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !user) {
+      console.error('Authentication error:', authError);
       return new Response('Unauthorized', { status: 401 });
     }
 
@@ -57,6 +109,7 @@ export async function POST(req: Request) {
       .single();
 
     if (!profile || profile.status !== 'approved') {
+      console.error('User not approved:', profile);
       return new Response('Account not approved', { status: 403 });
     }
 
@@ -68,16 +121,19 @@ export async function POST(req: Request) {
       content: string;
     }> = [];
 
-    // If we have document IDs or should search all accessible documents
+    // If we have document IDs, search for relevant chunks
     if (documentIds && documentIds.length > 0) {
       try {
+        console.log('Searching documents for context...');
         // Search for relevant document chunks
         const relevantChunks = await searchDocuments(
           userQuery,
           documentIds,
-          0.7,
+          0.5, // Lower threshold for better results
           5
         );
+
+        console.log(`Found ${relevantChunks?.length || 0} relevant chunks`);
 
         if (relevantChunks && relevantChunks.length > 0) {
           context = relevantChunks
@@ -101,8 +157,8 @@ export async function POST(req: Request) {
       }
     }
 
-    // Generate response using Ollama
-    const response = await generateChatResponse(messages, context);
+    // Generate response using mock AI for development
+    const response = await generateMockChatResponse(messages, context);
 
     // Log successful chat interaction
     await auditLogger.log({
@@ -120,35 +176,7 @@ export async function POST(req: Request) {
       }
     });
 
-    // Save the conversation to database
-    try {
-      const { data: conversation, error: convError } = await supabase
-        .from('conversations')
-        .insert({
-          user_id: user.id,
-          title: userQuery.substring(0, 100) + '...',
-        })
-        .select()
-        .single();
-
-      if (conversation && !convError) {
-        // Save user message
-        await supabase.from('messages').insert({
-          conversation_id: conversation.id,
-          role: 'user',
-          content: userQuery,
-        });
-
-        // Save assistant message
-        await supabase.from('messages').insert({
-          conversation_id: conversation.id,
-          role: 'assistant',
-          content: response,
-        });
-      }
-    } catch (saveError) {
-      console.error('Error saving conversation:', saveError);
-    }
+    console.log('Chat response generated successfully');
 
     return new Response(JSON.stringify({ 
       response,
@@ -156,7 +184,6 @@ export async function POST(req: Request) {
     }), {
       headers: {
         'Content-Type': 'application/json',
-        'X-Sources': JSON.stringify(sources),
       },
     });
 

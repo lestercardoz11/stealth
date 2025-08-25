@@ -7,8 +7,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageBubble } from './message-bubble';
 import { DocumentSelector } from './document-selector';
 import { ContextPanel } from './context-panel';
+import { ConversationList } from './conversation-list';
 import { PrivacyBadge } from '@/components/security/privacy-badge';
-import { Send, FileText, Brain, AlertCircle } from 'lucide-react';
+import { Send, FileText, Brain, AlertCircle, MessageSquare } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { RetryButton } from '@/components/ui/retry-button';
@@ -31,12 +32,19 @@ export function RAGChatInterface({
   availableDocuments,
 }: RAGChatInterfaceProps) {
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
+  const [showConversations, setShowConversations] = useState(true);
+  const [showDocuments, setShowDocuments] = useState(false);
 
   const {
     messages,
+    conversations,
+    currentConversation,
     isLoading,
     error,
     sendMessage,
+    createNewConversation,
+    selectConversation,
+    deleteConversation,
     clearError,
     retryLastMessage,
   } = useChat({
@@ -69,46 +77,119 @@ export function RAGChatInterface({
 
   return (
     <ErrorBoundary>
-      <div className='flex bg-gray-50/50 dark:bg-gray-900/50'>
-        {/* Document Selector Sidebar */}
-        <div className='hidden lg:block w-80 border-r bg-background'>
-          <div className='p-4 border-b'>
-            <div className='mb-3'>
-              <PrivacyBadge variant='compact' />
-            </div>
-            <h3 className='font-semibold flex items-center gap-2'>
-              <FileText className='h-4 w-4' />
-              Document Context
-            </h3>
-            <p className='text-sm text-muted-foreground mt-1'>
-              Select documents to provide context for your AI assistant
-            </p>
+      <div className='flex h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-gray-900/50'>
+        {/* Conversations Sidebar - Desktop */}
+        {showConversations && (
+          <div className='hidden lg:block'>
+            <ConversationList
+              conversations={conversations}
+              selectedConversationId={currentConversation?.id}
+              onSelectConversation={selectConversation}
+              onNewConversation={createNewConversation}
+              onDeleteConversation={deleteConversation}
+            />
           </div>
+        )}
 
-          <ScrollArea className='h-[calc(100vh-200px)]'>
-            <div className='p-4'>
-              <DocumentSelector
-                documents={availableDocuments}
-                selected={selectedDocuments}
-                onSelect={setSelectedDocuments}
-              />
+        {/* Document Selector Sidebar - Desktop */}
+        {showDocuments && (
+          <div className='hidden lg:block w-80 border-r bg-background'>
+            <div className='p-4 border-b'>
+              <div className='mb-3'>
+                <PrivacyBadge variant='compact' />
+              </div>
+              <h3 className='font-semibold flex items-center gap-2'>
+                <FileText className='h-4 w-4' />
+                Document Context
+              </h3>
+              <p className='text-sm text-muted-foreground mt-1'>
+                Select documents to provide context for your AI assistant
+              </p>
             </div>
-          </ScrollArea>
-        </div>
+
+            <ScrollArea className='h-[calc(100vh-200px)]'>
+              <div className='p-4'>
+                <DocumentSelector
+                  documents={availableDocuments}
+                  selected={selectedDocuments}
+                  onSelect={setSelectedDocuments}
+                />
+              </div>
+            </ScrollArea>
+          </div>
+        )}
 
         {/* Main Chat Interface */}
         <div className='flex-1 flex flex-col'>
-          {/* Mobile Document Selector */}
+          {/* Mobile Controls */}
           <div className='lg:hidden border-b bg-background p-4'>
             <div className='flex items-center justify-between mb-2'>
-              <h3 className='font-medium text-sm'>Selected Documents</h3>
+              <div className='flex gap-2'>
+                <Button
+                  variant={showConversations ? 'default' : 'outline'}
+                  size='sm'
+                  onClick={() => {
+                    setShowConversations(!showConversations);
+                    setShowDocuments(false);
+                  }}
+                >
+                  <MessageSquare className='h-4 w-4 mr-1' />
+                  Chats
+                </Button>
+                <Button
+                  variant={showDocuments ? 'default' : 'outline'}
+                  size='sm'
+                  onClick={() => {
+                    setShowDocuments(!showDocuments);
+                    setShowConversations(false);
+                  }}
+                >
+                  <FileText className='h-4 w-4 mr-1' />
+                  Docs
+                </Button>
+              </div>
               <PrivacyBadge variant='compact' />
             </div>
-            <p className='text-xs text-muted-foreground'>
-              {selectedDocuments.length} document
-              {selectedDocuments.length !== 1 ? 's' : ''} selected
-            </p>
+            
+            {showDocuments && (
+              <p className='text-xs text-muted-foreground'>
+                {selectedDocuments.length} document
+                {selectedDocuments.length !== 1 ? 's' : ''} selected
+              </p>
+            )}
           </div>
+
+          {/* Mobile Sidebars */}
+          {showConversations && (
+            <div className='lg:hidden border-b bg-background'>
+              <ConversationList
+                conversations={conversations}
+                selectedConversationId={currentConversation?.id}
+                onSelectConversation={(conv) => {
+                  selectConversation(conv);
+                  setShowConversations(false);
+                }}
+                onNewConversation={() => {
+                  createNewConversation();
+                  setShowConversations(false);
+                }}
+                onDeleteConversation={deleteConversation}
+              />
+            </div>
+          )}
+
+          {showDocuments && (
+            <div className='lg:hidden border-b bg-background p-4'>
+              <DocumentSelector
+                documents={availableDocuments}
+                selected={selectedDocuments}
+                onSelect={(docs) => {
+                  setSelectedDocuments(docs);
+                  setShowDocuments(false);
+                }}
+              />
+            </div>
+          )}
 
           {/* Messages Area */}
           <ScrollArea className='flex-1 p-2 md:p-4'>
@@ -119,7 +200,7 @@ export function RAGChatInterface({
                     <Brain className='h-8 w-8 text-white' />
                   </div>
                   <h3 className='text-lg md:text-xl font-semibold mb-2'>
-                    Welcome to Stealth AI
+                    {currentConversation ? 'Continue Your Conversation' : 'Welcome to Stealth AI'}
                   </h3>
                   <p className='text-muted-foreground mb-4 text-sm md:text-base px-4'>
                     Your intelligent legal document assistant.
@@ -214,7 +295,7 @@ export function RAGChatInterface({
                   placeholder={
                     selectedDocuments.length > 0
                       ? 'Ask about your selected documents...'
-                      : 'Select documents first, then ask questions...'
+                      : 'Ask a question or select documents for context...'
                   }
                   disabled={isLoading}
                   className='flex-1 text-sm md:text-base'
@@ -230,8 +311,7 @@ export function RAGChatInterface({
 
               {selectedDocuments.length === 0 && (
                 <p className='text-xs text-muted-foreground mt-2 text-center'>
-                  💡 Tip: Select documents from the sidebar to enable
-                  RAG-powered, context-aware responses with source citations
+                  💡 Tip: Select documents to enable RAG-powered, context-aware responses with source citations
                 </p>
               )}
 
