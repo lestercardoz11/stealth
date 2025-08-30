@@ -1,11 +1,72 @@
 import { createClient } from '@/lib/utils/supabase/server';
-import { generateEmbedding, chunkText } from './embeddings';
+import { generateEmbedding } from './ollama-client';
 
 export interface ProcessedChunk {
   content: string;
   embedding: number[];
   chunkIndex: number;
   metadata: Record<string, unknown>;
+}
+
+export function chunkText(text: string, maxChunkSize: number = 1000): string[] {
+  console.log('Chunking text of length:', text.length);
+  
+  if (!text || text.trim().length === 0) {
+    console.log('Empty text provided, returning empty chunks');
+    return [];
+  }
+  
+  // Split by sentences first for better semantic chunks
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const chunks: string[] = [];
+  let currentChunk = '';
+
+  for (const sentence of sentences) {
+    const trimmedSentence = sentence.trim();
+    if (currentChunk.length + trimmedSentence.length > maxChunkSize && currentChunk.length > 0) {
+      chunks.push(currentChunk.trim());
+      currentChunk = trimmedSentence;
+    } else {
+      currentChunk += (currentChunk ? '. ' : '') + trimmedSentence;
+    }
+  }
+
+  if (currentChunk.trim()) {
+    chunks.push(currentChunk.trim());
+  }
+
+  // If no sentences found, split by paragraphs or words
+  if (chunks.length === 0) {
+    const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+    
+    for (const paragraph of paragraphs) {
+      if (paragraph.length <= maxChunkSize) {
+        chunks.push(paragraph.trim());
+      } else {
+        // Split long paragraphs by words
+        const words = paragraph.split(/\s+/);
+        let currentChunk = '';
+        
+        for (const word of words) {
+          if (currentChunk.length + word.length > maxChunkSize && currentChunk.length > 0) {
+            chunks.push(currentChunk.trim());
+            currentChunk = word;
+          } else {
+            currentChunk += (currentChunk ? ' ' : '') + word;
+          }
+        }
+        
+        if (currentChunk.trim()) {
+          chunks.push(currentChunk.trim());
+        }
+      }
+    }
+  }
+
+  const filteredChunks = chunks.filter(chunk => chunk.length > 20); // Filter out very short chunks
+  console.log(`Created ${filteredChunks.length} chunks from ${chunks.length} initial chunks`);
+  
+  return filteredChunks;
 }
 
 export async function processDocumentText(
@@ -17,7 +78,7 @@ export async function processDocumentText(
     console.log('Starting document processing for:', documentId);
     
     // Chunk the text into smaller pieces
-    const chunks = chunkText(text, 1000);
+    const chunks = chunkText(text, 800); // Smaller chunks for better context
     console.log(`Created ${chunks.length} chunks for document ${documentId}`);
     
     const supabase = await createClient();
@@ -39,7 +100,7 @@ export async function processDocumentText(
           .insert({
             document_id: documentId,
             content: chunk,
-            embedding: JSON.stringify(embedding), // Store as JSON string for compatibility
+            embedding: embedding, // Store as vector directly
             chunk_index: i,
             metadata: {
               ...metadata,
@@ -58,7 +119,7 @@ export async function processDocumentText(
         
         // Add small delay to avoid overwhelming the system
         if (i < chunks.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 200));
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
       } catch (chunkError) {
         console.error(`Error processing chunk ${i}:`, chunkError);
@@ -93,73 +154,38 @@ export async function searchDocuments(
     
     const supabase = await createClient();
     
-    // For now, implement a simple text search until vector search is properly configured
-    let query_builder = supabase
-      .from('document_chunks')
-      .select(`
-        id,
-        document_id,
-        content,
-        metadata,
-        documents!inner(title)
-      `)
-      .textSearch('content', query, { type: 'websearch' })
-      .limit(limit);
+    // Generate embedding for the search query
+    const queryEmbedding = await generateEmbedding(query);
+    console.log('Generated query embedding');
     
-    if (documentIds && documentIds.length > 0) {
-      query_builder = query_builder.in('document_id', documentIds);
-    }
-    
-    const { data, error } = await query_builder;
+    // Use the vector similarity search function
+    const { data, error } = await supabase.rpc('match_documents', {
+      query_embedding: queryEmbedding,
+      match_threshold: threshold,
+      match_count: limit,
+      document_ids: documentIds || null
+    });
     
     if (error) {
-      console.error('Document search error:', error);
-      // Fallback to basic content search
-      const fallbackQuery = supabase
-        .from('document_chunks')
-        .select(`
-          id,
-          document_id,
-          content,
-          metadata,
-          documents!inner(title)
-        `)
-        .ilike('content', `%${query}%`)
-        .limit(limit);
-      
-      if (documentIds && documentIds.length > 0) {
-        fallbackQuery.in('document_id', documentIds);
-      }
-      
-      const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+      console.error('Vector search error:', error);
+      // Fallback to text search
+      const { data: fallbackData, error: fallbackError } = await supabase.rpc('search_documents_text', {
+        search_query: query,
+        match_count: limit,
+        document_ids: documentIds || null
+      });
       
       if (fallbackError) {
         console.error('Fallback search error:', fallbackError);
         return [];
       }
       
-      console.log(`Fallback search found ${fallbackData?.length || 0} chunks`);
-      
-      return (fallbackData || []).map((chunk: any) => ({
-        id: chunk.id,
-        document_id: chunk.document_id,
-        content: chunk.content,
-        metadata: chunk.metadata || {},
-        similarity: 0.8, // Mock similarity for text search
-        document_title: chunk.documents?.title || 'Unknown Document'
-      }));
+      console.log(`Fallback text search found ${fallbackData?.length || 0} chunks`);
+      return fallbackData || [];
     }
     
-    console.log(`Found ${data?.length || 0} relevant chunks`);
-    
-    return (data || []).map((chunk: any) => ({
-      id: chunk.id,
-      document_id: chunk.document_id,
-      content: chunk.content,
-      metadata: chunk.metadata || {},
-      similarity: 0.8, // Mock similarity for now
-      document_title: chunk.documents?.title || 'Unknown Document'
-    }));
+    console.log(`Vector search found ${data?.length || 0} relevant chunks`);
+    return data || [];
   } catch (error) {
     console.error('Document search error:', error);
     return []; // Return empty array instead of throwing

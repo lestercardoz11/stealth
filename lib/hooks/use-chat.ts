@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Message, Conversation } from '@/lib/types/database';
 import { createClient } from '@/lib/utils/supabase/client';
+import { sendChatMessage } from '@/lib/actions/chat-actions';
 
 export interface UseChatOptions {
   initialMessages?: Message[];
@@ -10,6 +11,7 @@ export interface UseChatOptions {
   autoSave?: boolean;
   onError?: (error: string) => void;
   onResponse?: (response: { response: string; sources: any[] }) => void;
+  onProcessingStage?: (stage: string) => void;
 }
 
 export interface UseChatReturn {
@@ -33,6 +35,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     autoSave = true,
     onError,
     onResponse,
+    onProcessingStage,
   } = options;
 
   const [messages, setMessages] = useState<Message[]>(initialMessages);
@@ -173,82 +176,32 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     setError(null);
 
     try {
-      const supabase = createClient();
-      let conversationToUse = currentConversation;
-
-      // Create new conversation if none exists
-      if (!conversationToUse) {
-        const { data: newConversation, error: convError } = await supabase
-          .from('conversations')
-          .insert({
-            title: content.substring(0, 50) + (content.length > 50 ? '...' : ''),
-          })
-          .select()
-          .single();
-
-        if (convError) throw convError;
-        
-        conversationToUse = newConversation;
-        setCurrentConversation(newConversation);
-        setConversations(prev => [newConversation, ...prev]);
-      }
-
-      // Save user message to database
-      const { error: userMsgError } = await supabase
-        .from('messages')
-        .insert({
-          conversation_id: conversationToUse.id,
-          role: 'user',
-          content: content.trim(),
-        });
-
-      if (userMsgError) throw userMsgError;
-
-      // Send to chat API
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages: [userMessage],
-          documentIds,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`Chat API error: ${response.status} - ${errorData}`);
-      }
-
-      const data = await response.json();
+      // Processing stages for better UX
+      onProcessingStage?.('Analyzing query...');
       
+      if (documentIds.length > 0) {
+        onProcessingStage?.('Searching documents...');
+      }
+      
+      // Use server action for chat processing
+      const result = await sendChatMessage(messages.concat(userMessage), documentIds);
+      
+      onProcessingStage?.('Generating response...');
       // Create assistant message
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
+        content: result.response,
         role: 'assistant',
         created_at: new Date().toISOString(),
-        conversation_id: conversationToUse.id,
-        sources: data.sources || [],
+        conversation_id: currentConversation?.id || '',
+        sources: result.sources || [],
       };
-
-      // Save assistant message to database
-      const { error: assistantMsgError } = await supabase
-        .from('messages')
-        .insert({
-          conversation_id: conversationToUse.id,
-          role: 'assistant',
-          content: data.response,
-        });
-
-      if (assistantMsgError) throw assistantMsgError;
 
       // Add assistant message to UI
       setMessages(prev => [...prev, assistantMessage]);
 
       // Call success callback
-      onResponse?.(data);
+      onResponse?.(result);
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
@@ -259,8 +212,9 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       setMessages(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
+      onProcessingStage?.('');
     }
-  }, [currentConversation, isLoading, onError, onResponse]);
+  }, [currentConversation, isLoading, onError, onResponse, onProcessingStage, messages]);
 
   const retryLastMessage = useCallback(async (): Promise<void> => {
     if (!lastRequestRef.current) return;

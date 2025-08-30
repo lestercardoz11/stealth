@@ -9,7 +9,7 @@ import { DocumentSelector } from './document-selector';
 import { ContextPanel } from './context-panel';
 import { ConversationList } from './conversation-list';
 import { PrivacyBadge } from '@/components/security/privacy-badge';
-import { Send, FileText, Brain, AlertCircle, MessageSquare } from 'lucide-react';
+import { Send, FileText, Brain, AlertCircle, MessageSquare, Loader2, Zap } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { RetryButton } from '@/components/ui/retry-button';
@@ -34,6 +34,7 @@ export function RAGChatInterface({
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
   const [showConversations, setShowConversations] = useState(true);
   const [showDocuments, setShowDocuments] = useState(false);
+  const [processingStage, setProcessingStage] = useState<string>('');
 
   const {
     messages,
@@ -50,9 +51,11 @@ export function RAGChatInterface({
   } = useChat({
     onError: (error) => {
       console.error('Chat error:', error);
+      setProcessingStage('');
     },
     onResponse: (response) => {
       console.log('Chat response received:', response);
+      setProcessingStage('');
     },
   });
 
@@ -64,6 +67,7 @@ export function RAGChatInterface({
 
     const messageContent = input.trim();
     setInput('');
+    setProcessingStage('Analyzing query...');
 
     await sendMessage(messageContent, selectedDocuments);
   };
@@ -75,6 +79,37 @@ export function RAGChatInterface({
     .find((m) => m.role === 'assistant');
   const sources = lastAssistantMessage?.sources || [];
 
+  // Enhanced loading component with stages
+  const LoadingIndicator = () => (
+    <div className='flex flex-col items-center gap-3 p-6'>
+      <div className='flex items-center gap-3'>
+        <div className='relative'>
+          <Loader2 className='h-8 w-8 animate-spin text-blue-600' />
+          <div className='absolute inset-0 rounded-full border-2 border-blue-200 animate-pulse' />
+        </div>
+        <div className='text-left'>
+          <p className='font-medium text-blue-700'>Stealth AI Processing</p>
+          <p className='text-sm text-blue-600'>
+            {processingStage || 'Generating response...'}
+          </p>
+        </div>
+      </div>
+      
+      {selectedDocuments.length > 0 && (
+        <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+          <Zap className='h-3 w-3' />
+          <span>
+            Searching through {selectedDocuments.length} document{selectedDocuments.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+      )}
+      
+      <div className='flex items-center gap-1 text-xs text-green-600'>
+        <div className='w-2 h-2 bg-green-500 rounded-full animate-pulse' />
+        <span>100% Private Processing</span>
+      </div>
+    </div>
+  );
   return (
     <ErrorBoundary>
       <div className='flex h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-gray-900/50'>

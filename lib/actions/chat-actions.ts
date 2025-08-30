@@ -15,6 +15,8 @@ export async function sendChatMessage(
   documentIds: string[]
 ): Promise<ChatResponse> {
   try {
+    console.log('Processing chat message with', documentIds.length, 'documents');
+    
     // Get the user's query (last message)
     const userQuery = messages[messages.length - 1]?.content;
     
@@ -52,13 +54,16 @@ export async function sendChatMessage(
     // If we have document IDs, search for relevant chunks
     if (documentIds && documentIds.length > 0) {
       try {
+        console.log('Searching for relevant document chunks...');
         // Search for relevant document chunks
         const relevantChunks = await searchDocuments(
           userQuery,
           documentIds,
-          0.7,
+          0.3, // Lower threshold for better recall
           5
         );
+
+        console.log(`Found ${relevantChunks?.length || 0} relevant chunks`);
 
         if (relevantChunks && relevantChunks.length > 0) {
           context = relevantChunks
@@ -73,6 +78,8 @@ export async function sendChatMessage(
           }));
           
           console.log(`Using context from ${relevantChunks.length} document chunks`);
+        } else {
+          console.log('No relevant chunks found, proceeding without context');
         }
       } catch (searchError) {
         console.error('Document search error:', searchError);
@@ -82,11 +89,34 @@ export async function sendChatMessage(
       }
     }
 
+    console.log('Generating AI response with context length:', context.length);
+    
     // Generate response using Ollama
-    const response = await generateChatResponse(messages, context);
+    const response = await generateChatResponse(
+      messages.map(m => ({ role: m.role, content: m.content })), 
+      context
+    );
 
     // Save the conversation to database
     try {
+      let conversationToUse = null;
+      
+      // Create new conversation if none exists
+      if (!messages[0]?.conversation_id) {
+        const { data: conversation, error: convError } = await supabase
+          .from('conversations')
+          .insert({
+            user_id: user.id,
+            title: userQuery.substring(0, 100) + (userQuery.length > 100 ? '...' : ''),
+          })
+          .select()
+          .single();
+
+        if (conversation && !convError) {
+          conversationToUse = conversation;
+        }
+      }
+      
       const { data: conversation, error: convError } = await supabase
         .from('conversations')
         .insert({
@@ -115,6 +145,8 @@ export async function sendChatMessage(
       console.error('Error saving conversation:', saveError);
     }
 
+    console.log('Chat response generated successfully');
+    
     return {
       response,
       sources,

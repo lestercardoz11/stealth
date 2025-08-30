@@ -151,6 +151,28 @@ export async function POST(request: NextRequest) {
         const decoder = new TextDecoder('utf-8');
         extractedText = decoder.decode(uint8Array);
         console.log('Extracted text length:', extractedText.length);
+      } else if (file.type === 'application/pdf') {
+        // For PDF files, extract text content
+        try {
+          const pdfParse = require('pdf-parse');
+          const pdfData = await pdfParse(fileBuffer);
+          extractedText = pdfData.text;
+          console.log('Extracted PDF text length:', extractedText.length);
+        } catch (pdfError) {
+          console.error('PDF extraction error:', pdfError);
+          extractedText = `PDF Document: ${title}\n\nThis PDF document has been uploaded but text extraction failed. The document can still be referenced by title and metadata.`;
+        }
+      } else if (file.type.includes('wordprocessingml') || file.type.includes('msword')) {
+        // For Word documents, extract text content
+        try {
+          const mammoth = require('mammoth');
+          const result = await mammoth.extractRawText({ buffer: fileBuffer });
+          extractedText = result.value;
+          console.log('Extracted Word text length:', extractedText.length);
+        } catch (wordError) {
+          console.error('Word extraction error:', wordError);
+          extractedText = `Word Document: ${title}\n\nThis Word document has been uploaded but text extraction failed. The document can still be referenced by title and metadata.`;
+        }
       } else {
         // For other file types, create descriptive content for now
         extractedText = `Document: ${title}
