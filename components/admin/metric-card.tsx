@@ -57,20 +57,20 @@ export function MetricCard({
           'border-yellow-300 bg-gradient-to-br from-yellow-50 to-orange-50 dark:border-yellow-700 dark:bg-gradient-to-br dark:from-yellow-900/20 dark:to-orange-900/20'
       )}>
       <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-3'>
-        <CardTitle className='text-sm font-semibold text-gray-700 dark:text-gray-200'>{title}</CardTitle>
+        <CardTitle className='text-xs font-semibold text-gray-700 dark:text-gray-200'>{title}</CardTitle>
         <Icon
           className={cn(
-            'h-5 w-5',
+            'h-4 w-4',
             urgent ? 'text-yellow-600 dark:text-yellow-400' : 'text-blue-500 dark:text-blue-400'
           )}
         />
       </CardHeader>
       <CardContent>
-        <div className='text-3xl font-bold text-gray-900 dark:text-white mb-2'>{value}</div>
+        <div className='text-2xl font-bold text-gray-900 dark:text-white mb-1'>{value}</div>
         <div className='flex items-center space-x-2 mb-2'>
           <span className={cn('flex items-center text-xs', getTrendColor())}>
             {getTrendIcon()}
-            <span className='ml-1 font-medium'>{change}</span>
+            <span className='ml-0.5 font-medium'>{change}</span>
           </span>
         </div>
         <p className='text-xs text-gray-600 dark:text-gray-400'>{description}</p>

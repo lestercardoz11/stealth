@@ -37,7 +37,7 @@ export interface Message {
   role: MessageRole;
   content: string;
   created_at: string;
-  sources: Source[]; // Array of sources related to the message
+  sources?: Source[]; // Array of sources related to the message
 }
 
 export interface Source {

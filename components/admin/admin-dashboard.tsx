@@ -40,9 +40,9 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
 
   return (
     <ErrorBoundary>
-      <div className='space-y-6 p-6'>
+      <div className='space-y-4 p-4'>
         {/* Key Metrics */}
-        <div className='grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4'>
+        <div className='grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4'>
           <MetricCard
             title='Total Users'
             value={allUsers.length}
@@ -98,11 +98,11 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
         </Card>
 
         {/* Charts and Analytics */}
-        <div className='grid gap-4 md:gap-6 lg:grid-cols-2'>
+        <div className='grid gap-3 md:gap-4 lg:grid-cols-2'>
           {/* Recent Activity */}
           <Card className='shadow-lg'>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2 text-base md:text-lg'>
+              <CardTitle className='flex items-center gap-2 text-sm md:text-base'>
                 <Activity className='h-5 w-5' />
                 Recent Activity
               </CardTitle>
@@ -114,7 +114,7 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
 
           <Card className='shadow-lg'>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2 text-base md:text-lg'>
+              <CardTitle className='flex items-center gap-2 text-sm md:text-base'>
                 <Shield className='h-5 w-5' />
                 Security Status
               </CardTitle>

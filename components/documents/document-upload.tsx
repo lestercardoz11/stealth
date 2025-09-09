@@ -209,16 +209,16 @@ export function DocumentUpload({
               )}>
               <input {...getInputProps()} />
               <Upload className='h-8 w-8 md:h-12 md:w-12 mx-auto mb-4 text-muted-foreground' />
-              <h3 className='text-base md:text-lg font-semibold mb-2'>
+              <h3 className='text-sm md:text-base font-semibold mb-2'>
                 {isDragActive ? 'Drop files here' : 'Drag & drop files here'}
               </h3>
-              <p className='text-muted-foreground mb-4 text-sm md:text-base'>
+              <p className='text-muted-foreground mb-3 text-xs md:text-sm'>
                 or click to browse files
               </p>
-              <p className='text-xs md:text-sm text-muted-foreground'>
+              <p className='text-xs text-muted-foreground'>
                 Supports PDF, DOCX, DOC, TXT files up to 50MB
               </p>
-              <div className='mt-4 p-2 md:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800'>
+              <div className='mt-3 p-2 bg-green-50/50 dark:bg-green-900/10 rounded border border-green-100 dark:border-green-800'>
                 <p className='text-xs text-green-700 dark:text-green-200'>
                   🔒 Your documents are processed locally and never sent to
                   external services

@@ -77,12 +77,12 @@ export function DocumentSelector({ documents, selected, onSelect }: DocumentSele
       {/* Search and Filters */}
       <div className="space-y-2">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search documents..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-8 h-8 text-xs"
           />
         </div>
         
@@ -91,7 +91,7 @@ export function DocumentSelector({ documents, selected, onSelect }: DocumentSele
             variant={filter === 'all' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter('all')}
-            className="text-xs"
+            className="text-xs h-6 px-2"
           >
             All
           </Button>
@@ -99,25 +99,25 @@ export function DocumentSelector({ documents, selected, onSelect }: DocumentSele
             variant={filter === 'personal' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter('personal')}
-            className="text-xs"
+            className="text-xs h-6 px-2"
           >
-            <User className="h-3 w-3 mr-1" />
+            <User className="h-3 w-3 mr-0.5" />
             Personal
           </Button>
           <Button
             variant={filter === 'company' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter('company')}
-            className="text-xs"
+            className="text-xs h-6 px-2"
           >
-            <Building2 className="h-3 w-3 mr-1" />
+            <Building2 className="h-3 w-3 mr-0.5" />
             Company
           </Button>
         </div>
       </div>
 
       {/* Selection Summary */}
-      <div className="flex items-center justify-between p-2 bg-muted/50 rounded">
+      <div className="flex items-center justify-between p-2 bg-muted/30 rounded text-xs">
         <span className="text-xs text-muted-foreground">
           {selectedCount} document{selectedCount !== 1 ? 's' : ''} selected
         </span>
@@ -127,7 +127,7 @@ export function DocumentSelector({ documents, selected, onSelect }: DocumentSele
             variant="ghost"
             size="sm"
             onClick={handleSelectAll}
-            className="text-xs h-6"
+            className="text-xs h-5 px-2"
           >
             {filteredSelectedCount === filteredDocuments.length ? (
               <>
@@ -145,10 +145,10 @@ export function DocumentSelector({ documents, selected, onSelect }: DocumentSele
       </div>
 
       {/* Document List */}
-      <div className="space-y-2 max-h-96 overflow-y-auto">
+      <div className="space-y-1 max-h-80 overflow-y-auto">
         {filteredDocuments.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <div className="text-center py-6 text-muted-foreground">
+            <FileText className="h-6 w-6 mx-auto mb-2 opacity-50" />
             <p className="text-sm">
               {searchTerm ? 'No documents match your search' : 'No documents available'}
             </p>
@@ -158,43 +158,44 @@ export function DocumentSelector({ documents, selected, onSelect }: DocumentSele
             <Card 
               key={document.id}
               className={`p-3 cursor-pointer transition-colors hover:bg-accent/50 ${
+              className={`p-2 cursor-pointer transition-colors hover:bg-accent/30 border-0 ${
                 selected.includes(document.id) ? 'bg-accent border-primary' : ''
               }`}
               onClick={() => handleDocumentToggle(document.id)}
             >
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-2">
                 <Checkbox
                   checked={selected.includes(document.id)}
                   onChange={() => handleDocumentToggle(document.id)}
-                  className="mt-0.5"
+                  className="mt-0.5 h-3 w-3"
                 />
                 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-1 mb-1">
                     <FileText className="h-3 w-3 text-muted-foreground shrink-0" />
-                    <p className="text-sm font-medium truncate">
+                    <p className="text-xs font-medium truncate">
                       {document.title}
                     </p>
                   </div>
                   
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Calendar className="h-3 w-3" />
-                    <span>
+                    <span className="truncate">
                       {formatDistanceToNow(new Date(document.created_at), { addSuffix: true })}
                     </span>
                     
                     <Badge 
                       variant={document.is_company_wide ? 'default' : 'secondary'}
-                      className="text-xs px-1 py-0"
+                      className="text-xs px-1 py-0 h-4"
                     >
                       {document.is_company_wide ? (
                         <>
-                          <Building2 className="h-2 w-2 mr-1" />
+                          <Building2 className="h-2 w-2 mr-0.5" />
                           Company
                         </>
                       ) : (
                         <>
-                          <User className="h-2 w-2 mr-1" />
+                          <User className="h-2 w-2 mr-0.5" />
                           Personal
                         </>
                       )}
@@ -209,10 +210,9 @@ export function DocumentSelector({ documents, selected, onSelect }: DocumentSele
 
       {/* Context Info */}
       {selectedCount > 0 && (
-        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-800">
+        <div className="p-2 bg-blue-50/50 dark:bg-blue-900/10 rounded border border-blue-100 dark:border-blue-800">
           <p className="text-xs text-blue-700 dark:text-blue-300">
-            💡 Selected documents will provide context for AI responses. 
-            The AI will search through these documents to find relevant information.
+            💡 Selected documents provide context for AI responses via vector search.
           </p>
         </div>
       )}

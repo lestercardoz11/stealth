@@ -70,22 +70,22 @@ export function TopNavigation({ profile }: TopNavigationProps) {
   const quickActions = getQuickActions();
 
   return (
-    <header className='h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
-      <div className='flex h-full items-center justify-between px-6'>
+    <header className='h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+      <div className='flex h-full items-center justify-between px-4'>
         {pathname === '/' && (
           <Link href='/' className='flex items-center space-x-3'>
-            <div className='w-8 h-8 bg-primary rounded-lg flex items-center justify-center'>
+            <div className='w-7 h-7 bg-primary rounded-lg flex items-center justify-center'>
               <span className='text-primary-foreground font-bold text-sm'>
                 S
               </span>
             </div>
-            <span className='font-bold text-xl'>Stealth</span>
+            <span className='font-bold text-lg'>Stealth</span>
           </Link>
         )}
         {/* Left side - could add breadcrumbs or search here */}
-        <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-3'>
           {/* Mobile spacing for menu button */}
-          <div className='w-8 md:w-0' />
+          <div className='w-6 md:w-0' />
 
           {/* Breadcrumbs or page title could go here */}
           <div className='hidden md:block items-end'>
@@ -93,36 +93,36 @@ export function TopNavigation({ profile }: TopNavigationProps) {
           </div>
         </div>
 
-        <div className='flex items-center space-x-4'>
+        <div className='flex items-center space-x-3'>
           {profile ? (
-            <div className='flex items-center gap-4'>
+            <div className='flex items-center gap-3'>
               {/* Privacy Badge for authenticated users */}
               <PrivacyBadge variant='compact' />
 
               {/* Notifications */}
-              <Button variant='ghost' size='sm' className='relative'>
-                <Bell className='h-4 w-4' />
+              <Button variant='ghost' size='sm' className='relative h-7 w-7 p-0'>
+                <Bell className='h-3 w-3' />
                 {/* Notification badge */}
-                <span className='absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs'></span>
+                <span className='absolute -top-0.5 -right-0.5 h-2 w-2 bg-red-500 rounded-full'></span>
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Avatar className='h-8 w-8 cursor-pointer'>
+                  <Avatar className='h-7 w-7 cursor-pointer'>
                     <AvatarFallback className='bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm'>
                       {getInitials(profile.full_name, profile.email)}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className='w-64 focus:outline-none'
+                  className='w-56 focus:outline-none'
                   align='end'
                   forceMount>
                   <DropdownMenuLabel className='font-normal focus:outline-none'>
-                    <div className='flex flex-col space-y-1'>
+                    <div className='flex flex-col space-y-0.5'>
                       <p className='text-sm font-medium leading-none'>
                         {profile.full_name || 'User'}
                       </p>
-                      <p className='text-xs leading-none text-muted-foreground'>
+                      <p className='text-xs leading-none text-muted-foreground truncate'>
                         {profile.email}
                       </p>
                     </div>

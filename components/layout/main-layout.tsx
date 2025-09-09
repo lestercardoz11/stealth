@@ -30,7 +30,7 @@ export async function MainLayout({ children }: MainLayoutProps) {
 
           {/* Main Content Area */}
           <div className='flex-1 flex flex-col overflow-hidden'>
-            <div className='h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4 md:px-6'>
+            <div className='h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-3 md:px-4'>
               {/* Mobile Navigation */}
               <div className='md:hidden'>
                 <MobileNavigation profile={profile} />
@@ -43,7 +43,7 @@ export async function MainLayout({ children }: MainLayoutProps) {
             </div>
 
             {/* Main Content */}
-            <main className='flex-1 overflow-y-auto bg-gray-50/50 dark:bg-gray-900/50'>
+            <main className='flex-1 overflow-y-auto bg-gray-50/30 dark:bg-gray-900/30'>
               <div className='container mx-auto'>
                 <LoadingBoundary>{children}</LoadingBoundary>
               </div>
