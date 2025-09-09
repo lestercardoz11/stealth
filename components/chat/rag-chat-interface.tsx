@@ -5,11 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageBubble } from './message-bubble';
-import { DocumentSelector } from './document-selector';
 import { ContextPanel } from './context-panel';
 import { ConversationList } from './conversation-list';
 import { PrivacyBadge } from '@/components/security/privacy-badge';
-import { Send, FileText, Brain, AlertCircle, MessageSquare, Loader2, Zap } from 'lucide-react';
+import {
+  Send,
+  FileText,
+  Brain,
+  AlertCircle,
+  MessageSquare,
+  Loader2,
+  Zap,
+} from 'lucide-react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { RetryButton } from '@/components/ui/retry-button';
@@ -80,36 +87,6 @@ export function RAGChatInterface({
   const sources = lastAssistantMessage?.sources || [];
 
   // Enhanced loading component with stages
-  const LoadingIndicator = () => (
-    <div className='flex flex-col items-center gap-3 p-6'>
-      <div className='flex items-center gap-3'>
-        <div className='relative'>
-          <Loader2 className='h-8 w-8 animate-spin text-blue-600' />
-          <div className='absolute inset-0 rounded-full border-2 border-blue-200 animate-pulse' />
-        </div>
-        <div className='text-left'>
-          <p className='font-medium text-blue-700'>Stealth AI Processing</p>
-          <p className='text-sm text-blue-600'>
-            {processingStage || 'Generating response...'}
-          </p>
-        </div>
-      </div>
-      
-      {selectedDocuments.length > 0 && (
-        <div className='flex items-center gap-2 text-xs text-muted-foreground'>
-          <Zap className='h-3 w-3' />
-          <span>
-            Searching through {selectedDocuments.length} document{selectedDocuments.length !== 1 ? 's' : ''}
-          </span>
-        </div>
-      )}
-      
-      <div className='flex items-center gap-1 text-xs text-green-600'>
-        <div className='w-2 h-2 bg-green-500 rounded-full animate-pulse' />
-        <span>100% Private Processing</span>
-      </div>
-    </div>
-  );
   return (
     <ErrorBoundary>
       <div className='flex h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-gray-900/50'>
@@ -141,16 +118,6 @@ export function RAGChatInterface({
                 Select documents to provide context for your AI assistant
               </p>
             </div>
-
-            <ScrollArea className='h-[calc(100vh-200px)]'>
-              <div className='p-4'>
-                <DocumentSelector
-                  documents={availableDocuments}
-                  selected={selectedDocuments}
-                  onSelect={setSelectedDocuments}
-                />
-              </div>
-            </ScrollArea>
           </div>
         )}
 
@@ -167,8 +134,7 @@ export function RAGChatInterface({
                   onClick={() => {
                     setShowConversations(!showConversations);
                     setShowDocuments(false);
-                  }}
-                >
+                  }}>
                   <MessageSquare className='h-3 w-3 mr-1' />
                   Chats
                 </Button>
@@ -179,15 +145,14 @@ export function RAGChatInterface({
                   onClick={() => {
                     setShowDocuments(!showDocuments);
                     setShowConversations(false);
-                  }}
-                >
+                  }}>
                   <FileText className='h-3 w-3 mr-1' />
                   Docs
                 </Button>
               </div>
               <PrivacyBadge variant='compact' />
             </div>
-            
+
             {showDocuments && (
               <p className='text-xs text-muted-foreground/80'>
                 {selectedDocuments.length} document
@@ -215,19 +180,6 @@ export function RAGChatInterface({
             </div>
           )}
 
-          {showDocuments && (
-            <div className='lg:hidden border-b bg-background p-3'>
-              <DocumentSelector
-                documents={availableDocuments}
-                selected={selectedDocuments}
-                onSelect={(docs) => {
-                  setSelectedDocuments(docs);
-                  setShowDocuments(false);
-                }}
-              />
-            </div>
-          )}
-
           {/* Messages Area */}
           <ScrollArea className='flex-1 p-3 md:p-4'>
             <div className='space-y-3 max-w-3xl mx-auto'>
@@ -237,7 +189,9 @@ export function RAGChatInterface({
                     <Brain className='h-6 w-6 text-white' />
                   </div>
                   <h3 className='text-base md:text-lg font-semibold mb-2'>
-                    {currentConversation ? 'Continue Your Conversation' : 'Welcome to Stealth AI'}
+                    {currentConversation
+                      ? 'Continue Your Conversation'
+                      : 'Welcome to Stealth AI'}
                   </h3>
                   <p className='text-muted-foreground mb-3 text-sm px-4 leading-relaxed'>
                     Your intelligent legal document assistant.
@@ -264,9 +218,7 @@ export function RAGChatInterface({
                       </p>
                     </Card>
                     <Card className='p-2 hover:bg-accent/30 transition-colors cursor-pointer border-0 bg-muted/30'>
-                      <p className='text-xs font-medium'>
-                        Summarize documents
-                      </p>
+                      <p className='text-xs font-medium'>Summarize documents</p>
                       <p className='text-xs text-muted-foreground'>
                         Get concise overviews of lengthy documents
                       </p>
@@ -280,9 +232,7 @@ export function RAGChatInterface({
                       </p>
                     </Card>
                     <Card className='p-2 hover:bg-accent/30 transition-colors cursor-pointer border-0 bg-muted/30'>
-                      <p className='text-xs font-medium'>
-                        Legal research
-                      </p>
+                      <p className='text-xs font-medium'>Legal research</p>
                       <p className='text-xs text-muted-foreground'>
                         Get insights on legal precedents
                       </p>
@@ -298,7 +248,10 @@ export function RAGChatInterface({
               {isLoading && (
                 <div className='flex justify-center'>
                   <div className='flex flex-col items-center gap-2'>
-                    <LoadingSpinner size='md' text='Stealth AI is analyzing documents...' />
+                    <LoadingSpinner
+                      size='md'
+                      text='Stealth AI is analyzing documents...'
+                    />
                     <p className='text-xs text-muted-foreground'>
                       Searching through {selectedDocuments.length} selected
                       document{selectedDocuments.length !== 1 ? 's' : ''}
@@ -349,7 +302,8 @@ export function RAGChatInterface({
 
               {selectedDocuments.length === 0 && (
                 <p className='text-xs text-muted-foreground mt-2 text-center'>
-                  💡 Select documents for RAG-powered responses with source citations
+                  💡 Select documents for RAG-powered responses with source
+                  citations
                 </p>
               )}
 
