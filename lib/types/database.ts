@@ -47,6 +47,13 @@ export interface Source {
   content: string;
 }
 
+export interface StreamingMessage {
+  id: string;
+  content: string;
+  isComplete: boolean;
+  sources?: Source[];
+}
+
 export interface Database {
   public: {
     Tables: {

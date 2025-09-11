@@ -15,7 +15,7 @@ export default async function ChatPage() {
   const availableDocuments = await getChatDocuments();
 
   return (
-    <div className='flex flex-col h-full'>
+    <div className='h-full'>
       <RAGChatInterface availableDocuments={availableDocuments} />
     </div>
   );

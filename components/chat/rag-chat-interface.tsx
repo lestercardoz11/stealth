@@ -4,10 +4,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 import { MessageBubble } from './message-bubble';
 import { ContextPanel } from './context-panel';
 import { ConversationList } from './conversation-list';
+import { DocumentSelectorModal } from './document-selector-modal';
 import { PrivacyBadge } from '@/components/security/privacy-badge';
+import { StreamingMessage } from './streaming-message';
 import {
   Send,
   FileText,
@@ -16,6 +19,8 @@ import {
   MessageSquare,
   Loader2,
   Zap,
+  Plus,
+  X,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
@@ -29,6 +34,8 @@ interface Document {
   created_at: string;
   is_company_wide: boolean;
   user_id: string;
+  file_size?: number;
+  file_type?: string;
 }
 
 interface RAGChatInterfaceProps {
@@ -40,8 +47,9 @@ export function RAGChatInterface({
 }: RAGChatInterfaceProps) {
   const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
   const [showConversations, setShowConversations] = useState(true);
-  const [showDocuments, setShowDocuments] = useState(false);
-  const [processingStage, setProcessingStage] = useState<string>('');
+  const [input, setInput] = useState('');
+  const [streamingResponse, setStreamingResponse] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
 
   const {
     messages,
@@ -58,15 +66,21 @@ export function RAGChatInterface({
   } = useChat({
     onError: (error) => {
       console.error('Chat error:', error);
-      setProcessingStage('');
+      setIsStreaming(false);
+      setStreamingResponse('');
     },
     onResponse: (response) => {
       console.log('Chat response received:', response);
-      setProcessingStage('');
+      setIsStreaming(false);
+      setStreamingResponse('');
+    },
+    onProcessingStage: (stage) => {
+      if (stage) {
+        setIsStreaming(true);
+        setStreamingResponse(stage);
+      }
     },
   });
-
-  const [input, setInput] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,9 +88,38 @@ export function RAGChatInterface({
 
     const messageContent = input.trim();
     setInput('');
-    setProcessingStage('Analyzing query...');
+    setIsStreaming(true);
+    setStreamingResponse('Analyzing your query...');
 
-    await sendMessage(messageContent, selectedDocuments);
+    // Simulate streaming effect
+    const stages = [
+      'Analyzing your query...',
+      'Searching through documents...',
+      'Finding relevant context...',
+      'Generating AI response...',
+    ];
+
+    let stageIndex = 0;
+    const stageInterval = setInterval(() => {
+      if (stageIndex < stages.length - 1) {
+        stageIndex++;
+        setStreamingResponse(stages[stageIndex]);
+      }
+    }, 1000);
+
+    try {
+      await sendMessage(messageContent, selectedDocuments);
+    } finally {
+      clearInterval(stageInterval);
+      setIsStreaming(false);
+      setStreamingResponse('');
+    }
+  };
+
+  const getSelectedDocumentTitles = () => {
+    return availableDocuments
+      .filter(doc => selectedDocuments.includes(doc.id))
+      .map(doc => doc.title);
   };
 
   // Get sources from the last assistant message
@@ -86,11 +129,10 @@ export function RAGChatInterface({
     .find((m) => m.role === 'assistant');
   const sources = lastAssistantMessage?.sources || [];
 
-  // Enhanced loading component with stages
   return (
     <ErrorBoundary>
-      <div className='flex h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-gray-900/50'>
-        {/* Conversations Sidebar - Desktop */}
+      <div className='flex h-[calc(100vh-3.5rem)] bg-gradient-soft'>
+        {/* Conversations Sidebar */}
         {showConversations && (
           <div className='hidden lg:block'>
             <ConversationList
@@ -103,67 +145,27 @@ export function RAGChatInterface({
           </div>
         )}
 
-        {/* Document Selector Sidebar - Desktop */}
-        {showDocuments && (
-          <div className='hidden lg:block w-80 border-r bg-background'>
-            <div className='p-4 border-b'>
-              <div className='mb-3'>
-                <PrivacyBadge variant='compact' />
-              </div>
-              <h3 className='font-semibold flex items-center gap-2'>
-                <FileText className='h-4 w-4' />
-                Document Context
-              </h3>
-              <p className='text-sm text-muted-foreground mt-1'>
-                Select documents to provide context for your AI assistant
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* Main Chat Interface */}
-        <div className='flex-1 flex flex-col'>
+        <div className='flex-1 flex flex-col min-w-0'>
           {/* Mobile Controls */}
-          <div className='lg:hidden border-b bg-background p-3'>
-            <div className='flex items-center justify-between mb-1'>
-              <div className='flex gap-2'>
-                <Button
-                  variant={showConversations ? 'default' : 'outline'}
-                  size='sm'
-                  className='h-7 text-xs'
-                  onClick={() => {
-                    setShowConversations(!showConversations);
-                    setShowDocuments(false);
-                  }}>
-                  <MessageSquare className='h-3 w-3 mr-1' />
-                  Chats
-                </Button>
-                <Button
-                  variant={showDocuments ? 'default' : 'outline'}
-                  size='sm'
-                  className='h-7 text-xs'
-                  onClick={() => {
-                    setShowDocuments(!showDocuments);
-                    setShowConversations(false);
-                  }}>
-                  <FileText className='h-3 w-3 mr-1' />
-                  Docs
-                </Button>
-              </div>
+          <div className='lg:hidden border-b bg-card/80 backdrop-blur p-2'>
+            <div className='flex items-center justify-between'>
+              <Button
+                variant={showConversations ? 'default' : 'outline'}
+                size='sm'
+                className='h-6 text-xs px-2'
+                onClick={() => setShowConversations(!showConversations)}
+              >
+                <MessageSquare className='h-3 w-3 mr-1' />
+                Chats ({conversations.length})
+              </Button>
               <PrivacyBadge variant='compact' />
             </div>
-
-            {showDocuments && (
-              <p className='text-xs text-muted-foreground/80'>
-                {selectedDocuments.length} document
-                {selectedDocuments.length !== 1 ? 's' : ''} selected
-              </p>
-            )}
           </div>
 
-          {/* Mobile Sidebars */}
+          {/* Mobile Conversations */}
           {showConversations && (
-            <div className='lg:hidden border-b bg-background/95'>
+            <div className='lg:hidden border-b bg-card/95'>
               <ConversationList
                 conversations={conversations}
                 selectedConversationId={currentConversation?.id}
@@ -182,61 +184,37 @@ export function RAGChatInterface({
 
           {/* Messages Area */}
           <ScrollArea className='flex-1 p-3 md:p-4'>
-            <div className='space-y-3 max-w-3xl mx-auto'>
+            <div className='space-y-3 max-w-4xl mx-auto'>
               {messages.length === 0 && (
                 <div className='text-center py-6 md:py-8'>
-                  <div className='w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3'>
-                    <Brain className='h-6 w-6 text-white' />
+                  <div className='w-10 h-10 bg-gradient-to-r from-primary/80 to-primary rounded-xl flex items-center justify-center mx-auto mb-3'>
+                    <Brain className='h-5 w-5 text-primary-foreground' />
                   </div>
-                  <h3 className='text-base md:text-lg font-semibold mb-2'>
-                    {currentConversation
-                      ? 'Continue Your Conversation'
-                      : 'Welcome to Stealth AI'}
+                  <h3 className='text-sm md:text-base font-semibold mb-2 text-foreground/90'>
+                    Welcome to Stealth AI
                   </h3>
-                  <p className='text-muted-foreground mb-3 text-sm px-4 leading-relaxed'>
-                    Your intelligent legal document assistant.
-                    <span className='hidden lg:inline'>
-                      Select documents from the sidebar and
-                    </span>
-                    <span className='lg:hidden'>Select documents and</span>{' '}
-                    start asking questions.
+                  <p className='text-muted-foreground mb-4 text-xs px-4 leading-relaxed'>
+                    Your intelligent legal document assistant. Select documents and start asking questions.
                   </p>
-                  <div className='mb-3 p-2 bg-blue-50/50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-800 max-w-md mx-auto'>
-                    <p className='text-xs text-blue-700 dark:text-blue-200'>
-                      💡 <strong>RAG-Powered:</strong> The AI will search
-                      through your selected documents to provide contextual,
-                      accurate responses with source citations.
+                  
+                  <div className='mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20 max-w-md mx-auto'>
+                    <p className='text-xs text-primary/80'>
+                      💡 <strong>RAG-Powered:</strong> The AI searches through your documents to provide contextual responses with citations.
                     </p>
                   </div>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 max-w-2xl mx-auto px-4'>
-                    <Card className='p-2 hover:bg-accent/30 transition-colors cursor-pointer border-0 bg-muted/30'>
-                      <p className='text-xs font-medium'>
-                        Analyze contract terms
-                      </p>
-                      <p className='text-xs text-muted-foreground'>
-                        Review key clauses and obligations
-                      </p>
-                    </Card>
-                    <Card className='p-2 hover:bg-accent/30 transition-colors cursor-pointer border-0 bg-muted/30'>
-                      <p className='text-xs font-medium'>Summarize documents</p>
-                      <p className='text-xs text-muted-foreground'>
-                        Get concise overviews of lengthy documents
-                      </p>
-                    </Card>
-                    <Card className='p-2 hover:bg-accent/30 transition-colors cursor-pointer border-0 bg-muted/30'>
-                      <p className='text-xs font-medium'>
-                        Find specific information
-                      </p>
-                      <p className='text-xs text-muted-foreground'>
-                        Search across multiple documents
-                      </p>
-                    </Card>
-                    <Card className='p-2 hover:bg-accent/30 transition-colors cursor-pointer border-0 bg-muted/30'>
-                      <p className='text-xs font-medium'>Legal research</p>
-                      <p className='text-xs text-muted-foreground'>
-                        Get insights on legal precedents
-                      </p>
-                    </Card>
+                  
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-2 max-w-2xl mx-auto px-4'>
+                    {[
+                      { title: 'Analyze contract terms', desc: 'Review key clauses and obligations' },
+                      { title: 'Summarize documents', desc: 'Get concise overviews' },
+                      { title: 'Find specific information', desc: 'Search across documents' },
+                      { title: 'Legal research', desc: 'Get insights on precedents' },
+                    ].map((item, index) => (
+                      <Card key={index} className='p-2 hover:bg-accent/20 transition-colors cursor-pointer border-0 bg-muted/20'>
+                        <p className='text-xs font-medium text-foreground/80'>{item.title}</p>
+                        <p className='text-xs text-muted-foreground'>{item.desc}</p>
+                      </Card>
+                    ))}
                   </div>
                 </div>
               )}
@@ -245,40 +223,76 @@ export function RAGChatInterface({
                 <MessageBubble key={message.id} message={message} />
               ))}
 
-              {isLoading && (
-                <div className='flex justify-center'>
-                  <div className='flex flex-col items-center gap-2'>
-                    <LoadingSpinner
-                      size='md'
-                      text='Stealth AI is analyzing documents...'
-                    />
-                    <p className='text-xs text-muted-foreground'>
-                      Searching through {selectedDocuments.length} selected
-                      document{selectedDocuments.length !== 1 ? 's' : ''}
-                    </p>
-                  </div>
-                </div>
+              {/* Streaming Message */}
+              {isStreaming && (
+                <StreamingMessage 
+                  content={streamingResponse}
+                  selectedDocumentCount={selectedDocuments.length}
+                />
               )}
 
               {error && (
-                <div className='flex flex-col items-center gap-2 text-red-600 bg-red-50/50 dark:bg-red-900/10 p-3 rounded-lg border border-red-100 dark:border-red-900'>
+                <div className='flex flex-col items-center gap-2 text-destructive bg-destructive/5 p-3 rounded-lg border border-destructive/20'>
                   <div className='flex items-center gap-2'>
                     <AlertCircle className='h-3 w-3' />
-                    <span className='text-sm'>Error: {error}</span>
+                    <span className='text-xs'>Error: {error}</span>
                   </div>
-                  <RetryButton onRetry={retryLastMessage} />
-                  <Button variant='ghost' size='sm' onClick={clearError}>
-                    Dismiss
-                  </Button>
+                  <div className='flex gap-2'>
+                    <RetryButton onRetry={retryLastMessage} size="sm" className="h-6 text-xs" />
+                    <Button variant='ghost' size='sm' onClick={clearError} className="h-6 text-xs">
+                      Dismiss
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
           </ScrollArea>
 
           {/* Input Area */}
-          <div className='border-t bg-background/95 backdrop-blur p-3'>
-            <form onSubmit={handleSubmit} className='max-w-3xl mx-auto'>
-              <div className='flex gap-2'>
+          <div className='border-t bg-card/80 backdrop-blur p-3'>
+            <div className='max-w-4xl mx-auto space-y-2'>
+              {/* Selected Documents Display */}
+              {selectedDocuments.length > 0 && (
+                <div className='flex items-center gap-2 flex-wrap'>
+                  <span className='text-xs text-muted-foreground'>Context:</span>
+                  {getSelectedDocumentTitles().slice(0, 3).map((title, index) => (
+                    <Badge key={index} variant='secondary' className='text-xs px-2 py-0 h-5'>
+                      {title.length > 20 ? title.substring(0, 20) + '...' : title}
+                    </Badge>
+                  ))}
+                  {selectedDocuments.length > 3 && (
+                    <Badge variant='outline' className='text-xs px-2 py-0 h-5'>
+                      +{selectedDocuments.length - 3} more
+                    </Badge>
+                  )}
+                  <Button
+                    variant='ghost'
+                    size='sm'
+                    className='h-5 w-5 p-0'
+                    onClick={() => setSelectedDocuments([])}
+                  >
+                    <X className='h-3 w-3' />
+                  </Button>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className='flex gap-2'>
+                <DocumentSelectorModal
+                  documents={availableDocuments}
+                  selectedDocuments={selectedDocuments}
+                  onSelectionChange={setSelectedDocuments}
+                >
+                  <Button
+                    type="button"
+                    variant='outline'
+                    size='sm'
+                    className='h-8 px-2 shrink-0'
+                  >
+                    <FileText className='h-3 w-3 mr-1' />
+                    {selectedDocuments.length > 0 ? selectedDocuments.length : 'Docs'}
+                  </Button>
+                </DocumentSelectorModal>
+
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -287,38 +301,39 @@ export function RAGChatInterface({
                       ? 'Ask about your selected documents...'
                       : 'Ask a question or select documents for context...'
                   }
-                  disabled={isLoading}
-                  className='flex-1 text-sm md:text-base'
-                  style={{ fontSize: '14px' }}
+                  disabled={isLoading || isStreaming}
+                  className='flex-1 h-8 text-xs'
                 />
+                
                 <Button
                   type='submit'
-                  disabled={isLoading || !input.trim()}
-                  size='icon'
-                  className='shrink-0'>
-                  <Send className='h-4 w-4' />
+                  disabled={isLoading || isStreaming || !input.trim()}
+                  size='sm'
+                  className='h-8 px-3 shrink-0'
+                >
+                  {isLoading || isStreaming ? (
+                    <Loader2 className='h-3 w-3 animate-spin' />
+                  ) : (
+                    <Send className='h-3 w-3' />
+                  )}
                 </Button>
-              </div>
+              </form>
 
-              {selectedDocuments.length === 0 && (
-                <p className='text-xs text-muted-foreground mt-2 text-center'>
-                  💡 Select documents for RAG-powered responses with source
-                  citations
+              {/* Context Indicator */}
+              {selectedDocuments.length === 0 ? (
+                <p className='text-xs text-muted-foreground text-center'>
+                  💡 Select documents for RAG-powered responses with source citations
+                </p>
+              ) : (
+                <p className='text-xs text-primary/80 text-center'>
+                  🔍 RAG Mode: AI will search through {selectedDocuments.length} selected document{selectedDocuments.length !== 1 ? 's' : ''} for context
                 </p>
               )}
-
-              {selectedDocuments.length > 0 && (
-                <p className='text-xs text-green-600 dark:text-green-400 mt-1 text-center'>
-                  🔍 RAG Mode: AI will search through {selectedDocuments.length}{' '}
-                  selected document{selectedDocuments.length !== 1 ? 's' : ''}{' '}
-                  for relevant context
-                </p>
-              )}
-            </form>
+            </div>
           </div>
         </div>
 
-        {/* Context Panel (optional, can be toggled) */}
+        {/* Context Panel */}
         {sources.length > 0 && window.innerWidth >= 1280 && (
           <div className='hidden xl:block'>
             <ContextPanel sources={sources} />

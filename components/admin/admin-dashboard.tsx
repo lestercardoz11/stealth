@@ -40,9 +40,9 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
 
   return (
     <ErrorBoundary>
-      <div className='space-y-4 p-4'>
+      <div className='space-y-3'>
         {/* Key Metrics */}
-        <div className='grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4'>
+        <div className='grid gap-2 md:gap-3 grid-cols-2 lg:grid-cols-4'>
           <MetricCard
             title='Total Users'
             value={allUsers.length}
@@ -85,9 +85,9 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
           </div>
         )}
 
-        <Card className='shadow-lg'>
+        <Card className='shadow-sm'>
           <CardHeader>
-            <CardTitle className='flex items-center gap-2 text-base md:text-lg'>
+            <CardTitle className='flex items-center gap-2'>
               <TrendingUp className='h-5 w-5' />
               Usage Analytics
             </CardTitle>
@@ -98,11 +98,11 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
         </Card>
 
         {/* Charts and Analytics */}
-        <div className='grid gap-3 md:gap-4 lg:grid-cols-2'>
+        <div className='grid gap-2 md:gap-3 lg:grid-cols-2'>
           {/* Recent Activity */}
-          <Card className='shadow-lg'>
+          <Card className='shadow-sm'>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2 text-sm md:text-base'>
+              <CardTitle className='flex items-center gap-2'>
                 <Activity className='h-5 w-5' />
                 Recent Activity
               </CardTitle>
@@ -112,9 +112,9 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
             </CardContent>
           </Card>
 
-          <Card className='shadow-lg'>
+          <Card className='shadow-sm'>
             <CardHeader>
-              <CardTitle className='flex items-center gap-2 text-sm md:text-base'>
+              <CardTitle className='flex items-center gap-2'>
                 <Shield className='h-5 w-5' />
                 Security Status
               </CardTitle>
@@ -126,35 +126,35 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
         </div>
 
         {/* Quick Actions */}
-        <Card className='shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900'>
+        <Card className='shadow-sm bg-gradient-card'>
           <CardHeader>
-            <CardTitle className='text-base md:text-lg'>
+            <CardTitle>
               Quick Actions
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-3'>
+            <div className='grid gap-2 md:gap-3 grid-cols-1 md:grid-cols-3'>
               <Button
                 variant='outline'
-                className='h-20 md:h-24 flex-col hover:bg-blue-50 dark:hover:bg-blue-950/50 border-blue-200 dark:border-blue-800'>
-                <Users className='h-6 w-6 mb-2' />
-                <span className='font-medium text-sm md:text-base'>
+                className='h-16 md:h-18 flex-col hover:bg-primary/5 border-primary/20'>
+                <Users className='h-5 w-5 mb-1' />
+                <span className='font-medium text-xs'>
                   Manage Users
                 </span>
               </Button>
               <Button
                 variant='outline'
-                className='h-20 md:h-24 flex-col hover:bg-green-50 dark:hover:bg-green-950/50 border-green-200 dark:border-green-800'>
-                <FileText className='h-6 w-6 mb-2' />
-                <span className='font-medium text-sm md:text-base'>
+                className='h-16 md:h-18 flex-col hover:bg-primary/5 border-primary/20'>
+                <FileText className='h-5 w-5 mb-1' />
+                <span className='font-medium text-xs'>
                   Upload Documents
                 </span>
               </Button>
               <Button
                 variant='outline'
-                className='h-20 md:h-24 flex-col hover:bg-purple-50 dark:hover:bg-purple-950/50 border-purple-200 dark:border-purple-800'>
-                <Zap className='h-6 w-6 mb-2' />
-                <span className='font-medium text-sm md:text-base'>
+                className='h-16 md:h-18 flex-col hover:bg-primary/5 border-primary/20'>
+                <Zap className='h-5 w-5 mb-1' />
+                <span className='font-medium text-xs'>
                   System Settings
                 </span>
               </Button>

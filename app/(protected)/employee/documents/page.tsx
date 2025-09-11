@@ -19,10 +19,10 @@ export default async function EmployeeDocumentsPage() {
   const documents = await getUserDocuments(profile.id);
 
   return (
-    <div className='space-y-4 p-4'>
+    <div className='space-y-3'>
       <div>
-        <h1 className='text-2xl font-bold'>My Documents</h1>
-        <p className='text-sm text-muted-foreground'>
+        <h1 className='text-xl font-bold'>My Documents</h1>
+        <p className='text-xs text-muted-foreground'>
           Manage your personal documents and files
         </p>
       </div>

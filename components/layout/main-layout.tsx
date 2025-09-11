@@ -23,14 +23,14 @@ export async function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <ErrorBoundary>
-      <div className='min-h-screen bg-background'>
+      <div className='min-h-screen bg-gradient-soft'>
         <div className='flex h-screen'>
           {/* Sidebar */}
           <Sidebar profile={profile} />
 
           {/* Main Content Area */}
           <div className='flex-1 flex flex-col overflow-hidden'>
-            <div className='h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-3 md:px-4'>
+            <div className='h-12 border-b bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60 flex items-center justify-between px-3 md:px-4'>
               {/* Mobile Navigation */}
               <div className='md:hidden'>
                 <MobileNavigation profile={profile} />
@@ -43,8 +43,8 @@ export async function MainLayout({ children }: MainLayoutProps) {
             </div>
 
             {/* Main Content */}
-            <main className='flex-1 overflow-y-auto bg-gray-50/30 dark:bg-gray-900/30'>
-              <div className='container mx-auto'>
+            <main className='flex-1 overflow-y-auto bg-gradient-soft'>
+              <div className='container mx-auto p-2 md:p-4'>
                 <LoadingBoundary>{children}</LoadingBoundary>
               </div>
             </main>

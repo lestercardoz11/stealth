@@ -52,28 +52,28 @@ export function MetricCard({
   return (
     <Card
       className={cn(
-        'transition-all duration-200 hover:shadow-lg hover:-translate-y-1',
+        'transition-all duration-200 hover:shadow-md hover:-translate-y-0.5',
         urgent &&
-          'border-yellow-300 bg-gradient-to-br from-yellow-50 to-orange-50 dark:border-yellow-700 dark:bg-gradient-to-br dark:from-yellow-900/20 dark:to-orange-900/20'
+          'border-yellow-200 bg-gradient-to-br from-yellow-50/50 to-orange-50/50 dark:border-yellow-800 dark:bg-gradient-to-br dark:from-yellow-900/10 dark:to-orange-900/10'
       )}>
-      <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-3'>
-        <CardTitle className='text-xs font-semibold text-gray-700 dark:text-gray-200'>{title}</CardTitle>
+      <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+        <CardTitle className='text-xs font-semibold text-foreground/80'>{title}</CardTitle>
         <Icon
           className={cn(
-            'h-4 w-4',
-            urgent ? 'text-yellow-600 dark:text-yellow-400' : 'text-blue-500 dark:text-blue-400'
+            'h-3.5 w-3.5',
+            urgent ? 'text-yellow-600 dark:text-yellow-400' : 'text-primary'
           )}
         />
       </CardHeader>
       <CardContent>
-        <div className='text-2xl font-bold text-gray-900 dark:text-white mb-1'>{value}</div>
-        <div className='flex items-center space-x-2 mb-2'>
+        <div className='text-xl font-bold text-foreground mb-1'>{value}</div>
+        <div className='flex items-center space-x-2 mb-1'>
           <span className={cn('flex items-center text-xs', getTrendColor())}>
             {getTrendIcon()}
             <span className='ml-0.5 font-medium'>{change}</span>
           </span>
         </div>
-        <p className='text-xs text-gray-600 dark:text-gray-400'>{description}</p>
+        <p className='text-xs text-muted-foreground'>{description}</p>
       </CardContent>
     </Card>
   );

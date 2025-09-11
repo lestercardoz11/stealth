@@ -11,13 +11,19 @@ export default {
   theme: {
     extend: {
       fontSize: {
-        'xs': ['0.7rem', { lineHeight: '1rem' }],
-        'sm': ['0.8rem', { lineHeight: '1.25rem' }],
-        'base': ['0.875rem', { lineHeight: '1.5rem' }],
-        'lg': ['1rem', { lineHeight: '1.75rem' }],
-        'xl': ['1.125rem', { lineHeight: '1.75rem' }],
-        '2xl': ['1.25rem', { lineHeight: '2rem' }],
-        '3xl': ['1.5rem', { lineHeight: '2rem' }],
+        'xs': ['0.65rem', { lineHeight: '0.9rem' }],
+        'sm': ['0.75rem', { lineHeight: '1.1rem' }],
+        'base': ['0.8rem', { lineHeight: '1.3rem' }],
+        'lg': ['0.9rem', { lineHeight: '1.4rem' }],
+        'xl': ['1rem', { lineHeight: '1.5rem' }],
+        '2xl': ['1.125rem', { lineHeight: '1.75rem' }],
+        '3xl': ['1.25rem', { lineHeight: '1.75rem' }],
+      },
+      spacing: {
+        '0.5': '0.125rem',
+        '1.5': '0.375rem',
+        '2.5': '0.625rem',
+        '3.5': '0.875rem',
       },
       colors: {
         background: "hsl(var(--background))",

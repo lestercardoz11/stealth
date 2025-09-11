@@ -100,26 +100,26 @@ export function TopNavigation({ profile }: TopNavigationProps) {
               <PrivacyBadge variant='compact' />
 
               {/* Notifications */}
-              <Button variant='ghost' size='sm' className='relative h-7 w-7 p-0'>
+              <Button variant='ghost' size='sm' className='relative h-6 w-6 p-0'>
                 <Bell className='h-3 w-3' />
                 {/* Notification badge */}
-                <span className='absolute -top-0.5 -right-0.5 h-2 w-2 bg-red-500 rounded-full'></span>
+                <span className='absolute -top-0.5 -right-0.5 h-1.5 w-1.5 bg-destructive rounded-full'></span>
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Avatar className='h-7 w-7 cursor-pointer'>
+                  <Avatar className='h-6 w-6 cursor-pointer'>
                     <AvatarFallback className='bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm'>
                       {getInitials(profile.full_name, profile.email)}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className='w-56 focus:outline-none'
+                  className='w-48 focus:outline-none'
                   align='end'
                   forceMount>
                   <DropdownMenuLabel className='font-normal focus:outline-none'>
                     <div className='flex flex-col space-y-0.5'>
-                      <p className='text-sm font-medium leading-none'>
+                      <p className='text-xs font-medium leading-none'>
                         {profile.full_name || 'User'}
                       </p>
                       <p className='text-xs leading-none text-muted-foreground truncate'>

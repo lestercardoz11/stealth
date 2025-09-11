@@ -2,9 +2,8 @@
 
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User, Brain, ExternalLink, FileText, Quote } from 'lucide-react';
+import { User, Brain, FileText, Quote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Message } from '@/lib/types/database';
 import ReactMarkdown from 'react-markdown';
@@ -43,18 +42,18 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'
       )}>
       {/* Avatar */}
-      <Avatar className='w-7 h-7 shrink-0'>
+      <Avatar className='w-6 h-6 shrink-0'>
         <AvatarFallback
           className={cn(
-            'text-xs font-medium',
+            'text-xs font-medium text-xs',
             isUser
               ? 'bg-primary text-primary-foreground'
-              : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+              : 'bg-gradient-to-r from-primary/80 to-primary text-primary-foreground'
           )}>
           {isUser ? (
-            <User className='h-3 w-3' />
+            <User className='h-2.5 w-2.5' />
           ) : (
-            <Brain className='h-3 w-3' />
+            <Brain className='h-2.5 w-2.5' />
           )}
         </AvatarFallback>
       </Avatar>
@@ -65,14 +64,14 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         {/* Message Card */}
         <Card
           className={cn(
-            'p-3 max-w-xl',
+            'p-2.5 max-w-xl border-0',
             isUser
-              ? 'ml-auto bg-primary text-primary-foreground'
-              : 'mr-auto bg-background border'
+              ? 'ml-auto bg-primary text-primary-foreground shadow-sm'
+              : 'mr-auto bg-card/80 backdrop-blur shadow-sm'
           )}>
           <div className='space-y-1'>
             {/* Message Text */}
-            <div className='prose prose-xs max-w-none dark:prose-invert text-sm leading-relaxed'>
+            <div className='prose prose-xs max-w-none dark:prose-invert text-xs leading-relaxed'>
               <ReactMarkdown>{message.content}</ReactMarkdown>
             </div>
 
@@ -89,10 +88,10 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
         {/* Sources (only for assistant messages) */}
         {!isUser && sources.length > 0 && (
-          <Card className='p-2 bg-gradient-to-r from-blue-50/30 to-purple-50/30 dark:from-blue-900/5 dark:to-purple-900/5 border-blue-100 dark:border-blue-900'>
+          <Card className='p-2 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20'>
             <div className='flex items-center gap-1 mb-2'>
-              <Quote className='h-3 w-3 text-blue-500' />
-              <span className='text-xs font-medium text-blue-600 dark:text-blue-400'>
+              <Quote className='h-2.5 w-2.5 text-primary' />
+              <span className='text-xs font-medium text-primary'>
                 RAG Sources Referenced ({sources.length})
               </span>
             </div>
@@ -101,17 +100,17 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               {sources.slice(0, 3).map((source, index) => (
                 <div
                   key={`${source.documentId}-${index}`}
-                  className='flex items-start gap-2 p-2 bg-white/60 dark:bg-gray-800/60 rounded border border-blue-100 dark:border-blue-900'>
-                  <FileText className='h-3 w-3 text-blue-500 mt-0.5 shrink-0' />
+                  className='flex items-start gap-2 p-1.5 bg-card/60 rounded border border-primary/10'>
+                  <FileText className='h-2.5 w-2.5 text-primary mt-0.5 shrink-0' />
                   <div className='flex-1 min-w-0'>
-                    <p className='text-xs font-medium truncate text-gray-700 dark:text-gray-200'>
+                    <p className='text-xs font-medium truncate'>
                       {source.documentTitle}
                     </p>
-                    <p className='text-xs text-gray-600 dark:text-gray-300 line-clamp-2 leading-tight mt-0.5'>
+                    <p className='text-xs text-muted-foreground line-clamp-2 leading-tight mt-0.5'>
                       {source.content}
                     </p>
                     <div className='flex items-center gap-1 mt-1'>
-                      <Badge variant='outline' className='text-xs px-1 py-0 bg-blue-50 dark:bg-blue-900/20'>
+                      <Badge variant='outline' className='text-xs px-1 py-0 h-3.5 bg-primary/5'>
                         {Math.round(source.similarity * 100)}% similarity
                       </Badge>
                     </div>
@@ -120,16 +119,14 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               ))}
 
               {sources.length > 3 && (
-                <Button
-                  variant='ghost'
-                  size='sm' 
-                  className='w-full h-5 text-xs text-muted-foreground hover:text-foreground'
+                <button
+                  className='w-full h-4 text-xs text-muted-foreground hover:text-foreground transition-colors'
                   onClick={() => {
                     // Could expand to show all sources
                     console.log('Show all sources');
                   }}>
                   +{sources.length - 3} more sources
-                </Button>
+                </button>
               )}
             </div>
           </Card>

@@ -179,14 +179,20 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       // Processing stages for better UX
       onProcessingStage?.('Analyzing query...');
       
+      // Add delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       if (documentIds.length > 0) {
         onProcessingStage?.('Searching documents...');
+        await new Promise(resolve => setTimeout(resolve, 800));
       }
       
       // Use server action for chat processing
       const result = await sendChatMessage(messages.concat(userMessage), documentIds);
       
       onProcessingStage?.('Generating response...');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       // Create assistant message
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),

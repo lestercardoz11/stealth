@@ -55,11 +55,15 @@ export async function sendChatMessage(
     if (documentIds && documentIds.length > 0) {
       try {
         console.log('Searching for relevant document chunks...');
+        
+        // Add small delay for better UX feedback
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         // Search for relevant document chunks
         const relevantChunks = await searchDocuments(
           userQuery,
           documentIds,
-          0.3, // Lower threshold for better recall
+          0.2, // Even lower threshold for better recall
           5
         );
 
@@ -90,6 +94,9 @@ export async function sendChatMessage(
     }
 
     console.log('Generating AI response with context length:', context.length);
+    
+    // Add delay for streaming effect
+    await new Promise(resolve => setTimeout(resolve, 800));
     
     // Generate response using Ollama
     const response = await generateChatResponse(
