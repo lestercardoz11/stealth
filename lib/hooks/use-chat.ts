@@ -1,16 +1,15 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Message, Conversation } from '@/lib/types/database';
+import { Message, Conversation, Source } from '@/lib/types/database';
 import { createClient } from '@/lib/utils/supabase/client';
-import { sendChatMessage } from '@/lib/actions/chat-actions';
 
 export interface UseChatOptions {
   initialMessages?: Message[];
   conversationId?: string;
   autoSave?: boolean;
   onError?: (error: string) => void;
-  onResponse?: (response: { response: string; sources: any[] }) => void;
+  onResponse?: (response: { response: string; sources: Source[] }) => void;
   onProcessingStage?: (stage: string) => void;
 }
 
@@ -102,7 +101,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       // Transform database messages to include sources
       const transformedMessages = (data || []).map(msg => ({
         ...msg,
-        sources: [] // Sources will be populated from the response
+        sources: msg.sources || [] // Ensure sources is always an array
       }));
       
       setMessages(transformedMessages);
@@ -157,6 +156,8 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   ): Promise<void> => {
     if (!content.trim() || isLoading) return;
 
+    console.log('Sending message with document context:', documentIds);
+
     // Store for retry functionality
     lastRequestRef.current = { content, documentIds };
 
@@ -176,40 +177,55 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
     try {
       // Processing stages for better UX
-      onProcessingStage?.('Analyzing query...');
-      
-      // Add delay for better UX
+      onProcessingStage?.('Analyzing your query...');
       await new Promise(resolve => setTimeout(resolve, 500));
       
       if (documentIds.length > 0) {
-        onProcessingStage?.('Searching documents...');
+        onProcessingStage?.('Searching through selected documents...');
         await new Promise(resolve => setTimeout(resolve, 800));
+        onProcessingStage?.('Finding relevant context...');
+        await new Promise(resolve => setTimeout(resolve, 600));
       }
       
-      // Use server action for chat processing
-      const result = await sendChatMessage(messages.concat(userMessage), documentIds);
+      onProcessingStage?.('Generating AI response...');
       
-      onProcessingStage?.('Generating response...');
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Call the chat API with streaming
+      const response = await fetch('/api/chat/stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: messages.concat(userMessage),
+          documentIds,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
       
       // Create assistant message
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: result.response,
+        content: data.response,
         role: 'assistant',
         created_at: new Date().toISOString(),
         conversation_id: currentConversation?.id || '',
-        sources: result.sources || [],
+        sources: data.sources || [],
       };
 
       // Add assistant message to UI
       setMessages(prev => [...prev, assistantMessage]);
 
       // Call success callback
-      onResponse?.(result);
+      onResponse?.(data);
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
+      console.error('Chat error:', errorMessage);
       setError(errorMessage);
       onError?.(errorMessage);
 

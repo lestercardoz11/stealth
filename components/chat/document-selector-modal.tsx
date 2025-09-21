@@ -94,51 +94,49 @@ export function DocumentSelectorModal({
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
-        <DialogHeader className="pb-3">
+      <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
+        <DialogHeader className="pb-4">
           <DialogTitle className="text-lg flex items-center gap-2">
             <FileText className="h-5 w-5" />
             Select Documents for Context
           </DialogTitle>
-          <p className="text-xs text-muted-foreground">
-            Choose documents to provide context for your AI assistant
+          <p className="text-sm text-muted-foreground">
+            Choose documents to provide context for your AI assistant. Selected documents will be analyzed to provide relevant responses.
           </p>
         </DialogHeader>
 
         {/* Search and Filters */}
-        <div className="space-y-3 pb-3 border-b">
+        <div className="space-y-4 pb-4 border-b">
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search documents..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 h-8 text-xs"
+              className="pl-10"
             />
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               {(['all', 'personal', 'company'] as const).map((filterType) => (
                 <Button
                   key={filterType}
                   variant={filter === filterType ? 'default' : 'outline'}
                   size="sm"
-                  className="h-6 px-2 text-xs"
                   onClick={() => setFilter(filterType)}
                 >
-                  {filterType === 'personal' && <User className="h-3 w-3 mr-1" />}
-                  {filterType === 'company' && <Building2 className="h-3 w-3 mr-1" />}
+                  {filterType === 'personal' && <User className="h-4 w-4 mr-2" />}
+                  {filterType === 'company' && <Building2 className="h-4 w-4 mr-2" />}
                   {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
                 </Button>
               ))}
             </div>
 
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 px-2 text-xs"
                 onClick={handleSelectAll}
                 disabled={filteredDocuments.length === 0}
               >
@@ -147,7 +145,6 @@ export function DocumentSelectorModal({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 px-2 text-xs"
                 onClick={handleClearAll}
                 disabled={selectedDocuments.length === 0}
               >
@@ -157,19 +154,21 @@ export function DocumentSelectorModal({
           </div>
 
           {/* Selection Summary */}
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center justify-between text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
             <span>{filteredDocuments.length} documents available</span>
-            <span>{selectedDocuments.length} selected</span>
+            <span className="font-medium text-primary">
+              {selectedDocuments.length} selected for RAG context
+            </span>
           </div>
         </div>
 
         {/* Document List */}
         <ScrollArea className="flex-1 min-h-0">
-          <div className="space-y-2 pr-3">
+          <div className="space-y-3 pr-4">
             {filteredDocuments.length === 0 ? (
-              <div className="text-center py-8">
-                <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-xs text-muted-foreground">
+              <div className="text-center py-12">
+                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">
                   {searchTerm ? 'No documents match your search' : 'No documents available'}
                 </p>
               </div>
@@ -178,9 +177,9 @@ export function DocumentSelectorModal({
                 <div
                   key={doc.id}
                   className={cn(
-                    "flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-all duration-200",
+                    "flex items-start gap-4 p-4 border rounded-lg cursor-pointer transition-all duration-200",
                     selectedDocuments.includes(doc.id)
-                      ? "border-primary/50 bg-primary/5"
+                      ? "border-primary/50 bg-primary/5 shadow-sm"
                       : "border-border hover:border-primary/30 hover:bg-accent/30"
                   )}
                   onClick={() => handleDocumentToggle(doc.id)}
@@ -188,48 +187,49 @@ export function DocumentSelectorModal({
                   <Checkbox
                     checked={selectedDocuments.includes(doc.id)}
                     onChange={() => handleDocumentToggle(doc.id)}
-                    className="mt-0.5"
+                    className="mt-1"
                   />
                   
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-sm">{getFileIcon(doc.file_type)}</span>
-                        <h4 className="text-xs font-medium truncate">{doc.title}</h4>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-lg">{getFileIcon(doc.file_type)}</span>
+                        <div className="min-w-0">
+                          <h4 className="font-medium truncate">{doc.title}</h4>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              <span>
+                                {formatDistanceToNow(new Date(doc.created_at), { addSuffix: true })}
+                              </span>
+                            </div>
+                            
+                            {doc.file_size && (
+                              <div className="flex items-center gap-1">
+                                <HardDrive className="h-3 w-3" />
+                                <span>{formatFileSize(doc.file_size)}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                       
                       <Badge
                         variant={doc.is_company_wide ? 'default' : 'secondary'}
-                        className="text-xs px-1.5 py-0 h-4 shrink-0"
+                        className="shrink-0"
                       >
                         {doc.is_company_wide ? (
                           <>
-                            <Building2 className="h-2.5 w-2.5 mr-1" />
+                            <Building2 className="h-3 w-3 mr-1" />
                             Company
                           </>
                         ) : (
                           <>
-                            <User className="h-2.5 w-2.5 mr-1" />
+                            <User className="h-3 w-3 mr-1" />
                             Personal
                           </>
                         )}
                       </Badge>
-                    </div>
-
-                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-2.5 w-2.5" />
-                        <span>
-                          {formatDistanceToNow(new Date(doc.created_at), { addSuffix: true })}
-                        </span>
-                      </div>
-                      
-                      {doc.file_size && (
-                        <div className="flex items-center gap-1">
-                          <HardDrive className="h-2.5 w-2.5" />
-                          <span>{formatFileSize(doc.file_size)}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -239,21 +239,22 @@ export function DocumentSelectorModal({
         </ScrollArea>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t">
-          <div className="text-xs text-muted-foreground">
-            {selectedDocuments.length > 0 && (
+        <div className="flex items-center justify-between pt-4 border-t">
+          <div className="text-sm text-muted-foreground">
+            {selectedDocuments.length > 0 ? (
               <span className="text-primary font-medium">
-                {selectedDocuments.length} document{selectedDocuments.length !== 1 ? 's' : ''} selected for RAG context
+                {selectedDocuments.length} document{selectedDocuments.length !== 1 ? 's' : ''} will be used for RAG context
               </span>
+            ) : (
+              <span>No documents selected - AI will provide general responses</span>
             )}
           </div>
           
           <Button
             onClick={() => setIsOpen(false)}
             size="sm"
-            className="h-7 px-3 text-xs"
           >
-            <Check className="h-3 w-3 mr-1" />
+            <Check className="h-4 w-4 mr-2" />
             Done
           </Button>
         </div>
