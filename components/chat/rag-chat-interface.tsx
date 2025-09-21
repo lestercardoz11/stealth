@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { MessageBubble } from './message-bubble';
-import { ContextPanel } from './context-panel';
 import { ConversationList } from './conversation-list';
 import { DocumentSelectorModal } from './document-selector-modal';
 import { PrivacyBadge } from '@/components/security/privacy-badge';
@@ -117,13 +116,6 @@ export function RAGChatInterface({
       .filter((doc) => selectedDocuments.includes(doc.id))
       .map((doc) => doc.title);
   };
-
-  // Get sources from the last assistant message
-  const lastAssistantMessage = messages
-    .slice()
-    .reverse()
-    .find((m) => m.role === 'assistant');
-  const sources = lastAssistantMessage?.sources || [];
 
   return (
     <ErrorBoundary>
@@ -344,13 +336,6 @@ export function RAGChatInterface({
             </div>
           </div>
         </div>
-
-        {/* Context Panel */}
-        {sources.length > 0 && window.innerWidth >= 1280 && (
-          <div className='hidden xl:block'>
-            <ContextPanel sources={sources} />
-          </div>
-        )}
       </div>
     </ErrorBoundary>
   );

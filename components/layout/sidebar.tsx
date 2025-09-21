@@ -9,11 +9,6 @@ import {
   Home,
   MessageSquare,
   Users,
-  Settings,
-  Shield,
-  BarChart3,
-  Upload,
-  Library,
 } from 'lucide-react';
 
 import {
@@ -22,130 +17,120 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { Profile } from '@/lib/types/database';
 import { NavUser } from '../nav-user';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+
+const adminNavItems = [
+  {
+    title: 'Dashboard',
+    url: '/admin',
+    icon: Home,
+    isActive: false,
+  },
+  {
+    title: 'Users',
+    icon: Users,
+    url: '/admin/users',
+    isActive: false,
+  },
+  {
+    title: 'Documents',
+    icon: FileText,
+    url: '/admin/documents',
+    isActive: false,
+  },
+  // {
+  //   title: 'Settings',
+  //   url: '/admin/settings',
+  //   icon: Settings,
+  //   isActive: false,
+  // },
+  // {
+  //   title: 'Security',
+  //   url: '/admin/security',
+  //   icon: Shield,
+  //   isActive: false,
+  // },
+];
+
+const employeeNavItems = [
+  {
+    title: 'AI Chat',
+    url: '/employee/chat',
+    icon: MessageSquare,
+    isActive: false,
+  },
+  {
+    title: 'My Documents',
+    icon: FileText,
+    url: '/employee/documents',
+    isActive: false,
+  },
+  {
+    title: 'Company Documents',
+    url: '/employee/company-documents',
+    icon: Building2,
+    isActive: false,
+  },
+  {
+    title: 'Help',
+    url: '/employee/help',
+    icon: HelpCircle,
+    isActive: false,
+  },
+];
 
 interface SidebarProps {
   profile: Profile;
 }
 
 export function AppSidebar({ profile }: SidebarProps) {
-  const pathname = usePathname();
-
-  const adminNavItems = [
-    {
-      title: 'Dashboard',
-      url: '/admin',
-      icon: Home,
-    },
-    {
-      title: 'User Management',
-      url: '/admin/users',
-      icon: Users,
-    },
-    {
-      title: 'Documents',
-      url: '/admin/documents',
-      icon: FileText,
-    },
-    {
-      title: 'Analytics',
-      url: '/admin/analytics',
-      icon: BarChart3,
-    },
-    {
-      title: 'Security',
-      url: '/admin/security',
-      icon: Shield,
-    },
-    {
-      title: 'Settings',
-      url: '/admin/settings',
-      icon: Settings,
-    },
-  ];
-
-  const employeeNavItems = [
-    {
-      title: 'AI Chat',
-      url: '/employee/chat',
-      icon: MessageSquare,
-    },
-    {
-      title: 'My Documents',
-      url: '/employee/documents',
-      icon: Library,
-    },
-    {
-      title: 'Upload Documents',
-      url: '/employee/documents/upload',
-      icon: Upload,
-    },
-    {
-      title: 'Company Documents',
-      url: '/employee/company-documents',
-      icon: Building2,
-    },
-    {
-      title: 'Help',
-      url: '/employee/help',
-      icon: HelpCircle,
-    },
-  ];
-
-  const navItems = profile.role === 'admin' ? adminNavItems : employeeNavItems;
-
-  const isActive = (url: string) => {
-    if (url === '/admin' || url === '/employee') {
-      return pathname === url;
-    }
-    return pathname.startsWith(url);
-  };
+  const navMain = profile.role === 'admin' ? adminNavItems : employeeNavItems;
+  const [activeItem, setActiveItem] = React.useState(navMain[0]);
+  const { setOpen } = useSidebar();
 
   return (
-    <Sidebar collapsible="icon" className="overflow-hidden">
+    <Sidebar collapsible='none' className='overflow-hidden h-screen border-r'>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href={profile.role === 'admin' ? '/admin' : '/employee/chat'}>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Command className="size-4" />
+            <SidebarMenuButton size='lg' asChild className='md:h-8 md:p-0'>
+              <a href='#'>
+                <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg'>
+                  <Command className='size-4' />
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Stealth AI</span>
-                  <span className="truncate text-xs capitalize">{profile.role}</span>
-                </div>
-              </Link>
+              </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Platform</SidebarGroupLabel>
-          <SidebarGroupContent>
+          <SidebarGroupContent className='px-1.5 md:px-0'>
             <SidebarMenu>
-              {navItems.map((item) => (
+              {navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    tooltip={item.title}
-                  >
-                    <Link href={item.url}>
+                    tooltip={{
+                      children: item.title,
+                      hidden: false,
+                    }}
+                    onClick={() => {
+                      setActiveItem(item);
+                      setOpen(true);
+                    }}
+                    isActive={activeItem?.title === item.title}
+                    className='px-2 h-8 w-8'
+                    asChild>
+                    <Link href={item.url || '#'}>
                       <item.icon />
-                      <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -154,11 +139,9 @@ export function AppSidebar({ profile }: SidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
-      <SidebarFooter>
+      <SidebarFooter className='p-0'>
         <NavUser profile={profile} />
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 }

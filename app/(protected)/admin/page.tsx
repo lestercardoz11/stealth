@@ -16,7 +16,7 @@ export default async function AdminDashboardPage() {
   }
 
   // Fetch real data from database
-  const [allUsers, pendingUsers, profile] = await Promise.all([
+  const [allUsers, pendingUsers] = await Promise.all([
     getAllUsers(),
     getPendingUsers(),
     getCurrentUserProfile(),
@@ -24,10 +24,10 @@ export default async function AdminDashboardPage() {
 
   // Get real document and conversation counts
   const supabase = await createClient();
-  
+
   const [documentsResult, conversationsResult] = await Promise.all([
     supabase.from('documents').select('id', { count: 'exact' }),
-    supabase.from('conversations').select('id', { count: 'exact' })
+    supabase.from('conversations').select('id', { count: 'exact' }),
   ]);
 
   const totalDocuments = documentsResult.count || 0;
@@ -36,22 +36,28 @@ export default async function AdminDashboardPage() {
   // Generate recent activity from real data
   const recentActivity = allUsers.slice(0, 6).map((user, index) => ({
     id: user.id,
-    type: index % 3 === 0 ? 'user_signup' : index % 3 === 1 ? 'document_upload' : 'chat_session',
+    type:
+      index % 3 === 0
+        ? 'user_signup'
+        : index % 3 === 1
+        ? 'document_upload'
+        : 'chat_session',
     user: {
       email: user.email,
       full_name: user.full_name,
     },
-    action: index % 3 === 0 
-      ? 'signed up for an account'
-      : index % 3 === 1 
-      ? 'uploaded a new document'
-      : 'started an AI chat session',
+    action:
+      index % 3 === 0
+        ? 'signed up for an account'
+        : index % 3 === 1
+        ? 'uploaded a new document'
+        : 'started an AI chat session',
     timestamp: new Date(user.created_at),
   }));
 
   return (
-    <AdminDashboard 
-      allUsers={allUsers} 
+    <AdminDashboard
+      allUsers={allUsers}
       pendingUsers={pendingUsers}
       totalDocuments={totalDocuments}
       totalConversations={totalConversations}
