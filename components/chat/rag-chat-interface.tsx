@@ -249,22 +249,22 @@ export function RAGChatInterface({
               {selectedDocuments.length > 0 && (
                 <div className='flex items-center gap-2 flex-wrap'>
                   <span className='text-xs text-muted-foreground'>
-                    Context:
+                    📄 Selected Documents ({selectedDocuments.length}):
                   </span>
                   {getSelectedDocumentTitles()
                     .slice(0, 3)
                     .map((title, index) => (
                       <Badge
                         key={index}
-                        variant='secondary'
-                        className='text-xs px-2 py-0 h-5'>
+                        variant='outline'
+                        className='text-xs px-2 py-1 bg-primary/10 border-primary/30'>
                         {title.length > 20
                           ? title.substring(0, 20) + '...'
                           : title}
                       </Badge>
                     ))}
                   {selectedDocuments.length > 3 && (
-                    <Badge variant='outline' className='text-xs px-2 py-0 h-5'>
+                    <Badge variant='outline' className='text-xs px-2 py-1 bg-primary/10 border-primary/30'>
                       +{selectedDocuments.length - 3} more
                     </Badge>
                   )}
@@ -323,14 +323,11 @@ export function RAGChatInterface({
               {/* Context Indicator */}
               {selectedDocuments.length === 0 ? (
                 <p className='text-xs text-muted-foreground text-center'>
-                  💡 Select documents for RAG-powered responses with source
-                  citations
+                  💡 Click "Select Documents" to choose files for AI analysis with source citations
                 </p>
               ) : (
                 <p className='text-xs text-primary/80 text-center'>
-                  🔍 RAG Mode: AI will search through {selectedDocuments.length}{' '}
-                  selected document{selectedDocuments.length !== 1 ? 's' : ''}{' '}
-                  for context
+                  🔍 AI will analyze {selectedDocuments.length} selected document{selectedDocuments.length !== 1 ? 's' : ''} to answer your questions
                 </p>
               )}
             </div>

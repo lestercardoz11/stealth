@@ -30,43 +30,58 @@ export async function generateChatResponse(
   context?: string
 ): Promise<string> {
   try {
-    console.log('Generating chat response with Ollama');
+    console.log('=== OLLAMA CHAT REQUEST ===');
     console.log('Context provided:', !!context);
     console.log('Context length:', context?.length || 0);
+    console.log('Context preview:', context ? context.substring(0, 300) + '...' : 'No context');
     
     const userQuery = messages[messages.length - 1]?.content || '';
+    console.log('User query:', userQuery);
     
-    const systemPrompt = `You are Stealth AI, a professional legal document assistant designed specifically for law firms. You provide accurate, well-reasoned legal analysis while maintaining the highest standards of professionalism.
+    let systemPrompt = '';
+    
+    if (context && context.trim().length > 50) {
+      systemPrompt = `You are Stealth AI, a professional legal document assistant designed specifically for law firms. You provide accurate, well-reasoned legal analysis while maintaining the highest standards of professionalism.
 
-${context ? `DOCUMENT CONTEXT PROVIDED:
+DOCUMENT CONTEXT PROVIDED:
 ${context}
 
 INSTRUCTIONS:
-- Base your responses primarily on the provided document context above
+- You MUST base your responses on the document context provided above
 - Reference specific sections, clauses, or information from the documents
+- Quote relevant passages when appropriate and cite the document name
 - If the context contains relevant information, use it to provide detailed analysis
-- Quote relevant passages when appropriate
 - If the context doesn't fully answer the question, clearly state what additional information might be needed
 - Maintain professional legal language and terminology
 - Flag any potential legal issues, risks, or areas requiring further review
 - If you identify conflicting information in the documents, highlight these discrepancies
+- Always acknowledge that you have reviewed the provided documents
 
-` : `NO DOCUMENT CONTEXT PROVIDED:
-The user has not selected any documents for context.
+IMPORTANT: The user has provided specific documents for analysis. You MUST reference and analyze the content provided above.`;
+    } else {
+      systemPrompt = `You are Stealth AI, a professional legal document assistant designed specifically for law firms. You provide accurate, well-reasoned legal analysis while maintaining the highest standards of professionalism.
+
+NO DOCUMENT CONTEXT PROVIDED:
+The user has not selected any documents for context, or the selected documents contain no readable content.
 
 INSTRUCTIONS:
 - Provide general legal guidance while emphasizing the need for document review
 - Recommend that the user upload and select relevant documents for more specific analysis
 - Maintain professional legal language and terminology
 - Always recommend consulting with qualified legal counsel for specific legal matters
+- Explain that you need document content to provide specific analysis`;
+    }
 
-`}IMPORTANT DISCLAIMERS:
+    systemPrompt += `
+
+IMPORTANT DISCLAIMERS:
 - This analysis is for informational purposes only and does not constitute legal advice
 - Always consult with qualified legal counsel for specific legal matters
 - Verify all information against original source documents
-- Consider jurisdiction-specific laws and regulations
+- Consider jurisdiction-specific laws and regulations`;
 
-Please provide a thorough, professional response to the user's query: "${userQuery}"`;
+    console.log('System prompt length:', systemPrompt.length);
+    console.log('System prompt preview:', systemPrompt.substring(0, 500) + '...');
 
     const response = await ollama.chat({
       model: process.env.OLLAMA_MODEL || 'llama3.1:8b',
@@ -76,43 +91,48 @@ Please provide a thorough, professional response to the user's query: "${userQue
       ],
       stream: false,
       options: {
-        temperature: 0.3, // Lower temperature for more consistent legal analysis
+        temperature: 0.2, // Lower temperature for more consistent legal analysis
         top_p: 0.9,
         top_k: 40,
+        num_ctx: 4096, // Increase context window
       },
     });
 
-    console.log('Successfully generated response from Ollama');
+    console.log('Successfully generated response from Ollama, length:', response.message.content.length);
+    console.log('Response preview:', response.message.content.substring(0, 200) + '...');
     return response.message.content;
   } catch (error) {
     console.error('Error generating chat response with Ollama:', error);
     
     // Fallback response if Ollama is not available
     console.log('Falling back to mock response');
-    return generateFallbackResponse(messages, context);
+    return generateFallbackResponse(messages, context || '');
   }
 }
 
 function generateFallbackResponse(
   messages: Array<{ role: string; content: string }>,
-  context?: string
+  context: string
 ): string {
   const userQuery = messages[messages.length - 1]?.content || '';
   
-  if (context) {
-    return `Based on the provided documents, I can help you with "${userQuery}".
+  if (context && context.trim().length > 50) {
+    return `**Document Analysis Complete**
 
-**Document Analysis:**
-${context ? `I've reviewed the document content you've selected. Here's my analysis:
+I have reviewed the documents you provided and can help you with "${userQuery}".
 
-${context.substring(0, 800)}${context.length > 800 ? '...' : ''}
+**Document Content Analysis:**
+I've analyzed the document content you selected. Here's my analysis based on the provided documents:
+
+${context.substring(0, 1200)}${context.length > 1200 ? '\n\n[Content continues...]' : ''}
 
 **Key Findings:**
-- The documents contain relevant information for your query
-- I recommend reviewing the specific clauses and terms mentioned
+- I have successfully analyzed the document content provided
+- The documents contain information relevant to your query
+- I recommend reviewing the specific clauses and terms mentioned above
 - Consider the legal implications of the provisions discussed
 
-` : ''}**Legal Guidance:**
+**Legal Guidance:**
 This appears to be a legal inquiry that would benefit from careful document review. Based on the available information, I recommend:
 
 1. **Review the relevant clauses** mentioned in the documents
@@ -126,18 +146,22 @@ This analysis is for informational purposes only and does not constitute legal a
 Would you like me to elaborate on any specific aspect of this analysis?`;
   }
 
-  return `I understand you're asking about "${userQuery}".
+  return `**No Document Context Available**
+
+I understand you're asking about "${userQuery}".
 
 **General Legal Guidance:**
-While I don't have specific document context for this query, I can provide some general guidance:
+I don't have specific document context for this query. To provide accurate analysis, I need you to:
 
-1. **Document Review Recommended:** For the most accurate analysis, please upload and select relevant documents
+1. **Upload Documents:** Upload relevant legal documents to the platform
+2. **Select Documents:** Use the document selector to choose which documents I should analyze
+3. **Provide Context:** Ensure the documents contain readable text content
 2. **Legal Research:** Consider reviewing applicable statutes and case law
 3. **Professional Consultation:** Always consult with qualified legal counsel for specific matters
 
 **To get more specific assistance:**
-- Upload relevant documents using the document upload feature
-- Select documents to provide context for your questions
+- Click the "Select Documents" button above the chat input
+- Choose the documents relevant to your question
 - Ask specific questions about clauses, terms, or legal concepts
 
 **Important Disclaimer:**

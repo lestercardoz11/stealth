@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     // If we have document IDs, get the full document content and search for relevant chunks
     if (documentIds && documentIds.length > 0) {
       try {
-        console.log('Processing selected documents for context...');
+        console.log('Processing selected documents for context...', documentIds);
         
         // Get full content of selected documents
         const { data: selectedDocuments, error: docError } = await supabase
@@ -87,15 +87,29 @@ export async function POST(req: Request) {
         if (docError) {
           console.error('Error fetching selected documents:', docError);
         } else if (selectedDocuments && selectedDocuments.length > 0) {
-          console.log(`Retrieved ${selectedDocuments.length} selected documents`);
+          console.log(`Retrieved ${selectedDocuments.length} selected documents:`, 
+            selectedDocuments.map(d => ({ id: d.id, title: d.title, contentLength: d.content?.length || 0 })));
           
-          // Use full document content as primary context
-          context = selectedDocuments
-            .filter(doc => doc.content && doc.content.trim().length > 0)
-            .map((doc) => `Document: ${doc.title}\n\nContent:\n${doc.content}`)
-            .join('\n\n---DOCUMENT_SEPARATOR---\n\n');
+          // Filter documents with content and create detailed context
+          const documentsWithContent = selectedDocuments.filter(doc => 
+            doc.content && doc.content.trim().length > 20
+          );
           
-          console.log(`Assembled context from ${selectedDocuments.length} documents, total length: ${context.length}`);
+          if (documentsWithContent.length > 0) {
+            context = documentsWithContent
+              .map((doc) => `=== DOCUMENT: ${doc.title} ===\n\n${doc.content}\n\n=== END DOCUMENT ===`)
+              .join('\n\n');
+            
+            console.log(`Assembled context from ${documentsWithContent.length} documents with content`);
+            console.log('Context preview:', context.substring(0, 500) + '...');
+          } else {
+            console.log('No documents with sufficient content found');
+            context = selectedDocuments
+              .map((doc) => `Document "${doc.title}" was selected but contains no readable content.`)
+              .join('\n');
+          }
+          
+          console.log(`Final context length: ${context.length} characters`);
           
           // Also search for most relevant chunks for source attribution
           try {
