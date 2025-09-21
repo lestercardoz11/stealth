@@ -124,7 +124,8 @@ export async function POST(req: Request) {
     // If we have document IDs, search for relevant chunks
     if (documentIds && documentIds.length > 0) {
       try {
-        console.log('Searching documents for context...');
+        console.log('=== DOCUMENT CONTEXT ASSEMBLY ===');
+        console.log('Selected document IDs:', documentIds);
         // Search for relevant document chunks
         const relevantChunks = await searchDocuments(
           userQuery,
@@ -133,12 +134,37 @@ export async function POST(req: Request) {
           5
         );
 
-        console.log(`Found ${relevantChunks?.length || 0} relevant chunks`);
+          console.log(`Found ${selectedDocuments.length} selected documents:`, 
+            selectedDocuments.map(d => ({ 
+              id: d.id, 
+              title: d.title, 
+              hasContent: !!(d.content && d.content.trim().length > 20),
+              contentLength: d.content?.length || 0 
+            })));
 
-        if (relevantChunks && relevantChunks.length > 0) {
-          context = relevantChunks
-            .map((chunk) => `Document: ${chunk.document_title}\nContent: ${chunk.content}`)
-            .join('\n\n---\n\n');
+          // Filter documents with meaningful content
+          const documentsWithContent = selectedDocuments.filter(doc => 
+            doc.content && doc.content.trim().length > 20
+          );
+          
+          if (documentsWithContent.length > 0) {
+            // Use full document content as context
+            context = documentsWithContent
+              .map((doc) => `=== DOCUMENT: ${doc.title} ===\n\n${doc.content}\n\n=== END DOCUMENT ===`)
+              .join('\n\n');
+            
+            console.log(`Assembled context from ${documentsWithContent.length} documents with content`);
+            console.log('Context length:', context.length);
+            console.log('Context preview:', context.substring(0, 300) + '...');
+          } else {
+            console.log('No documents with sufficient content found');
+            // Create a message about the selected documents
+            context = `The user has selected the following documents for analysis:
+
+${selectedDocuments.map(doc => `- "${doc.title}"`).join('\n')}
+
+However, these documents may not contain extractable text content or may be in a format that requires special processing. Please acknowledge the document selection and provide guidance on how to better analyze these specific documents.`;
+          }
           
           sources = relevantChunks.map((chunk) => ({
             documentId: chunk.document_id,
