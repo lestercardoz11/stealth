@@ -19,7 +19,7 @@ export default async function EmployeeDocumentsPage() {
   const documents = await getUserDocuments(profile.id);
 
   return (
-    <div className='space-y-3'>
+    <div className='space-y-6 p-6'>
       <div>
         <h1 className='text-xl font-bold'>My Documents</h1>
         <p className='text-xs text-muted-foreground'>

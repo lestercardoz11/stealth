@@ -18,11 +18,10 @@ import {
   MessageSquare,
   FileText,
   Users,
-  HelpCircle,
-  ExternalLink,
   Play,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
 
 interface GuideSection {
   id: string;
@@ -67,8 +66,7 @@ export function UserGuide() {
           description: 'Overview of the platform and key features',
           readTime: '3 min',
           difficulty: 'beginner',
-          content: `
-# Welcome to Stealth AI
+          content: `Welcome to Stealth AI
 
 Stealth AI is a private LLM platform designed exclusively for law firms. This guide will help you get started with the platform.
 
@@ -429,7 +427,7 @@ Keep your platform secure with comprehensive monitoring.
             ← Back to Guide
           </Button>
           <div>
-            <h1 className='text-2xl font-bold'>{selectedArticle.title}</h1>
+            <p className='text-2xl font-bold'>{selectedArticle.title}</p>
             <div className='flex items-center gap-2 mt-1'>
               <Badge className={getDifficultyColor(selectedArticle.difficulty)}>
                 {selectedArticle.difficulty}
@@ -444,11 +442,7 @@ Keep your platform secure with comprehensive monitoring.
         <Card>
           <CardContent className='p-6'>
             <div className='prose prose-sm max-w-none dark:prose-invert'>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: selectedArticle.content.replace(/\n/g, '<br>'),
-                }}
-              />
+              <ReactMarkdown>{selectedArticle.content}</ReactMarkdown>
             </div>
           </CardContent>
         </Card>
@@ -469,79 +463,33 @@ Keep your platform secure with comprehensive monitoring.
         </p>
       </div>
 
-      {/* Search and Filters */}
-      <div className='flex flex-col md:flex-row gap-4'>
-        <div className='relative flex-1'>
-          <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-          <Input
-            placeholder='Search help articles...'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className='pl-10'
-          />
-        </div>
-
-        <div className='flex gap-2 flex-wrap'>
-          {categories.map((category) => (
-            <Button
-              key={category.id}
-              variant={selectedCategory === category.id ? 'default' : 'outline'}
-              size='sm'
-              onClick={() => setSelectedCategory(category.id)}>
-              {category.label}
-            </Button>
-          ))}
-        </div>
+      {/* Search */}
+      <div className='relative'>
+        <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+        <Input
+          placeholder='Search help articles...'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className='pl-10'
+        />
       </div>
 
-      {/* Quick Start */}
-      <Card className='bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200 dark:border-blue-800'>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
-            <Play className='h-5 w-5 text-blue-600' />
-            Quick Start Guide
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className='grid gap-4 md:grid-cols-3'>
-            <div className='flex items-start gap-3'>
-              <div className='w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold'>
-                1
-              </div>
-              <div>
-                <h4 className='font-medium'>Upload Documents</h4>
-                <p className='text-sm text-muted-foreground'>
-                  Start by uploading your legal documents
-                </p>
-              </div>
-            </div>
-
-            <div className='flex items-start gap-3'>
-              <div className='w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold'>
-                2
-              </div>
-              <div>
-                <h4 className='font-medium'>Select Context</h4>
-                <p className='text-sm text-muted-foreground'>
-                  Choose documents for AI analysis
-                </p>
-              </div>
-            </div>
-
-            <div className='flex items-start gap-3'>
-              <div className='w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold'>
-                3
-              </div>
-              <div>
-                <h4 className='font-medium'>Ask Questions</h4>
-                <p className='text-sm text-muted-foreground'>
-                  Get AI-powered insights and analysis
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Categories */}
+      <div className='flex flex-wrap gap-2'>
+        {categories.map((category) => (
+          <button
+            key={category.id}
+            onClick={() => setSelectedCategory(category.id)}
+            className={cn(
+              'flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors',
+              selectedCategory === category.id
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-background hover:bg-accent border-border'
+            )}>
+            <span className='text-sm font-medium'>{category.label}</span>
+          </button>
+        ))}
+      </div>
 
       {/* Guide Sections */}
       <div className='space-y-4'>
@@ -620,31 +568,6 @@ Keep your platform secure with comprehensive monitoring.
           </Card>
         ))}
       </div>
-
-      {/* Help Footer */}
-      <Card>
-        <CardContent className='p-6'>
-          <div className='text-center space-y-4'>
-            <HelpCircle className='h-12 w-12 text-muted-foreground mx-auto' />
-            <div>
-              <h3 className='font-semibold mb-2'>Need More Help?</h3>
-              <p className='text-sm text-muted-foreground mb-4'>
-                Can&apos;t find what you&apos;re looking for? Contact your
-                administrator or check our FAQ.
-              </p>
-              <div className='flex justify-center gap-2'>
-                <Button variant='outline' size='sm'>
-                  <ExternalLink className='h-4 w-4 mr-2' />
-                  Contact Support
-                </Button>
-                <Button variant='outline' size='sm'>
-                  View FAQ
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

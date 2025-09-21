@@ -32,7 +32,6 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   const {
     initialMessages = [],
     conversationId,
-    autoSave = true,
     onError,
     onResponse,
     onProcessingStage,

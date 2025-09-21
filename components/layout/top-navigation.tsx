@@ -12,20 +12,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import {
-  User,
-  Settings,
-  LogOut,
-  Shield,
-  MessageSquare,
-  Menu,
-  X,
-  Bell,
-} from 'lucide-react';
+import { User, LogOut, Shield, MessageSquare, Menu, X } from 'lucide-react';
 import { createClient } from '@/lib/utils/supabase/client';
 import { usePathname, useRouter } from 'next/navigation';
 import { Profile } from '@/lib/types/database';
-import { PrivacyBadge } from '@/components/security/privacy-badge';
 
 interface TopNavigationProps {
   profile: Profile | null;
@@ -70,7 +60,7 @@ export function TopNavigation({ profile }: TopNavigationProps) {
   const quickActions = getQuickActions();
 
   return (
-    <header className='h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+    <header className='h-16'>
       <div className='flex h-full items-center justify-between px-4'>
         {pathname === '/' && (
           <Link href='/' className='flex items-center space-x-3'>
@@ -96,15 +86,6 @@ export function TopNavigation({ profile }: TopNavigationProps) {
         <div className='flex items-center space-x-3'>
           {profile ? (
             <div className='flex items-center gap-3'>
-              {/* Privacy Badge for authenticated users */}
-              <PrivacyBadge variant='compact' />
-
-              {/* Notifications */}
-              <Button variant='ghost' size='sm' className='relative h-6 w-6 p-0'>
-                <Bell className='h-3 w-3' />
-                {/* Notification badge */}
-                <span className='absolute -top-0.5 -right-0.5 h-1.5 w-1.5 bg-destructive rounded-full'></span>
-              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Avatar className='h-6 w-6 cursor-pointer'>
@@ -150,12 +131,12 @@ export function TopNavigation({ profile }: TopNavigationProps) {
                       <span>Profile</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className='cursor-pointer' asChild>
+                  {/* <DropdownMenuItem className='cursor-pointer' asChild>
                     <Link href='/settings'>
                       <Settings className='mr-2 h-4 w-4' />
                       <span>Settings</span>
                     </Link>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className='cursor-pointer text-destructive'

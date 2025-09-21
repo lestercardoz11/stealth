@@ -1,260 +1,147 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Profile } from '@/lib/types/database';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import * as React from 'react';
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import {
-  Home,
-  Users,
-  FileText,
-  Settings,
-  MessageSquare,
   Building2,
+  Command,
+  FileText,
   HelpCircle,
-  ChevronDown,
-  ChevronRight,
-  Shield,
+  Home,
+  MessageSquare,
+  Users,
 } from 'lucide-react';
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from '@/components/ui/sidebar';
+import { Profile } from '@/lib/types/database';
+import { NavUser } from '../nav-user';
+import Link from 'next/link';
+
+const adminNavItems = [
+  {
+    title: 'Dashboard',
+    url: '/admin',
+    icon: Home,
+    isActive: false,
+  },
+  {
+    title: 'Users',
+    icon: Users,
+    url: '/admin/users',
+    isActive: false,
+  },
+  {
+    title: 'Documents',
+    icon: FileText,
+    url: '/admin/documents',
+    isActive: false,
+  },
+  // {
+  //   title: 'Settings',
+  //   url: '/admin/settings',
+  //   icon: Settings,
+  //   isActive: false,
+  // },
+  // {
+  //   title: 'Security',
+  //   url: '/admin/security',
+  //   icon: Shield,
+  //   isActive: false,
+  // },
+];
+
+const employeeNavItems = [
+  {
+    title: 'AI Chat',
+    url: '/employee/chat',
+    icon: MessageSquare,
+    isActive: false,
+  },
+  {
+    title: 'My Documents',
+    icon: FileText,
+    url: '/employee/documents',
+    isActive: false,
+  },
+  {
+    title: 'Company Documents',
+    url: '/employee/company-documents',
+    icon: Building2,
+    isActive: false,
+  },
+  {
+    title: 'Help',
+    url: '/employee/help',
+    icon: HelpCircle,
+    isActive: false,
+  },
+];
 
 interface SidebarProps {
   profile: Profile;
 }
 
-interface NavItem {
-  title: string;
-  href?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  children?: NavItem[];
-  badge?: string;
-}
-
-export function Sidebar({ profile }: SidebarProps) {
-  const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-
-  const adminNavItems: NavItem[] = [
-    {
-      title: 'Dashboard',
-      href: '/admin',
-      icon: Home,
-    },
-    {
-      title: 'Users',
-      icon: Users,
-      href: '/admin/users',
-    },
-    {
-      title: 'Documents',
-      icon: FileText,
-      href: '/admin/documents',
-    },
-    {
-      title: 'Settings',
-      href: '/admin/settings',
-      icon: Settings,
-    },
-    {
-      title: 'Security',
-      href: '/admin/security',
-      icon: Shield,
-    },
-  ];
-
-  const employeeNavItems: NavItem[] = [
-    {
-      title: 'AI Chat',
-      href: '/employee/chat',
-      icon: MessageSquare,
-    },
-    {
-      title: 'My Documents',
-      icon: FileText,
-      href: '/employee/documents',
-    },
-    {
-      title: 'Company Documents',
-      href: '/employee/company-documents',
-      icon: Building2,
-    },
-    {
-      title: 'Help',
-      href: '/employee/help',
-      icon: HelpCircle,
-    },
-  ];
-
-  const navItems = profile.role === 'admin' ? adminNavItems : employeeNavItems;
-
-  const isActive = (href: string) => {
-    if (href === '/admin' || href === '/employee') {
-      return pathname === href;
-    }
-    return pathname.startsWith(href);
-  };
-
-  const NavItemComponent = ({
-    item,
-    level = 0,
-  }: {
-    item: NavItem;
-    level?: number;
-  }) => {
-    const [isOpen, setIsOpen] = useState(
-      item.children?.some((child) => child.href && isActive(child.href)) ||
-        false
-    );
-
-    if (item.children) {
-      return (
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <CollapsibleTrigger asChild>
-            <Button
-              variant='ghost'
-              className={cn(
-                'w-full justify-start gap-3 h-10 px-3',
-                level > 0 && 'pl-6',
-                isCollapsed && 'px-2 justify-center'
-              )}>
-              <item.icon className='h-4 w-4 shrink-0' />
-              {!isCollapsed && (
-                <>
-                  <span className='flex-1 text-left'>{item.title}</span>
-                  {item.badge && (
-                    <span className='bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full'>
-                      {item.badge}
-                    </span>
-                  )}
-                  {isOpen ? (
-                    <ChevronDown className='h-4 w-4' />
-                  ) : (
-                    <ChevronRight className='h-4 w-4' />
-                  )}
-                </>
-              )}
-            </Button>
-          </CollapsibleTrigger>
-          {!isCollapsed && (
-            <CollapsibleContent className='space-y-1'>
-              {item.children.map((child) => (
-                <NavItemComponent
-                  key={child.title}
-                  item={child}
-                  level={level + 1}
-                />
-              ))}
-            </CollapsibleContent>
-          )}
-        </Collapsible>
-      );
-    }
-
-    return (
-      <Button
-        variant='ghost'
-        className={cn(
-          'w-full justify-start gap-3 h-10 px-3',
-          level > 0 && 'pl-6',
-          isCollapsed && 'px-2 justify-center',
-          item.href && isActive(item.href) && 'bg-accent text-accent-foreground'
-        )}
-        asChild>
-        <Link href={item.href || '#'}>
-          <item.icon className='h-4 w-4 shrink-0' />
-          {!isCollapsed && (
-            <>
-              <span className='flex-1 text-left'>{item.title}</span>
-              {item.badge && (
-                <span className='bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full'>
-                  {item.badge}
-                </span>
-              )}
-            </>
-          )}
-        </Link>
-      </Button>
-    );
-  };
-
-  const sidebarContent = (
-    <div className='flex flex-col h-full'>
-      {/* Logo */}
-      <Link href='/'>
-        <div
-          className={cn(
-            'h-16 flex items-center gap-3 py-2 px-6 border-b',
-            isCollapsed && 'justify-center px-3'
-          )}>
-          <div className='w-8 h-8 bg-primary rounded-lg flex items-center justify-center'>
-            <span className='text-primary-foreground font-bold text-sm'>S</span>
-          </div>
-          {!isCollapsed && <span className='font-bold text-xl'>Stealth</span>}
-        </div>
-      </Link>
-
-      {/* Navigation */}
-      <nav className='flex-1 p-4 space-y-1 overflow-y-auto'>
-        {navItems.map((item) => (
-          <NavItemComponent key={item.title} item={item} />
-        ))}
-      </nav>
-
-      {/* Collapse Toggle */}
-      <div className='p-4 border-t'>
-        <Button
-          variant='ghost'
-          size='sm'
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className={cn('w-full', isCollapsed && 'px-2 justify-center')}>
-          {isCollapsed ? (
-            <ChevronRight className='h-4 w-4' />
-          ) : (
-            <>
-              <ChevronRight className='h-4 w-4 rotate-180' />
-            </>
-          )}
-        </Button>
-      </div>
-    </div>
-  );
+export function AppSidebar({ profile }: SidebarProps) {
+  const navMain = profile.role === 'admin' ? adminNavItems : employeeNavItems;
+  const [activeItem, setActiveItem] = React.useState(navMain[0]);
+  const { setOpen } = useSidebar();
 
   return (
-    <>
-      {/* Mobile Menu Button */}
-
-      {/* Mobile Overlay */}
-      {isMobileOpen && (
-        <div
-          className='fixed inset-0 bg-black/50 z-40 md:hidden'
-          onClick={() => setIsMobileOpen(false)}
-        />
-      )}
-
-      {/* Desktop Sidebar */}
-      <aside
-        className={cn(
-          'hidden md:flex flex-col bg-card border-r transition-all duration-300 ease-in-out',
-          isCollapsed ? 'w-16' : 'w-64'
-        )}>
-        {sidebarContent}
-      </aside>
-
-      {/* Mobile Sidebar */}
-      <aside
-        className={cn(
-          'fixed left-0 top-0 z-50 h-full w-64 bg-card border-r transition-all duration-300 ease-in-out md:hidden',
-          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
-        )}>
-        {sidebarContent}
-      </aside>
-    </>
+    <Sidebar collapsible='none' className='overflow-hidden h-screen border-r'>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size='lg' asChild className='md:h-8 md:p-0'>
+              <a href='#'>
+                <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg'>
+                  <Command className='size-4' />
+                </div>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent className='px-1.5 md:px-0'>
+            <SidebarMenu>
+              {navMain.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    tooltip={{
+                      children: item.title,
+                      hidden: false,
+                    }}
+                    onClick={() => {
+                      setActiveItem(item);
+                      setOpen(true);
+                    }}
+                    isActive={activeItem?.title === item.title}
+                    className='px-2 h-8 w-8'
+                    asChild>
+                    <Link href={item.url || '#'}>
+                      <item.icon />
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter className='p-0'>
+        <NavUser profile={profile} />
+      </SidebarFooter>
+    </Sidebar>
   );
 }

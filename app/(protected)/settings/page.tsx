@@ -1,12 +1,8 @@
 import { requireApprovedUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
-import { NotificationSettings } from '@/components/settings/notification-settings';
 import { ThemeSettings } from '@/components/settings/theme-settings';
-import { PrivacySettings } from '@/components/settings/privacy-settings';
-import { LanguageSettings } from '@/components/settings/language-settings';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Bell, Palette, Shield, Globe } from 'lucide-react';
+import { Palette } from 'lucide-react';
 
 export default async function SettingsPage() {
   try {
@@ -40,51 +36,6 @@ export default async function SettingsPage() {
           </CardHeader>
           <CardContent>
             <ThemeSettings />
-          </CardContent>
-        </Card>
-
-        <Separator />
-
-        {/* Notification Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className='flex items-center gap-2'>
-              <Bell className='h-5 w-5' />
-              Notifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <NotificationSettings />
-          </CardContent>
-        </Card>
-
-        <Separator />
-
-        {/* Privacy Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className='flex items-center gap-2'>
-              <Shield className='h-5 w-5' />
-              Privacy & Security
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PrivacySettings />
-          </CardContent>
-        </Card>
-
-        <Separator />
-
-        {/* Language Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className='flex items-center gap-2'>
-              <Globe className='h-5 w-5' />
-              Language & Region
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <LanguageSettings />
           </CardContent>
         </Card>
       </div>

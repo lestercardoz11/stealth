@@ -4,7 +4,6 @@ import { ProfileForm } from '@/components/profile/profile-form';
 import { PasswordChange } from '@/components/profile/password-change';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { DataExport } from '@/components/security/data-export';
 import { User, Lock, Settings } from 'lucide-react';
 import {
   updateUserProfile,
@@ -45,10 +44,7 @@ export default async function ProfilePage() {
   return (
     <div className='space-y-6 md:p-6'>
       <div>
-        <h1 className='text-3xl font-bold'>Profile Settings</h1>
-        <p className='text-muted-foreground'>
-          Manage your account settings and preferences
-        </p>
+        <h1 className='text-3xl font-bold'>Profile</h1>
       </div>
 
       <div className='grid gap-6'>
@@ -83,11 +79,6 @@ export default async function ProfilePage() {
             <PasswordChange onPasswordChange={handlePasswordChange} />
           </CardContent>
         </Card>
-
-        <Separator />
-
-        {/* Data Export */}
-        <DataExport />
 
         <Separator />
 

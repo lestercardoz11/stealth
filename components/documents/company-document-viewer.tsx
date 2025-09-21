@@ -102,10 +102,10 @@ export function CompanyDocumentViewer({
           <div className='flex items-start gap-3'>
             <Info className='h-5 w-5 text-blue-600 mt-0.5' />
             <div>
-              <h3 className='font-semibold text-blue-900 dark:text-blue-100 mb-1'>
+              <h3 className='text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1'>
                 Company Documents
               </h3>
-              <p className='text-sm text-blue-700 dark:text-blue-200'>
+              <p className='text-xs text-blue-700 dark:text-blue-200'>
                 These documents are available to all employees and can be used
                 for AI analysis and research. You have read-only access to these
                 documents.

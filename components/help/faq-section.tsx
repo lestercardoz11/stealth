@@ -38,70 +38,80 @@ export function FAQSection() {
     {
       id: 'privacy-guarantee',
       question: 'How can I be sure my data stays private?',
-      answer: 'Stealth AI processes all data locally on your infrastructure. We never send your documents or queries to external APIs. All AI processing happens on your own servers using local models, ensuring 100% data privacy.',
+      answer:
+        'Stealth AI processes all data locally on your infrastructure. We never send your documents or queries to external APIs. All AI processing happens on your own servers using local models, ensuring 100% data privacy.',
       category: 'security',
       tags: ['privacy', 'security', 'local processing'],
     },
     {
       id: 'supported-formats',
       question: 'What document formats are supported?',
-      answer: 'We support PDF, Microsoft Word (.docx, .doc), and plain text (.txt) files. Maximum file size is 50MB per document. PDFs are recommended for best results.',
+      answer:
+        'We support PDF, Microsoft Word (.docx, .doc), and plain text (.txt) files. Maximum file size is 50MB per document. PDFs are recommended for best results.',
       category: 'documents',
       tags: ['formats', 'upload', 'pdf', 'word'],
     },
     {
       id: 'ai-accuracy',
       question: 'How accurate are the AI responses?',
-      answer: 'Our AI provides analysis based on your uploaded documents with source citations. Always verify AI responses against original documents. The AI is designed to assist with research and analysis, not replace legal judgment.',
+      answer:
+        'Our AI provides analysis based on your uploaded documents with source citations. Always verify AI responses against original documents. The AI is designed to assist with research and analysis, not replace legal judgment.',
       category: 'chat',
       tags: ['accuracy', 'verification', 'sources'],
     },
     {
       id: 'user-roles',
       question: 'What are the different user roles?',
-      answer: 'There are two roles: Admin (full platform access, user management, system settings) and Employee (document upload, AI chat, company document access). Admins can change user roles as needed.',
+      answer:
+        'There are two roles: Admin (full platform access, user management, system settings) and Employee (document upload, AI chat, company document access). Admins can change user roles as needed.',
       category: 'admin',
       tags: ['roles', 'permissions', 'admin', 'employee'],
     },
     {
       id: 'company-documents',
       question: 'What are company-wide documents?',
-      answer: 'Company-wide documents are accessible to all employees and can be used for AI analysis by anyone in the organization. These are typically templates, policies, or reference materials.',
+      answer:
+        'Company-wide documents are accessible to all employees and can be used for AI analysis by anyone in the organization. These are typically templates, policies, or reference materials.',
       category: 'documents',
       tags: ['company-wide', 'sharing', 'access'],
     },
     {
       id: 'data-export',
       question: 'Can I export my data?',
-      answer: 'Yes, you can export all your personal data including documents, chat history, and profile information. Go to Profile > Data Export to request a complete data export.',
+      answer:
+        'Yes, you can export all your personal data including documents, chat history, and profile information. Go to Profile > Data Export to request a complete data export.',
       category: 'general',
       tags: ['export', 'gdpr', 'data portability'],
     },
     {
       id: 'session-security',
       question: 'How are user sessions secured?',
-      answer: 'Sessions use secure tokens with configurable timeouts. Admins can monitor active sessions, detect suspicious activity, and terminate sessions remotely. All session data is encrypted.',
+      answer:
+        'Sessions use secure tokens with configurable timeouts. Admins can monitor active sessions, detect suspicious activity, and terminate sessions remotely. All session data is encrypted.',
       category: 'security',
       tags: ['sessions', 'tokens', 'monitoring'],
     },
     {
       id: 'document-processing',
       question: 'How long does document processing take?',
-      answer: 'Document processing typically takes 1-5 minutes depending on file size and content. You can use documents for AI chat immediately after upload, with full processing completing in the background.',
+      answer:
+        'Document processing typically takes 1-5 minutes depending on file size and content. You can use documents for AI chat immediately after upload, with full processing completing in the background.',
       category: 'documents',
       tags: ['processing', 'time', 'background'],
     },
     {
       id: 'chat-context',
       question: 'How do I select documents for AI context?',
-      answer: 'Use the document selector in the chat sidebar to choose which documents the AI should reference. You can select multiple documents for comprehensive analysis across your document library.',
+      answer:
+        'Use the document selector in the chat sidebar to choose which documents the AI should reference. You can select multiple documents for comprehensive analysis across your document library.',
       category: 'chat',
       tags: ['context', 'selection', 'multiple documents'],
     },
     {
       id: 'audit-logs',
       question: 'What activities are logged for security?',
-      answer: 'We log all authentication events, document uploads/downloads, user management actions, and system configuration changes. Logs include timestamps, user information, and IP addresses for security monitoring.',
+      answer:
+        'We log all authentication events, document uploads/downloads, user management actions, and system configuration changes. Logs include timestamps, user information, and IP addresses for security monitoring.',
       category: 'security',
       tags: ['audit', 'logging', 'monitoring', 'compliance'],
     },
@@ -116,26 +126,30 @@ export function FAQSection() {
     { id: 'admin', label: 'Admin', icon: Users },
   ];
 
-  const filteredFAQs = faqItems.filter(item => {
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-    const matchesSearch = !searchTerm || 
+  const filteredFAQs = faqItems.filter((item) => {
+    const matchesCategory =
+      selectedCategory === 'all' || item.category === selectedCategory;
+    const matchesSearch =
+      !searchTerm ||
       item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    
+      item.tags.some((tag) =>
+        tag.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
     return matchesCategory && matchesSearch;
   });
 
   const toggleItem = (itemId: string) => {
-    setExpandedItems(prev =>
+    setExpandedItems((prev) =>
       prev.includes(itemId)
-        ? prev.filter(id => id !== itemId)
+        ? prev.filter((id) => id !== itemId)
         : [...prev, itemId]
     );
   };
 
   const getCategoryIcon = (category: string) => {
-    const categoryData = categories.find(cat => cat.id === category);
+    const categoryData = categories.find((cat) => cat.id === category);
     return categoryData?.icon || HelpCircle;
   };
 
@@ -174,8 +188,7 @@ export function FAQSection() {
               selectedCategory === category.id
                 ? 'bg-primary text-primary-foreground border-primary'
                 : 'bg-background hover:bg-accent border-border'
-            )}
-          >
+            )}>
             <category.icon className='h-4 w-4' />
             <span className='text-sm font-medium'>{category.label}</span>
           </button>
@@ -198,13 +211,12 @@ export function FAQSection() {
           filteredFAQs.map((item) => {
             const CategoryIcon = getCategoryIcon(item.category);
             const isExpanded = expandedItems.includes(item.id);
-            
+
             return (
               <Card key={item.id}>
                 <Collapsible
                   open={isExpanded}
-                  onOpenChange={() => toggleItem(item.id)}
-                >
+                  onOpenChange={() => toggleItem(item.id)}>
                   <CollapsibleTrigger asChild>
                     <CardContent className='p-4 cursor-pointer hover:bg-accent/50 transition-colors'>
                       <div className='flex items-start justify-between gap-4'>
@@ -216,21 +228,26 @@ export function FAQSection() {
                             </h3>
                             <div className='flex flex-wrap gap-1'>
                               {item.tags.slice(0, 3).map((tag) => (
-                                <Badge key={tag} variant='secondary' className='text-xs'>
+                                <Badge
+                                  key={tag}
+                                  variant='secondary'
+                                  className='text-xs'>
                                   {tag}
                                 </Badge>
                               ))}
                             </div>
                           </div>
                         </div>
-                        <ChevronDown className={cn(
-                          'h-5 w-5 text-muted-foreground transition-transform shrink-0',
-                          isExpanded && 'rotate-180'
-                        )} />
+                        <ChevronDown
+                          className={cn(
+                            'h-5 w-5 text-muted-foreground transition-transform shrink-0',
+                            isExpanded && 'rotate-180'
+                          )}
+                        />
                       </div>
                     </CardContent>
                   </CollapsibleTrigger>
-                  
+
                   <CollapsibleContent>
                     <CardContent className='pt-0 pb-4 px-4'>
                       <div className='pl-8'>
@@ -248,25 +265,6 @@ export function FAQSection() {
           })
         )}
       </div>
-
-      {/* Contact Support */}
-      <Card className='bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-blue-200 dark:border-blue-800'>
-        <CardContent className='p-6 text-center'>
-          <HelpCircle className='h-8 w-8 text-blue-600 mx-auto mb-3' />
-          <h3 className='font-semibold mb-2'>Still need help?</h3>
-          <p className='text-sm text-muted-foreground mb-4'>
-            Can&apos;t find the answer you&apos;re looking for? Contact your administrator or reach out to our support team.
-          </p>
-          <div className='flex justify-center gap-2'>
-            <button className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm'>
-              Contact Support
-            </button>
-            <button className='px-4 py-2 border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-sm'>
-              Request Feature
-            </button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

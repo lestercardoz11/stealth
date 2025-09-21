@@ -1,13 +1,10 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { MetricCard } from './metric-card';
 import { UsageChart } from './usage-chart';
-import { RecentActivity } from './recent-activity';
 import { UserApprovalCard } from './user-approval-card';
 import { Profile } from '@/lib/types/database';
-import { SecurityStatus } from '@/components/security/security-status';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 
 import {
@@ -16,9 +13,6 @@ import {
   FileText,
   MessageSquare,
   TrendingUp,
-  Activity,
-  Zap,
-  Shield,
 } from 'lucide-react';
 
 type Props = {
@@ -40,7 +34,7 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
 
   return (
     <ErrorBoundary>
-      <div className='space-y-3'>
+      <div className='space-y-4 p-6 overflow-x-hidden'>
         {/* Key Metrics */}
         <div className='grid gap-2 md:gap-3 grid-cols-2 lg:grid-cols-4'>
           <MetricCard
@@ -94,71 +88,6 @@ export default function AdminDashboard({ allUsers, pendingUsers }: Props) {
           </CardHeader>
           <CardContent>
             <UsageChart />
-          </CardContent>
-        </Card>
-
-        {/* Charts and Analytics */}
-        <div className='grid gap-2 md:gap-3 lg:grid-cols-2'>
-          {/* Recent Activity */}
-          <Card className='shadow-sm'>
-            <CardHeader>
-              <CardTitle className='flex items-center gap-2'>
-                <Activity className='h-5 w-5' />
-                Recent Activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <RecentActivity users={allUsers} />
-            </CardContent>
-          </Card>
-
-          <Card className='shadow-sm'>
-            <CardHeader>
-              <CardTitle className='flex items-center gap-2'>
-                <Shield className='h-5 w-5' />
-                Security Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <SecurityStatus variant='compact' />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
-        <Card className='shadow-sm bg-gradient-card'>
-          <CardHeader>
-            <CardTitle>
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='grid gap-2 md:gap-3 grid-cols-1 md:grid-cols-3'>
-              <Button
-                variant='outline'
-                className='h-16 md:h-18 flex-col hover:bg-primary/5 border-primary/20'>
-                <Users className='h-5 w-5 mb-1' />
-                <span className='font-medium text-xs'>
-                  Manage Users
-                </span>
-              </Button>
-              <Button
-                variant='outline'
-                className='h-16 md:h-18 flex-col hover:bg-primary/5 border-primary/20'>
-                <FileText className='h-5 w-5 mb-1' />
-                <span className='font-medium text-xs'>
-                  Upload Documents
-                </span>
-              </Button>
-              <Button
-                variant='outline'
-                className='h-16 md:h-18 flex-col hover:bg-primary/5 border-primary/20'>
-                <Zap className='h-5 w-5 mb-1' />
-                <span className='font-medium text-xs'>
-                  System Settings
-                </span>
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </div>

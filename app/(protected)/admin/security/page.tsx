@@ -19,8 +19,8 @@ export default async function AdminSecurityPage() {
   return (
     <div className='space-y-6 p-6'>
       <div>
-        <h1 className='text-3xl font-bold'>Security Dashboard</h1>
-        <p className='text-muted-foreground'>
+        <h1 className='text-xl font-bold'>Security Dashboard</h1>
+        <p className='text-sm text-muted-foreground'>
           Monitor security status, audit logs, and compliance
         </p>
       </div>
@@ -29,18 +29,24 @@ export default async function AdminSecurityPage() {
       <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
         <Card>
           <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Security Score</CardTitle>
+            <CardTitle className='text-sm font-medium'>
+              Security Score
+            </CardTitle>
             <Shield className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
             <div className='text-2xl font-bold text-green-600'>98/100</div>
-            <p className='text-xs text-muted-foreground'>Excellent security posture</p>
+            <p className='text-xs text-muted-foreground'>
+              Excellent security posture
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Active Sessions</CardTitle>
+            <CardTitle className='text-sm font-medium'>
+              Active Sessions
+            </CardTitle>
             <Users className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
@@ -51,7 +57,9 @@ export default async function AdminSecurityPage() {
 
         <Card>
           <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Security Events</CardTitle>
+            <CardTitle className='text-sm font-medium'>
+              Security Events
+            </CardTitle>
             <Activity className='h-4 w-4 text-muted-foreground' />
           </CardHeader>
           <CardContent>
@@ -74,8 +82,8 @@ export default async function AdminSecurityPage() {
 
       {/* Security Status and Compliance */}
       <div className='grid gap-6 lg:grid-cols-2'>
-        <SecurityStatus variant="detailed" />
-        <ComplianceIndicator variant="detailed" showDetails={true} />
+        <SecurityStatus variant='detailed' />
+        <ComplianceIndicator variant='detailed' showDetails={true} />
       </div>
 
       <Separator />
@@ -93,7 +101,7 @@ export default async function AdminSecurityPage() {
       {/* Data Export and Privacy */}
       <div className='grid gap-6 lg:grid-cols-2'>
         <DataExport />
-        
+
         <Card>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
@@ -108,9 +116,11 @@ export default async function AdminSecurityPage() {
                 <p className='text-sm text-muted-foreground mb-2'>
                   Automatically manage data lifecycle and retention
                 </p>
-                <div className='text-xs text-green-600'>✓ Active - 365 days retention</div>
+                <div className='text-xs text-green-600'>
+                  ✓ Active - 365 days retention
+                </div>
               </div>
-              
+
               <div className='p-3 border rounded-lg'>
                 <h4 className='font-medium mb-1'>GDPR Compliance</h4>
                 <p className='text-sm text-muted-foreground mb-2'>
@@ -118,13 +128,15 @@ export default async function AdminSecurityPage() {
                 </p>
                 <div className='text-xs text-green-600'>✓ Fully compliant</div>
               </div>
-              
+
               <div className='p-3 border rounded-lg'>
                 <h4 className='font-medium mb-1'>Audit Trail</h4>
                 <p className='text-sm text-muted-foreground mb-2'>
                   Complete audit trail for all user actions
                 </p>
-                <div className='text-xs text-green-600'>✓ Enabled - 7 year retention</div>
+                <div className='text-xs text-green-600'>
+                  ✓ Enabled - 7 year retention
+                </div>
               </div>
             </div>
           </CardContent>

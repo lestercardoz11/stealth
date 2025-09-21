@@ -7,7 +7,7 @@ const ollama = new Ollama({
 export async function generateEmbedding(text: string): Promise<number[]> {
   try {
     const response = await ollama.embeddings({
-      model: 'nomic-embed-text',
+      model: 'nomic-embed-text:v1.5',
       prompt: text.replace(/\n/g, ' '),
     });
 
@@ -53,7 +53,7 @@ INSTRUCTIONS:
 Please provide a thorough, professional response to the user's query.`;
 
     const response = await ollama.chat({
-      model: process.env.OLLAMA_MODEL || 'llama3.1:8b',
+      model: process.env.OLLAMA_MODEL || 'gemma3:1b',
       messages: [
         { role: 'system', content: systemPrompt },
         ...messages,

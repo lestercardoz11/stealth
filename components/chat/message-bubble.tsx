@@ -21,11 +21,15 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
     try {
       const date = new Date(message.created_at);
-      return date.toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: true 
-      });
+      return (
+        date.toLocaleDateString('en-GB') +
+        ', ' +
+        date.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        })
+      );
     } catch (err) {
       console.error('Invalid date format:', err);
       return '';
@@ -45,7 +49,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       <Avatar className='w-6 h-6 shrink-0'>
         <AvatarFallback
           className={cn(
-            'text-xs font-medium text-xs',
+            'text-xs font-medium',
             isUser
               ? 'bg-primary text-primary-foreground'
               : 'bg-gradient-to-r from-primary/80 to-primary text-primary-foreground'
@@ -64,7 +68,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         {/* Message Card */}
         <Card
           className={cn(
-            'p-2.5 max-w-xl border-0',
+            'p-2.5 max-w-xl border-0 mb-2',
             isUser
               ? 'ml-auto bg-primary text-primary-foreground shadow-sm'
               : 'mr-auto bg-card/80 backdrop-blur shadow-sm'
@@ -88,7 +92,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
         {/* Sources (only for assistant messages) */}
         {!isUser && sources.length > 0 && (
-          <Card className='p-2 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20'>
+          <Card className='p-2 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20 mb-2'>
             <div className='flex items-center gap-1 mb-2'>
               <Quote className='h-2.5 w-2.5 text-primary' />
               <span className='text-xs font-medium text-primary'>
@@ -110,7 +114,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
                       {source.content}
                     </p>
                     <div className='flex items-center gap-1 mt-1'>
-                      <Badge variant='outline' className='text-xs px-1 py-0 h-3.5 bg-primary/5'>
+                      <Badge
+                        variant='outline'
+                        className='text-xs px-1 py-0 h-3.5 bg-primary/5'>
                         {Math.round(source.similarity * 100)}% similarity
                       </Badge>
                     </div>

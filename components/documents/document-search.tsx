@@ -79,7 +79,7 @@ export function DocumentSearch({
         <Button
           variant='outline'
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className='shrink-0'>
+          className='shrink-0 px-3 py-2'>
           <Filter className='h-4 w-4 mr-2' />
           Filters
         </Button>

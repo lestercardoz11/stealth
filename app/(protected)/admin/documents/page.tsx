@@ -14,7 +14,7 @@ export default async function AdminDocumentsPage() {
   const documents = await getAllDocuments();
 
   return (
-    <div className='space-y-3'>
+    <div className='space-y-4 p-6'>
       <div>
         <h1 className='text-xl font-bold'>Document Management</h1>
         <p className='text-xs text-muted-foreground'>

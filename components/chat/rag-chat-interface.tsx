@@ -18,15 +18,11 @@ import {
   AlertCircle,
   MessageSquare,
   Loader2,
-  Zap,
-  Plus,
   X,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { RetryButton } from '@/components/ui/retry-button';
 import { useChat } from '@/lib/hooks/use-chat';
-import { Card } from '@/components/ui/card';
 
 interface Document {
   id: string;
@@ -118,8 +114,8 @@ export function RAGChatInterface({
 
   const getSelectedDocumentTitles = () => {
     return availableDocuments
-      .filter(doc => selectedDocuments.includes(doc.id))
-      .map(doc => doc.title);
+      .filter((doc) => selectedDocuments.includes(doc.id))
+      .map((doc) => doc.title);
   };
 
   // Get sources from the last assistant message
@@ -131,7 +127,7 @@ export function RAGChatInterface({
 
   return (
     <ErrorBoundary>
-      <div className='flex h-[calc(100vh-3.5rem)] bg-gradient-soft'>
+      <div className='flex h-screen bg-gradient-soft'>
         {/* Conversations Sidebar */}
         {showConversations && (
           <div className='hidden lg:block'>
@@ -154,8 +150,7 @@ export function RAGChatInterface({
                 variant={showConversations ? 'default' : 'outline'}
                 size='sm'
                 className='h-6 text-xs px-2'
-                onClick={() => setShowConversations(!showConversations)}
-              >
+                onClick={() => setShowConversations(!showConversations)}>
                 <MessageSquare className='h-3 w-3 mr-1' />
                 Chats ({conversations.length})
               </Button>
@@ -182,9 +177,19 @@ export function RAGChatInterface({
             </div>
           )}
 
+          {currentConversation && (
+            <div className='p-3 md:p-4 max-w-4xl'>
+              <div className='flex items-center justify-between'>
+                <h2 className='text-sm font-semibold text-foreground flex items-center gap-2'>
+                  <MessageSquare className='h-4 w-4' />
+                  {currentConversation?.title}
+                </h2>
+              </div>
+            </div>
+          )}
           {/* Messages Area */}
           <ScrollArea className='flex-1 p-3 md:p-4'>
-            <div className='space-y-3 max-w-4xl mx-auto'>
+            <div className='space-y-1 max-w-4xl mx-auto'>
               {messages.length === 0 && (
                 <div className='text-center py-6 md:py-8'>
                   <div className='w-10 h-10 bg-gradient-to-r from-primary/80 to-primary rounded-xl flex items-center justify-center mx-auto mb-3'>
@@ -194,27 +199,16 @@ export function RAGChatInterface({
                     Welcome to Stealth AI
                   </h3>
                   <p className='text-muted-foreground mb-4 text-xs px-4 leading-relaxed'>
-                    Your intelligent legal document assistant. Select documents and start asking questions.
+                    Your intelligent legal document assistant. Select documents
+                    and start asking questions.
                   </p>
-                  
+
                   <div className='mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20 max-w-md mx-auto'>
                     <p className='text-xs text-primary/80'>
-                      💡 <strong>RAG-Powered:</strong> The AI searches through your documents to provide contextual responses with citations.
+                      💡 <strong>RAG-Powered:</strong> The AI searches through
+                      your documents to provide contextual responses with
+                      citations.
                     </p>
-                  </div>
-                  
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-2 max-w-2xl mx-auto px-4'>
-                    {[
-                      { title: 'Analyze contract terms', desc: 'Review key clauses and obligations' },
-                      { title: 'Summarize documents', desc: 'Get concise overviews' },
-                      { title: 'Find specific information', desc: 'Search across documents' },
-                      { title: 'Legal research', desc: 'Get insights on precedents' },
-                    ].map((item, index) => (
-                      <Card key={index} className='p-2 hover:bg-accent/20 transition-colors cursor-pointer border-0 bg-muted/20'>
-                        <p className='text-xs font-medium text-foreground/80'>{item.title}</p>
-                        <p className='text-xs text-muted-foreground'>{item.desc}</p>
-                      </Card>
-                    ))}
                   </div>
                 </div>
               )}
@@ -225,7 +219,7 @@ export function RAGChatInterface({
 
               {/* Streaming Message */}
               {isStreaming && (
-                <StreamingMessage 
+                <StreamingMessage
                   content={streamingResponse}
                   selectedDocumentCount={selectedDocuments.length}
                 />
@@ -238,8 +232,16 @@ export function RAGChatInterface({
                     <span className='text-xs'>Error: {error}</span>
                   </div>
                   <div className='flex gap-2'>
-                    <RetryButton onRetry={retryLastMessage} size="sm" className="h-6 text-xs" />
-                    <Button variant='ghost' size='sm' onClick={clearError} className="h-6 text-xs">
+                    <RetryButton
+                      onRetry={retryLastMessage}
+                      size='sm'
+                      className='h-6 text-xs'
+                    />
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      onClick={clearError}
+                      className='h-6 text-xs'>
                       Dismiss
                     </Button>
                   </div>
@@ -254,12 +256,21 @@ export function RAGChatInterface({
               {/* Selected Documents Display */}
               {selectedDocuments.length > 0 && (
                 <div className='flex items-center gap-2 flex-wrap'>
-                  <span className='text-xs text-muted-foreground'>Context:</span>
-                  {getSelectedDocumentTitles().slice(0, 3).map((title, index) => (
-                    <Badge key={index} variant='secondary' className='text-xs px-2 py-0 h-5'>
-                      {title.length > 20 ? title.substring(0, 20) + '...' : title}
-                    </Badge>
-                  ))}
+                  <span className='text-xs text-muted-foreground'>
+                    Context:
+                  </span>
+                  {getSelectedDocumentTitles()
+                    .slice(0, 3)
+                    .map((title, index) => (
+                      <Badge
+                        key={index}
+                        variant='secondary'
+                        className='text-xs px-2 py-0 h-5'>
+                        {title.length > 20
+                          ? title.substring(0, 20) + '...'
+                          : title}
+                      </Badge>
+                    ))}
                   {selectedDocuments.length > 3 && (
                     <Badge variant='outline' className='text-xs px-2 py-0 h-5'>
                       +{selectedDocuments.length - 3} more
@@ -269,8 +280,7 @@ export function RAGChatInterface({
                     variant='ghost'
                     size='sm'
                     className='h-5 w-5 p-0'
-                    onClick={() => setSelectedDocuments([])}
-                  >
+                    onClick={() => setSelectedDocuments([])}>
                     <X className='h-3 w-3' />
                   </Button>
                 </div>
@@ -280,16 +290,16 @@ export function RAGChatInterface({
                 <DocumentSelectorModal
                   documents={availableDocuments}
                   selectedDocuments={selectedDocuments}
-                  onSelectionChange={setSelectedDocuments}
-                >
+                  onSelectionChange={setSelectedDocuments}>
                   <Button
-                    type="button"
+                    type='button'
                     variant='outline'
                     size='sm'
-                    className='h-8 px-2 shrink-0'
-                  >
+                    className='h-8 px-2 shrink-0'>
                     <FileText className='h-3 w-3 mr-1' />
-                    {selectedDocuments.length > 0 ? selectedDocuments.length : 'Docs'}
+                    {selectedDocuments.length > 0
+                      ? selectedDocuments.length
+                      : 'Docs'}
                   </Button>
                 </DocumentSelectorModal>
 
@@ -304,13 +314,12 @@ export function RAGChatInterface({
                   disabled={isLoading || isStreaming}
                   className='flex-1 h-8 text-xs'
                 />
-                
+
                 <Button
                   type='submit'
                   disabled={isLoading || isStreaming || !input.trim()}
                   size='sm'
-                  className='h-8 px-3 shrink-0'
-                >
+                  className='h-8 px-3 shrink-0'>
                   {isLoading || isStreaming ? (
                     <Loader2 className='h-3 w-3 animate-spin' />
                   ) : (
@@ -322,11 +331,14 @@ export function RAGChatInterface({
               {/* Context Indicator */}
               {selectedDocuments.length === 0 ? (
                 <p className='text-xs text-muted-foreground text-center'>
-                  💡 Select documents for RAG-powered responses with source citations
+                  💡 Select documents for RAG-powered responses with source
+                  citations
                 </p>
               ) : (
                 <p className='text-xs text-primary/80 text-center'>
-                  🔍 RAG Mode: AI will search through {selectedDocuments.length} selected document{selectedDocuments.length !== 1 ? 's' : ''} for context
+                  🔍 RAG Mode: AI will search through {selectedDocuments.length}{' '}
+                  selected document{selectedDocuments.length !== 1 ? 's' : ''}{' '}
+                  for context
                 </p>
               )}
             </div>
