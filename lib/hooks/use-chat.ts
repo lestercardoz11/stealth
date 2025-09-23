@@ -177,6 +177,33 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     setError(null);
 
     try {
+      // Create conversation if it doesn't exist
+      let conversationId = currentConversation?.id;
+      if (!conversationId) {
+        const supabase = createClient();
+        const { data: newConversation, error: convError } = await supabase
+          .from('conversations')
+          .insert({
+            user_id: (await supabase.auth.getUser()).data.user?.id,
+            title: 'New Conversation',
+          })
+          .select()
+          .single();
+
+        if (convError) {
+          console.error('Error creating conversation:', convError);
+          throw new Error('Failed to create conversation');
+        }
+
+        conversationId = newConversation.id;
+        setCurrentConversation(newConversation);
+        setConversations(prev => [newConversation, ...prev]);
+      }
+
+      // Update user message with conversation ID
+      const updatedUserMessage = { ...userMessage, conversation_id: conversationId };
+      setMessages(prev => prev.map(msg => msg.id === userMessage.id ? updatedUserMessage : msg));
+
       // Processing stages for better UX
       onProcessingStage?.('Analyzing your query...');
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -197,8 +224,9 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          messages: messages.concat(userMessage),
+          messages: messages.concat(updatedUserMessage),
           documentIds,
+          conversationId,
         }),
       });
 
@@ -214,13 +242,60 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         content: data.response,
         role: 'assistant',
         created_at: new Date().toISOString(),
-        conversation_id: currentConversation?.id || '',
+        conversation_id: conversationId || '',
         sources: data.sources || [],
       };
 
       // Add assistant message to UI
       setMessages(prev => [...prev, assistantMessage]);
 
+      // Save messages to database
+      const supabase = createClient();
+      await supabase.from('messages').insert([
+        {
+          conversation_id: conversationId,
+          role: updatedUserMessage.role,
+          content: updatedUserMessage.content,
+        },
+        {
+          conversation_id: conversationId,
+          role: assistantMessage.role,
+          content: assistantMessage.content,
+        },
+      ]);
+
+      // Generate conversation title if this is one of the first 3 messages
+      const messageCount = messages.length + 2; // +2 for the new messages
+      if (messageCount <= 6 && conversationId) { // 6 messages = 3 exchanges
+        try {
+          const titleResponse = await fetch('/api/chat/generate-title', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              conversationId,
+              messages: [updatedUserMessage, assistantMessage],
+            }),
+          });
+
+          if (titleResponse.ok) {
+            const titleData = await titleResponse.json();
+            if (titleData.title) {
+              // Update conversation title in state
+              setCurrentConversation(prev => prev ? { ...prev, title: titleData.title } : null);
+              setConversations(prev => 
+                prev.map(conv => 
+                  conv.id === conversationId ? { ...conv, title: titleData.title } : conv
+                )
+              );
+            }
+          }
+        } catch (titleError) {
+          console.error('Error generating conversation title:', titleError);
+          // Don't fail the whole operation if title generation fails
+        }
+      }
       // Call success callback
       onResponse?.(data);
 
@@ -236,7 +311,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       setIsLoading(false);
       onProcessingStage?.('');
     }
-  }, [currentConversation, isLoading, onError, onResponse, onProcessingStage, messages]);
+  }, [currentConversation, isLoading, onError, onResponse, onProcessingStage, messages, setCurrentConversation, setConversations]);
 
   const retryLastMessage = useCallback(async (): Promise<void> => {
     if (!lastRequestRef.current) return;

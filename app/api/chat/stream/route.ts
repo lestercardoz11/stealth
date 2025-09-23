@@ -19,7 +19,7 @@ export async function POST(req: Request) {
                     req.headers.get('x-real-ip') || 
                     'unknown';
     
-    const { messages, documentIds } = await req.json();
+    const { messages, documentIds, conversationId } = await req.json();
     console.log('Chat request:', { messagesCount: messages?.length, documentIds });
     
     // Get the user's query (last message)
@@ -33,6 +33,12 @@ export async function POST(req: Request) {
     if (userQuery.length > 10000) {
       return new Response('Query too long', { status: 400 });
     }
+
+    // Check if user mentions attachments or similar terms
+    const attachmentKeywords = ['attached', 'attachment', 'uploaded', 'document', 'file', 'pdf', 'docx'];
+    const mentionsAttachment = attachmentKeywords.some(keyword => 
+      userQuery.toLowerCase().includes(keyword)
+    );
 
     // Check if user is authenticated and approved
     const supabase = await createClient();
@@ -170,6 +176,10 @@ export async function POST(req: Request) {
       }
     }
 
+    // Enhance context message if user mentions attachments
+    if (mentionsAttachment && context) {
+      context = `IMPORTANT: The user has mentioned attachments or documents. The following document content has been parsed and extracted for analysis:\n\n${context}`;
+    }
     console.log('Final context length:', context.length);
     console.log('Number of sources:', sources.length);
 
