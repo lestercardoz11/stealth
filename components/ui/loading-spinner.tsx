@@ -1,5 +1,5 @@
 import { Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
@@ -7,10 +7,10 @@ interface LoadingSpinnerProps {
   text?: string;
 }
 
-export function LoadingSpinner({ 
-  size = 'md', 
+export function LoadingSpinner({
+  size = 'md',
   className,
-  text 
+  text,
 }: LoadingSpinnerProps) {
   const sizeClasses = {
     sm: 'h-4 w-4',
@@ -22,11 +22,12 @@ export function LoadingSpinner({
     <div className={cn('flex items-center justify-center gap-2', className)}>
       <Loader2 className={cn('animate-spin', sizeClasses[size])} />
       {text && (
-        <span className={cn(
-          'text-muted-foreground',
-          size === 'sm' && 'text-sm',
-          size === 'lg' && 'text-lg'
-        )}>
+        <span
+          className={cn(
+            'text-muted-foreground',
+            size === 'sm' && 'text-sm',
+            size === 'lg' && 'text-lg'
+          )}>
           {text}
         </span>
       )}
@@ -49,17 +50,23 @@ export function PageLoading({ message = 'Loading...' }: { message?: string }) {
 }
 
 // Inline loading for buttons and small components
-export function InlineLoading({ 
-  text = 'Loading...', 
-  size = 'sm' 
-}: { 
-  text?: string; 
-  size?: 'sm' | 'md'; 
+export function InlineLoading({
+  text = 'Loading...',
+  size = 'sm',
+}: {
+  text?: string;
+  size?: 'sm' | 'md';
 }) {
   return (
     <div className='flex items-center gap-2'>
-      <Loader2 className={cn('animate-spin', size === 'sm' ? 'h-3 w-3' : 'h-4 w-4')} />
-      <span className={cn('text-muted-foreground', size === 'sm' ? 'text-xs' : 'text-sm')}>
+      <Loader2
+        className={cn('animate-spin', size === 'sm' ? 'h-3 w-3' : 'h-4 w-4')}
+      />
+      <span
+        className={cn(
+          'text-muted-foreground',
+          size === 'sm' ? 'text-xs' : 'text-sm'
+        )}>
         {text}
       </span>
     </div>

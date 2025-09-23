@@ -24,7 +24,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { Profile } from '@/lib/types/database';
-import { NavUser } from '../nav-user';
+import { NavUser } from './nav-user';
 import Link from 'next/link';
 
 const adminNavItems = [

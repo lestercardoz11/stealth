@@ -6,7 +6,7 @@ import {
 } from '@/lib/auth/middleware-utils';
 import { type NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { hasEnvVars } from '@/lib/utils';
+import { hasEnvVars } from '@/lib/utils/utils';
 import { rateLimiter } from '@/lib/security/input-validation';
 import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 

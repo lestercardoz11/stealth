@@ -51,6 +51,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
   // Load conversations on mount
   useEffect(() => {
     loadConversations();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load messages when conversation changes

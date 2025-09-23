@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -23,7 +23,10 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn('flex flex-col space-y-1 p-2.5 md:p-3 pb-1.5 md:pb-2', className)}
+    className={cn(
+      'flex flex-col space-y-1 p-2.5 md:p-3 pb-1.5 md:pb-2',
+      className
+    )}
     {...props}
   />
 ));
@@ -35,7 +38,10 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn('text-sm font-semibold leading-none tracking-tight', className)}
+    className={cn(
+      'text-sm font-semibold leading-none tracking-tight',
+      className
+    )}
     {...props}
   />
 ));

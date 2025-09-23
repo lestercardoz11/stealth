@@ -5,7 +5,7 @@ import {
   TrendingDown,
   Minus,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 
 interface MetricCardProps {
   title: string;
@@ -57,7 +57,9 @@ export function MetricCard({
           'border-yellow-200 bg-gradient-to-br from-yellow-50/50 to-orange-50/50 dark:border-yellow-800 dark:bg-gradient-to-br dark:from-yellow-900/10 dark:to-orange-900/10'
       )}>
       <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-        <CardTitle className='text-xs font-semibold text-foreground/80'>{title}</CardTitle>
+        <CardTitle className='text-xs font-semibold text-foreground/80'>
+          {title}
+        </CardTitle>
         <Icon
           className={cn(
             'h-3.5 w-3.5',

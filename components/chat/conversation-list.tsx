@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { MessageSquare, Plus, MoreVertical, Trash2 } from 'lucide-react';
 import { Conversation } from '@/lib/types/database';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 
 interface ConversationListProps {
   conversations: Conversation[];

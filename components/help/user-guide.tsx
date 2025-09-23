@@ -20,7 +20,7 @@ import {
   Users,
   Play,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 import ReactMarkdown from 'react-markdown';
 
 interface GuideSection {

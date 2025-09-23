@@ -25,7 +25,7 @@ import {
   Trash2,
   Download,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 
 interface PrivacyPreferences {
   profileVisibility: boolean;

@@ -1,7 +1,7 @@
 import { requireApprovedUser, getCurrentUserProfile } from '@/lib/auth/roles';
 import { redirect } from 'next/navigation';
 import { ProfileForm } from '@/components/profile/profile-form';
-import { PasswordChange } from '@/components/profile/password-change';
+import { PasswordChange } from '@/components/auth/password-change';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { User, Lock, Settings } from 'lucide-react';

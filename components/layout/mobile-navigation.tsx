@@ -4,7 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -26,7 +32,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { Profile } from '@/lib/types/database';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 
 interface MobileNavigationProps {
   profile: Profile;
@@ -133,9 +139,9 @@ export function MobileNavigation({ profile }: MobileNavigationProps) {
   };
 
   const toggleExpanded = (title: string) => {
-    setExpandedItems(prev =>
+    setExpandedItems((prev) =>
       prev.includes(title)
-        ? prev.filter(item => item !== title)
+        ? prev.filter((item) => item !== title)
         : [...prev, title]
     );
   };
@@ -167,8 +173,7 @@ export function MobileNavigation({ profile }: MobileNavigationProps) {
               level > 0 && 'pl-8',
               'text-left'
             )}
-            onClick={() => toggleExpanded(item.title)}
-          >
+            onClick={() => toggleExpanded(item.title)}>
             <item.icon className='h-5 w-5 shrink-0' />
             <span className='flex-1 text-left'>{item.title}</span>
             {item.badge && (
@@ -192,8 +197,7 @@ export function MobileNavigation({ profile }: MobileNavigationProps) {
               itemIsActive && 'bg-accent text-accent-foreground'
             )}
             asChild
-            onClick={() => setIsOpen(false)}
-          >
+            onClick={() => setIsOpen(false)}>
             <Link href={item.href || '#'}>
               <item.icon className='h-5 w-5 shrink-0' />
               <span className='flex-1 text-left'>{item.title}</span>
@@ -223,7 +227,7 @@ export function MobileNavigation({ profile }: MobileNavigationProps) {
           <span className='sr-only'>Open navigation menu</span>
         </Button>
       </SheetTrigger>
-      
+
       <SheetContent side='left' className='w-80 p-0'>
         <div className='flex flex-col h-full'>
           {/* Header */}
@@ -231,7 +235,9 @@ export function MobileNavigation({ profile }: MobileNavigationProps) {
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-3'>
                 <div className='w-8 h-8 bg-primary rounded-lg flex items-center justify-center'>
-                  <span className='text-primary-foreground font-bold text-sm'>S</span>
+                  <span className='text-primary-foreground font-bold text-sm'>
+                    S
+                  </span>
                 </div>
                 <SheetTitle className='text-xl font-bold'>Stealth</SheetTitle>
               </div>
@@ -239,8 +245,7 @@ export function MobileNavigation({ profile }: MobileNavigationProps) {
                 variant='ghost'
                 size='sm'
                 onClick={() => setIsOpen(false)}
-                className='h-8 w-8 p-0'
-              >
+                className='h-8 w-8 p-0'>
                 <X className='h-4 w-4' />
               </Button>
             </div>
@@ -280,20 +285,18 @@ export function MobileNavigation({ profile }: MobileNavigationProps) {
               variant='ghost'
               className='w-full justify-start gap-3 h-10'
               asChild
-              onClick={() => setIsOpen(false)}
-            >
+              onClick={() => setIsOpen(false)}>
               <Link href='/profile'>
                 <Settings className='h-4 w-4' />
                 Profile Settings
               </Link>
             </Button>
-            
+
             <Button
               variant='ghost'
               className='w-full justify-start gap-3 h-10'
               asChild
-              onClick={() => setIsOpen(false)}
-            >
+              onClick={() => setIsOpen(false)}>
               <Link href='/settings'>
                 <Settings className='h-4 w-4' />
                 App Settings

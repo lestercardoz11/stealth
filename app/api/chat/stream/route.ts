@@ -4,6 +4,12 @@ import { generateChatResponse } from '@/lib/ai/ollama-client';
 import { rateLimiter, RATE_LIMITS } from '@/lib/security/input-validation';
 import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 
+interface ChatMessage {
+      role: string;
+      content: string;
+    }
+
+  
 export async function POST(req: Request) {
   try {
     console.log('Chat stream API called');
@@ -167,9 +173,8 @@ export async function POST(req: Request) {
     console.log('Final context length:', context.length);
     console.log('Number of sources:', sources.length);
 
-    // Generate response using Ollama with document context
-    const response = await generateChatResponse(
-      messages.map(m => ({ role: m.role, content: m.content })), 
+    const response: string = await generateChatResponse(
+      (messages as ChatMessage[]).map((m: ChatMessage) => ({ role: m.role, content: m.content })), 
       context
     );
 

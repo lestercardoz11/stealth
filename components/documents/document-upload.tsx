@@ -20,7 +20,7 @@ import { validateFile, formatFileSize } from '@/lib/utils/file-validation';
 import { uploadDocument } from '@/lib/storage/document-api';
 import { PrivacyBadge } from '@/components/security/privacy-badge';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 
 interface DocumentUploadProps {
   allowCompanyWide: boolean;
@@ -142,7 +142,7 @@ export function DocumentUpload({
         handleUpload(uploadingFile, uploadingFiles.length + index);
       });
     },
-    [uploadingFiles.length, handleUpload]
+    [uploadingFiles.length, handleUpload, allowCompanyWide]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
