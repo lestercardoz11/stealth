@@ -264,7 +264,9 @@ export function RAGChatInterface({
                       </Badge>
                     ))}
                   {selectedDocuments.length > 3 && (
-                    <Badge variant='outline' className='text-xs px-2 py-1 bg-primary/10 border-primary/30'>
+                    <Badge
+                      variant='outline'
+                      className='text-xs px-2 py-1 bg-primary/10 border-primary/30'>
                       +{selectedDocuments.length - 3} more
                     </Badge>
                   )}
@@ -323,11 +325,14 @@ export function RAGChatInterface({
               {/* Context Indicator */}
               {selectedDocuments.length === 0 ? (
                 <p className='text-xs text-muted-foreground text-center'>
-                  💡 Click "Select Documents" to choose files for AI analysis with source citations
+                  💡 Click Select Documents to choose files for AI analysis with
+                  source citations
                 </p>
               ) : (
                 <p className='text-xs text-primary/80 text-center'>
-                  🔍 AI will analyze {selectedDocuments.length} selected document{selectedDocuments.length !== 1 ? 's' : ''} to answer your questions
+                  🔍 AI will analyze {selectedDocuments.length} selected
+                  document{selectedDocuments.length !== 1 ? 's' : ''} to answer
+                  your questions
                 </p>
               )}
             </div>

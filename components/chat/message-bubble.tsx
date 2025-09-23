@@ -3,7 +3,7 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User, Brain, FileText, Quote } from 'lucide-react';
+import { User, Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Message } from '@/lib/types/database';
 import ReactMarkdown from 'react-markdown';
@@ -79,64 +79,31 @@ export function MessageBubble({ message }: MessageBubbleProps) {
               <ReactMarkdown>{message.content}</ReactMarkdown>
             </div>
 
-            {/* Timestamp */}
-            <p
-              className={cn(
-                'text-xs opacity-60 mt-1',
-                isUser ? 'text-primary-foreground/70' : 'text-muted-foreground'
-              )}>
-              {getFormattedTime()}
-            </p>
+            <div className='flex space-x-2'>
+              {/* Timestamp */}
+              <p
+                className={cn(
+                  'text-xs opacity-60 mt-1',
+                  isUser
+                    ? 'text-primary-foreground/70'
+                    : 'text-muted-foreground'
+                )}>
+                {getFormattedTime()}
+              </p>
+
+              {!isUser &&
+                sources.slice(0, 3).map((source, index) => (
+                  <div key={`${source.documentId}-${index}`}>
+                    <Badge
+                      variant='outline'
+                      className='text-xs p-2 h-3.5 bg-primary/5 mx-1'>
+                      {source.documentTitle}
+                    </Badge>
+                  </div>
+                ))}
+            </div>
           </div>
         </Card>
-
-        {/* Sources (only for assistant messages) */}
-        {!isUser && sources.length > 0 && (
-          <Card className='p-2 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20 mb-2'>
-            <div className='flex items-center gap-1 mb-2'>
-              <Quote className='h-2.5 w-2.5 text-primary' />
-              <span className='text-xs font-medium text-primary'>
-                RAG Sources Referenced ({sources.length})
-              </span>
-            </div>
-
-            <div className='space-y-1'>
-              {sources.slice(0, 3).map((source, index) => (
-                <div
-                  key={`${source.documentId}-${index}`}
-                  className='flex items-start gap-2 p-1.5 bg-card/60 rounded border border-primary/10'>
-                  <FileText className='h-2.5 w-2.5 text-primary mt-0.5 shrink-0' />
-                  <div className='flex-1 min-w-0'>
-                    <p className='text-xs font-medium truncate'>
-                      {source.documentTitle}
-                    </p>
-                    <p className='text-xs text-muted-foreground line-clamp-2 leading-tight mt-0.5'>
-                      {source.content}
-                    </p>
-                    <div className='flex items-center gap-1 mt-1'>
-                      <Badge
-                        variant='outline'
-                        className='text-xs px-1 py-0 h-3.5 bg-primary/5'>
-                        {Math.round(source.similarity * 100)}% similarity
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {sources.length > 3 && (
-                <button
-                  className='w-full h-4 text-xs text-muted-foreground hover:text-foreground transition-colors'
-                  onClick={() => {
-                    // Could expand to show all sources
-                    console.log('Show all sources');
-                  }}>
-                  +{sources.length - 3} more sources
-                </button>
-              )}
-            </div>
-          </Card>
-        )}
       </div>
     </div>
   );

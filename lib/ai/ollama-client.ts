@@ -9,7 +9,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     console.log('Generating embedding for text length:', text.length);
     
     const response = await ollama.embeddings({
-      model: 'nomic-embed-text',
+      model: 'nomic-embed-text:v1.5',
       prompt: text.replace(/\n/g, ' ').substring(0, 2000), // Limit text length
     });
 
