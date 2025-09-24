@@ -3,6 +3,7 @@
 import { Message, Source } from '@/lib/types/database';
 import { createClient } from '@/lib/utils/supabase/server';
 import { generateChatResponse } from '@/lib/ai/ollama-client';
+import { mentionsAttachment, enhanceContextForAttachments } from '@/lib/ai/prompts';
 import { searchDocuments } from '@/lib/ai/document-processor';
 import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 
@@ -43,6 +44,9 @@ export async function sendChatMessage(
     if (!profile || profile.status !== 'approved') {
       throw new Error('Account not approved');
     }
+
+    // Check if user mentions attachments or similar terms
+    const userMentionsAttachment = mentionsAttachment(userQuery);
 
     let context = '';
     let sources: Source[] = [];
@@ -104,6 +108,13 @@ export async function sendChatMessage(
         sources = [];
       }
     }
+
+    // Enhance context message if user mentions attachments
+    if (userMentionsAttachment && context) {
+      context = enhanceContextForAttachments(context);
+    }
+    console.log('Final context length:', context.length);
+    console.log('Number of sources:', sources.length);
 
     console.log('Generating AI response with context length:', context.length);
     console.log('Context preview:', context.substring(0, 500) + (context.length > 500 ? '...' : ''));
