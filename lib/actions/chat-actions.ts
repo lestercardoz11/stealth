@@ -166,7 +166,7 @@ export async function saveChatSession(
         .from('conversations')
         .insert({
           user_id: user.id,
-          title: messages[0]?.content.substring(0, 100) + '...' || 'New Conversation',
+          title: messages[0]?.content.substring(0, 50) + '...' || 'New Conversation',
         })
         .select()
         .single();
@@ -178,5 +178,33 @@ export async function saveChatSession(
   } catch (error) {
     console.error('Error saving chat session:', error);
     return { sessionId: sessionId || crypto.randomUUID() };
+  }
+}
+
+export async function generateConversationTitle(
+  conversationId: string,
+  messages: Message[]
+): Promise<string> {
+  try {
+    const response = await fetch('/api/chat/generate-title', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        conversationId,
+        messages: messages.slice(0, 6), // Only use first 3 exchanges
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to generate title');
+    }
+
+    const data = await response.json();
+    return data.title || 'New Conversation';
+  } catch (error) {
+    console.error('Error generating conversation title:', error);
+    return 'New Conversation';
   }
 }

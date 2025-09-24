@@ -104,6 +104,11 @@ export function RAGChatInterface({
 
     try {
       await sendMessage(messageContent, selectedDocuments);
+      
+      // If this was a new conversation, refresh conversations list
+      if (!currentConversation) {
+        // The useChat hook will handle updating the conversations list
+      }
     } finally {
       clearInterval(stageInterval);
       setIsStreaming(false);

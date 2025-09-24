@@ -41,12 +41,15 @@ export async function generateChatResponse(
     let systemPrompt = '';
     
     if (context && context.trim().length > 50) {
+      const hasAttachmentContext = context.includes('IMPORTANT: The user has mentioned attachments');
+      
       systemPrompt = `You are Stealth AI, a professional legal document assistant designed specifically for law firms. You provide accurate, well-reasoned legal analysis while maintaining the highest standards of professionalism.
 
 DOCUMENT CONTEXT PROVIDED:
 ${context}
 
 INSTRUCTIONS:
+${hasAttachmentContext ? '- The user has mentioned attachments/documents - the content above has been parsed and extracted from their uploaded files' : ''}
 - You MUST base your responses on the document context provided above
 - Reference specific sections, clauses, or information from the documents
 - Quote relevant passages when appropriate and cite the document name
@@ -56,6 +59,7 @@ INSTRUCTIONS:
 - Flag any potential legal issues, risks, or areas requiring further review
 - If you identify conflicting information in the documents, highlight these discrepancies
 - Always acknowledge that you have reviewed the provided documents
+${hasAttachmentContext ? '- When the user mentions "attached" or similar terms, acknowledge that you have access to and have analyzed their uploaded document content' : ''}
 
 IMPORTANT: The user has provided specific documents for analysis. You MUST reference and analyze the content provided above.`;
     } else {
