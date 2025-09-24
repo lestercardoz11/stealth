@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/utils/supabase/server';
-import { generateChatResponse } from '@/lib/ai/ollama-client';
+import { generateConversationTitle } from '@/lib/ai/ollama-client';
 
 interface Message {
   role: string;
@@ -61,24 +61,7 @@ export async function POST(request: NextRequest) {
       .map((msg: Message) => `${msg.role}: ${msg.content}`)
       .join('\n');
 
-    const titlePrompt = `Based on this conversation, generate a concise, descriptive title (maximum 50 characters) that captures the main topic or question being discussed. Only return the title, nothing else.
-
-Conversation:
-${conversationText}
-
-Title:`;
-
-    const generatedTitle = await generateChatResponse(
-      [{ role: 'user', content: titlePrompt }],
-      ''
-    );
-
-    // Clean up the generated title
-    const cleanTitle = generatedTitle
-      .replace(/^(Title:|Generated Title:|Conversation Title:)/i, '')
-      .replace(/['"]/g, '')
-      .trim()
-      .substring(0, 50);
+    const cleanTitle = await generateConversationTitle(conversationText);
 
     // Update conversation title in database
     const { error: updateError } = await supabase

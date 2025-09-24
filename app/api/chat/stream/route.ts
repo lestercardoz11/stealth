@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/utils/supabase/server';
 import { searchDocuments } from '@/lib/ai/document-processor';
 import { generateChatResponse } from '@/lib/ai/ollama-client';
+import { mentionsAttachment, enhanceContextForAttachments } from '@/lib/ai/prompts';
 import { rateLimiter, RATE_LIMITS } from '@/lib/security/input-validation';
 import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
 
@@ -38,18 +39,7 @@ export async function POST(req: Request) {
     }
 
     // Check if user mentions attachments or similar terms
-    const attachmentKeywords = [
-      'attached',
-      'attachment',
-      'uploaded',
-      'document',
-      'file',
-      'pdf',
-      'docx',
-    ];
-    const mentionsAttachment = attachmentKeywords.some((keyword) =>
-      userQuery.toLowerCase().includes(keyword)
-    );
+    const userMentionsAttachment = mentionsAttachment(userQuery);
 
     // Check if user is authenticated and approved
     const supabase = await createClient();
@@ -224,8 +214,8 @@ export async function POST(req: Request) {
     }
 
     // Enhance context message if user mentions attachments
-    if (mentionsAttachment && context) {
-      context = `IMPORTANT: The user has mentioned attachments or documents. The following document content has been parsed and extracted for analysis:\n\n${context}`;
+    if (userMentionsAttachment && context) {
+      context = enhanceContextForAttachments(context);
     }
     console.log('Final context length:', context.length);
     console.log('Number of sources:', sources.length);
