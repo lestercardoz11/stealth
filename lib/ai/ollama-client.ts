@@ -7,20 +7,23 @@ const ollama = new Ollama({
 export async function generateEmbedding(text: string): Promise<number[]> {
   try {
     console.log('Generating embedding for text length:', text.length);
-    
+
     const response = await ollama.embeddings({
       model: 'nomic-embed-text:v1.5',
       prompt: text.replace(/\n/g, ' ').substring(0, 2000), // Limit text length
     });
 
-    console.log('Successfully generated embedding of length:', response.embedding.length);
+    console.log(
+      'Successfully generated embedding of length:',
+      response.embedding.length
+    );
     return response.embedding;
   } catch (error) {
     console.error('Error generating embedding with Ollama:', error);
-    
-    // Fallback to mock embedding for development
+
+    // Fallback to mock embedding for development - Fixed dimension to match nomic-embed-text
     console.log('Falling back to mock embedding');
-    const dimension = 1536;
+    const dimension = 768; // Changed from 1536 to match nomic-embed-text
     return Array.from({ length: dimension }, () => Math.random() - 0.5);
   }
 }
@@ -33,23 +36,32 @@ export async function generateChatResponse(
     console.log('=== OLLAMA CHAT REQUEST ===');
     console.log('Context provided:', !!context);
     console.log('Context length:', context?.length || 0);
-    console.log('Context preview:', context ? context.substring(0, 300) + '...' : 'No context');
-    
+    console.log(
+      'Context preview:',
+      context ? context.substring(0, 300) + '...' : 'No context'
+    );
+
     const userQuery = messages[messages.length - 1]?.content || '';
     console.log('User query:', userQuery);
-    
+
     let systemPrompt = '';
-    
+
     if (context && context.trim().length > 50) {
-      const hasAttachmentContext = context.includes('IMPORTANT: The user has mentioned attachments');
-      
+      const hasAttachmentContext = context.includes(
+        'IMPORTANT: The user has mentioned attachments'
+      );
+
       systemPrompt = `You are Stealth AI, a professional legal document assistant designed specifically for law firms. You provide accurate, well-reasoned legal analysis while maintaining the highest standards of professionalism.
 
 DOCUMENT CONTEXT PROVIDED:
 ${context}
 
 INSTRUCTIONS:
-${hasAttachmentContext ? '- The user has mentioned attachments/documents - the content above has been parsed and extracted from their uploaded files' : ''}
+${
+  hasAttachmentContext
+    ? '- The user has mentioned attachments/documents - the content above has been parsed and extracted from their uploaded files'
+    : ''
+}
 - You MUST base your responses on the document context provided above
 - Reference specific sections, clauses, or information from the documents
 - Quote relevant passages when appropriate and cite the document name
@@ -59,7 +71,11 @@ ${hasAttachmentContext ? '- The user has mentioned attachments/documents - the c
 - Flag any potential legal issues, risks, or areas requiring further review
 - If you identify conflicting information in the documents, highlight these discrepancies
 - Always acknowledge that you have reviewed the provided documents
-${hasAttachmentContext ? '- When the user mentions "attached" or similar terms, acknowledge that you have access to and have analyzed their uploaded document content' : ''}
+${
+  hasAttachmentContext
+    ? '- When the user mentions "attached" or similar terms, acknowledge that you have access to and have analyzed their uploaded document content'
+    : ''
+}
 
 IMPORTANT: The user has provided specific documents for analysis. You MUST reference and analyze the content provided above.`;
     } else {
@@ -85,14 +101,14 @@ IMPORTANT DISCLAIMERS:
 - Consider jurisdiction-specific laws and regulations`;
 
     console.log('System prompt length:', systemPrompt.length);
-    console.log('System prompt preview:', systemPrompt.substring(0, 500) + '...');
+    console.log(
+      'System prompt preview:',
+      systemPrompt.substring(0, 500) + '...'
+    );
 
     const response = await ollama.chat({
       model: process.env.OLLAMA_MODEL || 'llama3.1:8b',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages,
-      ],
+      messages: [{ role: 'system', content: systemPrompt }, ...messages],
       stream: false,
       options: {
         temperature: 0.2, // Lower temperature for more consistent legal analysis
@@ -102,12 +118,18 @@ IMPORTANT DISCLAIMERS:
       },
     });
 
-    console.log('Successfully generated response from Ollama, length:', response.message.content.length);
-    console.log('Response preview:', response.message.content.substring(0, 200) + '...');
+    console.log(
+      'Successfully generated response from Ollama, length:',
+      response.message.content.length
+    );
+    console.log(
+      'Response preview:',
+      response.message.content.substring(0, 200) + '...'
+    );
     return response.message.content;
   } catch (error) {
     console.error('Error generating chat response with Ollama:', error);
-    
+
     // Fallback response if Ollama is not available
     console.log('Falling back to mock response');
     return generateFallbackResponse(messages, context || '');
@@ -119,7 +141,7 @@ function generateFallbackResponse(
   context: string
 ): string {
   const userQuery = messages[messages.length - 1]?.content || '';
-  
+
   if (context && context.trim().length > 50) {
     return `**Document Analysis Complete**
 
@@ -128,7 +150,9 @@ I have reviewed the documents you provided and can help you with "${userQuery}".
 **Document Content Analysis:**
 I've analyzed the document content you selected. Here's my analysis based on the provided documents:
 
-${context.substring(0, 1200)}${context.length > 1200 ? '\n\n[Content continues...]' : ''}
+${context.substring(0, 1200)}${
+      context.length > 1200 ? '\n\n[Content continues...]' : ''
+    }
 
 **Key Findings:**
 - I have successfully analyzed the document content provided

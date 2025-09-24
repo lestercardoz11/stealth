@@ -1,4 +1,4 @@
-import { Document } from "../types/database";
+import { Document } from '../types/database';
 
 export interface DocumentUploadResult {
   success: boolean;
@@ -25,8 +25,13 @@ export async function uploadDocument(
   isCompanyWide: boolean
 ): Promise<DocumentUploadResult> {
   try {
-    console.log('Starting document upload:', { fileName: file.name, size: file.size, type: file.type, isCompanyWide: isCompanyWide.toString() });
-    
+    console.log('Starting document upload:', {
+      fileName: file.name,
+      size: file.size,
+      type: file.type,
+      isCompanyWide: isCompanyWide.toString(),
+    });
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('title', title);
@@ -37,8 +42,11 @@ export async function uploadDocument(
       body: formData,
     });
 
-    console.log('Upload response status:', response.status);
-    console.log('Upload response headers:', Object.fromEntries(response.headers.entries()));
+    console.log('Upload response status:', JSON.stringify(response));
+    console.log(
+      'Upload response headers:',
+      Object.fromEntries(response.headers.entries())
+    );
 
     // Check if response is JSON
     const contentType = response.headers.get('content-type');
@@ -47,7 +55,7 @@ export async function uploadDocument(
       console.error('Non-JSON response:', textResponse);
       return {
         success: false,
-        error: 'Server returned invalid response format'
+        error: 'Server returned invalid response format',
       };
     }
 
@@ -83,7 +91,10 @@ export async function getDocuments(
     const data = await response.json();
 
     if (!response.ok) {
-      return { success: false, error: data.error || 'Failed to fetch documents' };
+      return {
+        success: false,
+        error: data.error || 'Failed to fetch documents',
+      };
     }
 
     return {
@@ -93,12 +104,15 @@ export async function getDocuments(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch documents',
+      error:
+        error instanceof Error ? error.message : 'Failed to fetch documents',
     };
   }
 }
 
-export async function deleteDocument(documentId: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteDocument(
+  documentId: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     const response = await fetch(`/api/documents/${documentId}`, {
       method: 'DELETE',
@@ -119,7 +133,9 @@ export async function deleteDocument(documentId: string): Promise<{ success: boo
   }
 }
 
-export async function getDocumentUrl(filePath: string): Promise<DocumentUrlResult> {
+export async function getDocumentUrl(
+  filePath: string
+): Promise<DocumentUrlResult> {
   try {
     const response = await fetch('/api/documents/url', {
       method: 'POST',

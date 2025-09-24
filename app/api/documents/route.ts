@@ -3,6 +3,7 @@ import { createClient } from '@/lib/utils/supabase/server';
 import { processDocumentText } from '@/lib/ai/document-processor';
 import { rateLimiter, RATE_LIMITS } from '@/lib/security/input-validation';
 import { auditLogger, AUDIT_ACTIONS } from '@/lib/security/audit-logger';
+import mammoth from 'mammoth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,8 +12,11 @@ export async function GET(request: NextRequest) {
     const companyWideOnly = searchParams.get('companyWideOnly') === 'true';
 
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -25,7 +29,10 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (!profile || profile.status !== 'approved') {
-      return NextResponse.json({ error: 'Account not approved' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Account not approved' },
+        { status: 403 }
+      );
     }
 
     let query = supabase
@@ -43,29 +50,32 @@ export async function GET(request: NextRequest) {
     }
 
     const { data, error } = await query;
-    
+
     if (error) {
       console.error('Database query error:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ documents: data || [] });
-
   } catch (error) {
     console.error('Documents API error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     console.log('Document upload API called');
-    
+
     // Get client IP for rate limiting and audit logging
-    const clientIP = request.headers.get('x-forwarded-for') || 
-                    request.headers.get('x-real-ip') || 
-                    'unknown';
-    
+    const clientIP =
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip') ||
+      'unknown';
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const title = formData.get('title') as string;
@@ -76,18 +86,24 @@ export async function POST(request: NextRequest) {
       fileSize: file?.size,
       fileType: file?.type,
       title,
-      isCompanyWide
+      isCompanyWide,
     });
 
     if (!file || !title) {
       console.error('Missing file or title');
-      return NextResponse.json({ error: 'File and title are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'File and title are required' },
+        { status: 400 }
+      );
     }
 
     // Validate file size (50MB limit)
     if (file.size > 50 * 1024 * 1024) {
       console.error('File too large:', file.size);
-      return NextResponse.json({ error: 'File size must be less than 50MB' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'File size must be less than 50MB' },
+        { status: 400 }
+      );
     }
 
     // Validate file type
@@ -95,17 +111,23 @@ export async function POST(request: NextRequest) {
       'application/pdf',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'application/msword',
-      'text/plain'
+      'text/plain',
     ];
 
     if (!allowedTypes.includes(file.type)) {
       console.error('Invalid file type:', file.type);
-      return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Unsupported file type' },
+        { status: 400 }
+      );
     }
 
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
     if (authError || !user) {
       console.error('Authentication error:', authError);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -113,7 +135,13 @@ export async function POST(request: NextRequest) {
 
     // Rate limiting
     const rateLimitKey = `upload:${user.id}`;
-    if (!rateLimiter.isAllowed(rateLimitKey, RATE_LIMITS.UPLOAD.maxRequests, RATE_LIMITS.UPLOAD.windowMs)) {
+    if (
+      !rateLimiter.isAllowed(
+        rateLimitKey,
+        RATE_LIMITS.UPLOAD.maxRequests,
+        RATE_LIMITS.UPLOAD.windowMs
+      )
+    ) {
       await auditLogger.log({
         userId: user.id,
         userEmail: user.email,
@@ -121,10 +149,13 @@ export async function POST(request: NextRequest) {
         resource: 'Document Upload',
         details: 'Upload rate limit exceeded',
         ipAddress: clientIP,
-        severity: 'medium'
+        severity: 'medium',
       });
-      
-      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+
+      return NextResponse.json(
+        { error: 'Rate limit exceeded' },
+        { status: 429 }
+      );
     }
 
     // Check user profile and status
@@ -136,7 +167,10 @@ export async function POST(request: NextRequest) {
 
     if (!profile || profile.status !== 'approved') {
       console.error('User not approved:', profile);
-      return NextResponse.json({ error: 'Account not approved' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Account not approved' },
+        { status: 403 }
+      );
     }
 
     // Extract text content based on file type
@@ -146,132 +180,90 @@ export async function POST(request: NextRequest) {
       const fileBuffer = await file.arrayBuffer();
 
       if (file.type === 'text/plain') {
-        // For text files, we can extract the content directly
-        const uint8Array = new Uint8Array(fileBuffer);
-        const decoder = new TextDecoder('utf-8');
-        extractedText = decoder.decode(uint8Array);
+        const extracted = new TextDecoder('utf-8').decode(fileBuffer);
+        extractedText = extracted;
         console.log('Extracted text length:', extractedText.length);
-        console.log('Text preview:', extractedText.substring(0, 200) + '...');
       } else if (file.type === 'application/pdf') {
-        // For PDF files, extract text content
-        // For now, create a comprehensive description for PDFs
-        extractedText = `PDF Document: ${title}
+        const buffer = Buffer.from(fileBuffer);
+        const pdfParse = (await import('pdf-parse')).default;
+        const pdfData = await pdfParse(buffer);
+        extractedText = pdfData.text;
+        console.log('Extracted PDF text length:', extractedText.length);
+      } else if (
+        file.type.includes('wordprocessingml') ||
+        file.type.includes('msword')
+      ) {
+        // Extract text from Word documents using mammoth
+        if (file.type.includes('wordprocessingml')) {
+          // DOCX files
+          const result = await mammoth.extractRawText({
+            buffer: Buffer.from(fileBuffer),
+          });
+          extractedText = result.value;
+          console.log('Extracted DOCX text length:', extractedText.length);
+        } else {
+          // DOC files (older format) - mammoth can handle these too
+          const result = await mammoth.extractRawText({
+            buffer: Buffer.from(fileBuffer),
+          });
+          extractedText = result.value;
+          console.log('Extracted DOC text length:', extractedText.length);
+        }
+      }
 
-This is a PDF document that has been uploaded to the Stealth AI platform for legal analysis.
-
-Document Details:
-- Title: ${title}
-- File Type: PDF
-- File Size: ${Math.round(file.size / 1024)} KB
-- Upload Date: ${new Date().toLocaleDateString()}
-- Uploaded by: User
-
-Content Summary:
-This PDF document contains legal content that can be analyzed by the AI assistant. The document is available for:
-- Legal research and analysis
-- Contract review and interpretation
-- Clause identification and explanation
-- Risk assessment and compliance checking
-- Document comparison and cross-referencing
-
-${isCompanyWide ? 'This document is available company-wide for all employees to access and analyze.' : 'This is a personal document accessible only to the uploader.'}
-
-To get the most accurate analysis, please ask specific questions about:
-- Particular clauses or sections
-- Legal terms and definitions
-- Compliance requirements
-- Risk factors and liabilities
-- Contractual obligations
-
-The AI will provide detailed analysis based on the document content and legal expertise.`;
-        
-        console.log('Generated PDF description length:', extractedText.length);
-      } else if (file.type.includes('wordprocessingml') || file.type.includes('msword')) {
-        // For Word documents, extract text content
-        // For now, create a comprehensive description for Word documents
-        extractedText = `Word Document: ${title}
-
-This is a Microsoft Word document that has been uploaded to the Stealth AI platform for legal analysis.
-
-Document Details:
-- Title: ${title}
-- File Type: ${file.type.includes('wordprocessingml') ? 'DOCX' : 'DOC'}
-- File Size: ${Math.round(file.size / 1024)} KB
-- Upload Date: ${new Date().toLocaleDateString()}
-- Uploaded by: User
-
-Content Summary:
-This Word document contains legal content that can be analyzed by the AI assistant. The document is available for:
-- Legal research and analysis
-- Contract review and interpretation
-- Clause identification and explanation
-- Risk assessment and compliance checking
-- Document comparison and cross-referencing
-
-${isCompanyWide ? 'This document is available company-wide for all employees to access and analyze.' : 'This is a personal document accessible only to the uploader.'}
-
-To get the most accurate analysis, please ask specific questions about:
-- Particular clauses or sections
-- Legal terms and definitions
-- Compliance requirements
-- Risk factors and liabilities
-- Contractual obligations
-
-The AI will provide detailed analysis based on the document content and legal expertise.`;
-        
-        console.log('Generated Word description length:', extractedText.length);
-      } else {
-        // For other file types, create descriptive content for now
+      // If extraction failed or resulted in very little text, create a descriptive fallback
+      if (!extractedText || extractedText.trim().length < 50) {
+        console.log(
+          'Text extraction yielded minimal content, creating fallback description'
+        );
         extractedText = `Document: ${title}
 
-This is a ${file.type.includes('pdf') ? 'PDF' : file.type.includes('word') ? 'Word' : 'document'} file that has been uploaded to the Stealth AI platform for legal analysis.
+This is a ${
+          file.type.includes('pdf')
+            ? 'PDF'
+            : file.type.includes('word')
+            ? 'Word'
+            : 'document'
+        } file uploaded to the Stealth AI platform for legal analysis.
 
 File Details:
 - Title: ${title}
 - Type: ${file.type}
 - Size: ${Math.round(file.size / 1024)} KB
 - Upload Date: ${new Date().toLocaleDateString()}
-- Uploaded by: User
 
-Content Summary:
-This document contains legal content that can be analyzed by the AI assistant. The document is available for:
-- Legal research and analysis
-- Contract review and interpretation
-- Clause identification and explanation
-- Risk assessment and compliance checking
-- Document comparison and cross-referencing
+${
+  isCompanyWide
+    ? 'This document is available company-wide for all employees to access and analyze.'
+    : 'This is a personal document accessible only to the uploader.'
+}
 
-${isCompanyWide ? 'This document is available company-wide for all employees to access and analyze.' : 'This is a personal document accessible only to the uploader.'}
-
-To get the most accurate analysis, please ask specific questions about:
-- Particular clauses or sections
-- Legal terms and definitions
-- Compliance requirements
-- Risk factors and liabilities
-- Contractual obligations
-
-The AI will provide detailed analysis based on the document content and legal expertise.`;
-        
-        console.log('Generated descriptive content for non-text file');
+Note: Text extraction was not successful for this file. For better analysis, please ensure the document contains readable text content.`;
       }
     } catch (extractError) {
       console.error('Text extraction error:', extractError);
-      // Continue with basic metadata if extraction fails
+      // Create basic metadata if extraction fails
       extractedText = `Document: ${title}
 
-This document has been uploaded to the Stealth AI platform and is available for legal analysis.
+This document has been uploaded to the Stealth AI platform but text extraction encountered an error.
 
 File Details:
 - Title: ${title}
 - Size: ${Math.round(file.size / 1024)} KB
 - Upload Date: ${new Date().toLocaleDateString()}
 
-The AI assistant can help analyze this document for legal research and provide insights based on the content.`;
+Error during text extraction: ${
+        extractError instanceof Error ? extractError.message : 'Unknown error'
+      }
+
+Please try re-uploading the document or contact support if the issue persists.`;
     }
 
     // Generate unique file path
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const fileName = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2)}.${fileExt}`;
     const filePath = `${user.id}/${fileName}`;
 
     console.log('Uploading to storage path:', filePath);
@@ -328,8 +320,8 @@ The AI assistant can help analyze this document for legal research and provide i
         documentId: document.id,
         fileSize: file.size,
         fileType: file.type,
-        isCompanyWide
-      }
+        isCompanyWide,
+      },
     });
 
     // Process document for vector search (with error handling)
@@ -341,7 +333,7 @@ The AI assistant can help analyze this document for legal research and provide i
         fileSize: file.size,
         isCompanyWide,
         uploadedBy: user.id,
-        uploadedAt: new Date().toISOString()
+        uploadedAt: new Date().toISOString(),
       });
       console.log('Document vector processing completed successfully');
     } catch (processError) {
@@ -357,22 +349,27 @@ The AI assistant can help analyze this document for legal research and provide i
         severity: 'medium',
         metadata: {
           documentId: document.id,
-          error: processError instanceof Error ? processError.message : 'Unknown error'
-        }
+          error:
+            processError instanceof Error
+              ? processError.message
+              : 'Unknown error',
+        },
       });
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       document,
-      message: 'Document uploaded successfully' 
+      message: 'Document uploaded successfully',
     });
-
   } catch (error) {
     console.error('Document upload error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
   }
 }
