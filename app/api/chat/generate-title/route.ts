@@ -2,9 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/utils/supabase/server';
 import { generateChatResponse } from '@/lib/ai/ollama-client';
 
+interface Message {
+  role: string;
+  content: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { conversationId, messages } = await request.json();
+    const {
+      conversationId,
+      messages,
+    }: { conversationId: string; messages: Message[] } = await request.json();
 
     if (!conversationId || !messages || messages.length === 0) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
@@ -12,8 +20,11 @@ export async function POST(request: NextRequest) {
 
     // Check if user is authenticated and approved
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -26,7 +37,10 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (!profile || profile.status !== 'approved') {
-      return NextResponse.json({ error: 'Account not approved' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Account not approved' },
+        { status: 403 }
+      );
     }
 
     // Verify user owns this conversation
@@ -37,12 +51,14 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (convError || !conversation || conversation.user_id !== user.id) {
-      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Conversation not found' },
+        { status: 404 }
+      );
     }
 
-    // Generate title using Ollama
     const conversationText = messages
-      .map((msg: any) => `${msg.role}: ${msg.content}`)
+      .map((msg: Message) => `${msg.role}: ${msg.content}`)
       .join('\n');
 
     const titlePrompt = `Based on this conversation, generate a concise, descriptive title (maximum 50 characters) that captures the main topic or question being discussed. Only return the title, nothing else.
@@ -72,13 +88,18 @@ Title:`;
 
     if (updateError) {
       console.error('Error updating conversation title:', updateError);
-      return NextResponse.json({ error: 'Failed to update title' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to update title' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ title: cleanTitle });
-
   } catch (error) {
     console.error('Generate title error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
