@@ -1,12 +1,10 @@
 import { Ollama } from 'ollama';
-import { 
-  generateSystemPrompt, 
-  generateTitlePrompt, 
+import {
+  generateSystemPrompt,
+  generateTitlePrompt,
   generateFallbackResponse,
-  mentionsAttachment,
-  enhanceContextForAttachments,
   OLLAMA_CONFIG,
-  type PromptContext
+  type PromptContext,
 } from './prompts';
 
 const ollama = new Ollama({
@@ -19,7 +17,9 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
     const response = await ollama.embeddings({
       model: OLLAMA_CONFIG.embeddingModel,
-      prompt: text.replace(/\n/g, ' ').substring(0, OLLAMA_CONFIG.embeddingOptions.maxTextLength),
+      prompt: text
+        .replace(/\n/g, ' ')
+        .substring(0, OLLAMA_CONFIG.embeddingOptions.maxTextLength),
     });
 
     console.log(
@@ -56,7 +56,9 @@ export async function generateChatResponse(
     // Create prompt context
     const promptContext: PromptContext = {
       hasDocumentContext: !!(context && context.trim().length > 50),
-      hasAttachmentMention: context?.includes('IMPORTANT: The user has mentioned attachments') || false,
+      hasAttachmentMention:
+        context?.includes('IMPORTANT: The user has mentioned attachments') ||
+        false,
       contextLength: context?.length || 0,
     };
 
@@ -98,10 +100,12 @@ export async function generateChatResponse(
 /**
  * Generate title for conversations using Ollama
  */
-export async function generateConversationTitle(conversationText: string): Promise<string> {
+export async function generateConversationTitle(
+  conversationText: string
+): Promise<string> {
   try {
     const titlePrompt = generateTitlePrompt(conversationText);
-    
+
     const response = await ollama.chat({
       model: OLLAMA_CONFIG.chatModel,
       messages: [{ role: 'user', content: titlePrompt }],
@@ -118,7 +122,6 @@ export async function generateConversationTitle(conversationText: string): Promi
       .replace(/['"]/g, '')
       .trim()
       .substring(0, 50);
-export { ollama };
 
     return cleanTitle || 'New Conversation';
   } catch (error) {
